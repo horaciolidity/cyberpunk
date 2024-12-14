@@ -7,6 +7,10 @@
   <title>KAIROS IA BOTS - Terminal</title>
   <link rel="stylesheet" href="style.css">
 </head>
+  
+  
+  
+  
 
 <body class="">
   <div class="container on">
@@ -28,11 +32,16 @@
                     Nombre Clave
                   </div>
                   <div class="col col__center">
-                    <input type="text" id="codename" maxlength="32" value="Agente 007" readonly>
+                <label for="agentCode" class="label">Código Agente 007</label>
+                <input id="agentCode" type="text" placeholder="Introduce tu código" class="styled-input">
+
                   </div>
                 </div>
                 <div class="row">
-                  <button id="connectWeb3" onclick="connectToWeb3()">[Conectar Web3]</button>
+                   <label for="web3connect" class="label">Conectar Web3</label>
+                   <button id="web3connect" class="styled-button">Conectar</button>
+
+
                 </div>
                 <br>
                 <div class="subscription">
