@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plataforma de Bots</title>
-  <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
-    /* Estilo básico y variables de color */
+    /* Estilo de la página */
     body {
       font-family: 'Share Tech Mono', monospace;
       background-color: #181818;
@@ -14,54 +14,73 @@
       margin: 0;
       padding: 0;
       overflow-y: scroll;
+      transition: background-color 0.3s ease;
     }
-    
+
     .container {
       position: relative;
-      padding: 20px;
       max-width: 1200px;
       margin: 0 auto;
+      padding: 20px;
     }
 
     h1 {
+      font-size: 36px;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 40px;
+      color: #d7001e;
     }
 
     .bot-card {
       background-color: #222;
       border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
     }
 
     .bot-card h3 {
       color: #d7001e;
+      font-size: 24px;
+      margin-bottom: 15px;
     }
 
-    .bot-card .button {
+    .bot-card p {
+      font-size: 16px;
+      color: #ccc;
+    }
+
+    .button {
       background-color: #d7001e;
       color: white;
-      padding: 10px 20px;
+      padding: 12px 25px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      margin: 10px 0;
+      transition: background-color 0.3s ease;
+      margin: 5px 0;
+      font-size: 16px;
     }
 
-    .bot-card .button:hover {
+    .button:hover {
       background-color: #c6001b;
     }
 
     .mini-wallet {
       background-color: #333;
       border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 20px;
+      padding: 15px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     }
 
-    /* Estilo de cambio de tema */
+    .mini-wallet h4 {
+      margin-bottom: 15px;
+      font-size: 18px;
+      color: #fff;
+    }
+
+    /* Tema de colores */
     .dark-theme {
       background-color: #181818;
       color: white;
@@ -75,10 +94,10 @@
     .theme-button {
       background-color: #00bcd4;
       color: white;
-      padding: 10px;
+      padding: 12px 20px;
       border-radius: 5px;
       cursor: pointer;
-      margin: 20px 0;
+      margin: 10px 0;
     }
 
     .theme-button:hover {
@@ -87,104 +106,102 @@
 
   </style>
 </head>
-<body>
+<body class="dark-theme">
   <div class="container">
     <h1>Plataforma de Bots de Inversión</h1>
 
     <!-- Mini billetera -->
     <div class="mini-wallet">
       <h4>Saldo Total: $500</h4>
-      <button class="button">Transferir</button>
+      <button class="button" onclick="transfer()">Transferir</button>
     </div>
 
-    <!-- Bot de configuración 1 -->
+    <!-- Bot 1 -->
     <div class="bot-card">
       <h3>Bot 1 - BTC/USDT</h3>
       <p>Profit: 5% diario | Congelamiento: 30 días | Fee de Retiro: 1%</p>
-      <p>Disponible para alquilar con mínimo de $50.</p>
-      <button class="button">Alquilar Bot</button>
-      <button class="button">Depositar</button>
-      <button class="button">Retirar</button>
-      <button class="button">Comprar Otro Bot</button>
+      <p>Mínimo para alquilar: $50</p>
+      <button class="button" onclick="rentBot(1)">Alquilar Bot</button>
+      <button class="button" onclick="deposit(1)">Depositar</button>
+      <button class="button" onclick="withdraw(1)">Retirar</button>
+      <button class="button" onclick="buyMore(1)">Comprar Otro Bot</button>
     </div>
 
-    <!-- Bot de configuración 2 -->
+    <!-- Bot 2 -->
     <div class="bot-card">
       <h3>Bot 2 - BTC/ETH</h3>
       <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 0.8%</p>
-      <p>Disponible para alquilar con mínimo de $50.</p>
-      <button class="button">Alquilar Bot</button>
-      <button class="button">Depositar</button>
-      <button class="button">Retirar</button>
-      <button class="button">Comprar Otro Bot</button>
+      <p>Mínimo para alquilar: $50</p>
+      <button class="button" onclick="rentBot(2)">Alquilar Bot</button>
+      <button class="button" onclick="deposit(2)">Depositar</button>
+      <button class="button" onclick="withdraw(2)">Retirar</button>
+      <button class="button" onclick="buyMore(2)">Comprar Otro Bot</button>
     </div>
 
-    <!-- Bot de configuración 3 -->
+    <!-- Bot 3 -->
     <div class="bot-card">
       <h3>Bot 3 - BTC/ETC</h3>
       <p>Profit: 3% diario | Congelamiento: 10 días | Fee de Retiro: 1.2%</p>
-      <p>Disponible para alquilar con mínimo de $50.</p>
-      <button class="button">Alquilar Bot</button>
-      <button class="button">Depositar</button>
-      <button class="button">Retirar</button>
-      <button class="button">Comprar Otro Bot</button>
+      <p>Mínimo para alquilar: $50</p>
+      <button class="button" onclick="rentBot(3)">Alquilar Bot</button>
+      <button class="button" onclick="deposit(3)">Depositar</button>
+      <button class="button" onclick="withdraw(3)">Retirar</button>
+      <button class="button" onclick="buyMore(3)">Comprar Otro Bot</button>
     </div>
 
-    <!-- Bot de configuración 4 -->
+    <!-- Bot 4 -->
     <div class="bot-card">
       <h3>Bot 4 - BTC/AJAX</h3>
       <p>Profit: 6% diario | Congelamiento: 20 días | Fee de Retiro: 1.5%</p>
-      <p>Disponible para alquilar con mínimo de $50.</p>
-      <button class="button">Alquilar Bot</button>
-      <button class="button">Depositar</button>
-      <button class="button">Retirar</button>
-      <button class="button">Comprar Otro Bot</button>
+      <p>Mínimo para alquilar: $50</p>
+      <button class="button" onclick="rentBot(4)">Alquilar Bot</button>
+      <button class="button" onclick="deposit(4)">Depositar</button>
+      <button class="button" onclick="withdraw(4)">Retirar</button>
+      <button class="button" onclick="buyMore(4)">Comprar Otro Bot</button>
     </div>
 
-    <!-- Bot de configuración 5 -->
+    <!-- Bot 5 -->
     <div class="bot-card">
       <h3>Bot 5 - BTC/SOL</h3>
       <p>Profit: 7% diario | Congelamiento: 25 días | Fee de Retiro: 1.3%</p>
-      <p>Disponible para alquilar con mínimo de $50.</p>
-      <button class="button">Alquilar Bot</button>
-      <button class="button">Depositar</button>
-      <button class="button">Retirar</button>
-      <button class="button">Comprar Otro Bot</button>
+      <p>Mínimo para alquilar: $50</p>
+      <button class="button" onclick="rentBot(5)">Alquilar Bot</button>
+      <button class="button" onclick="deposit(5)">Depositar</button>
+      <button class="button" onclick="withdraw(5)">Retirar</button>
+      <button class="button" onclick="buyMore(5)">Comprar Otro Bot</button>
     </div>
 
-    <!-- Bot de configuración 6 -->
+    <!-- Bot 6 -->
     <div class="bot-card">
       <h3>Bot 6 - BTC/ENA</h3>
       <p>Profit: 8% diario | Congelamiento: 30 días | Fee de Retiro: 2%</p>
-      <p>Disponible para alquilar con mínimo de $50.</p>
-      <button class="button">Alquilar Bot</button>
-      <button class="button">Depositar</button>
-      <button class="button">Retirar</button>
-      <button class="button">Comprar Otro Bot</button>
+      <p>Mínimo para alquilar: $50</p>
+      <button class="button" onclick="rentBot(6)">Alquilar Bot</button>
+      <button class="button" onclick="deposit(6)">Depositar</button>
+      <button class="button" onclick="withdraw(6)">Retirar</button>
+      <button class="button" onclick="buyMore(6)">Comprar Otro Bot</button>
     </div>
 
-    <!-- Bot de configuración 7 -->
+    <!-- Bot 7 -->
     <div class="bot-card">
       <h3>Bot 7 - BTC/USDT</h3>
       <p>Profit: 5% diario | Congelamiento: 35 días | Fee de Retiro: 0.9%</p>
-      <p>Disponible para alquilar con mínimo de $50.</p>
-      <button class="button">Alquilar Bot</button>
-      <button class="button">Depositar</button>
-      <button class="button">Retirar</button>
-      <button class="button">Comprar Otro Bot</button>
+      <p>Mínimo para alquilar: $50</p>
+      <button class="button" onclick="rentBot(7)">Alquilar Bot</button>
+      <button class="button" onclick="deposit(7)">Depositar</button>
+      <button class="button" onclick="withdraw(7)">Retirar</button>
+      <button class="button" onclick="buyMore(7)">Comprar Otro Bot</button>
     </div>
 
-    <!-- Botones para el cambio de tema y soporte -->
-    <div class="theme-buttons">
-      <button class="theme-button" onclick="changeTheme('dark')">Tema Oscuro</button>
-      <button class="theme-button" onclick="changeTheme('light')">Tema Claro</button>
-    </div>
-
+    <!-- Botones de cambio de tema y soporte -->
+    <button class="theme-button" onclick="changeTheme('dark')">Tema Oscuro</button>
+    <button class="theme-button" onclick="changeTheme('light')">Tema Claro</button>
     <button class="button">Llamar a Soporte</button>
     <button class="button">Reclamar Recompensa</button>
   </div>
 
   <script>
+    // Función para cambiar el tema
     function changeTheme(theme) {
       if (theme === 'dark') {
         document.body.classList.remove('light-theme');
@@ -193,6 +210,29 @@
         document.body.classList.remove('dark-theme');
         document.body.classList.add('light-theme');
       }
+    }
+
+    // Funciones de interacción para los bots
+    function rentBot(botId) {
+      alert(`Has alquilado el Bot ${botId}`);
+    }
+
+    function deposit(botId) {
+      let amount = prompt("¿Cuánto deseas depositar?");
+      alert(`Has depositado $${amount} en el Bot ${botId}`);
+    }
+
+    function withdraw(botId) {
+      let amount = prompt("¿Cuánto deseas retirar?");
+      alert(`Has retirado $${amount} del Bot ${botId}`);
+    }
+
+    function buyMore(botId) {
+      alert(`Has comprado otro Bot ${botId}`);
+    }
+
+    function transfer() {
+      alert("Función de transferencia activada.");
     }
   </script>
 </body>
