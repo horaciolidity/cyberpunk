@@ -11,18 +11,6 @@ span.amp {
 }
 
 
-body,
-html {
-  margin: 0;
-  padding: 0;
-  height: auto; /* Cambiar de 100% a auto para permitir más contenido */
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  overflow-y: scroll; /* Habilitar desplazamiento vertical */
-}
-
 body {
   color: #db0e15;
   font-family: 'Share Tech Mono', monospace;
@@ -31,9 +19,32 @@ body {
   text-shadow: 0 0 5px rgba(219, 14, 21, .8);
   background: url(https://image.ibb.co/h2hLAJ/bg.png) #000;
   position: relative;
-  min-height: 100vh; /* Asegura que el body tenga al menos la altura de la ventana */
-  overflow-y: auto; /* Permite el desplazamiento vertical */
+  min-height: 100vh; /* Cambiado a min-height */
+  padding-bottom: 20px; /* Agregado para dar un pequeño margen en la parte inferior */
+  overflow-y: auto; /* Permitimos el desplazamiento vertical */
 }
+
+html, body {
+  height: 100%; /* Asegura que el body y el html tengan una altura mínima completa */
+}
+
+body::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(49, 45, 45, .1);
+  opacity: 0;
+  pointer-events: none;
+  -webkit-animation: flicker .15s infinite, steady 4s;
+  animation: flicker .15s infinite, steady 4s;
+}
+
 
 
 .container {
