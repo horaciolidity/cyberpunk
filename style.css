@@ -11,16 +11,16 @@ span.amp {
 }
 
 
-
 body,
 html {
   margin: 0;
   padding: 0;
-  height: 100%;
+  height: auto; /* Cambiar de 100% a auto para permitir más contenido */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  user-select: none
+  user-select: none;
+  overflow-y: scroll; /* Habilitar desplazamiento vertical */
 }
 
 body {
@@ -31,8 +31,10 @@ body {
   text-shadow: 0 0 5px rgba(219, 14, 21, .8);
   background: url(https://image.ibb.co/h2hLAJ/bg.png) #000;
   position: relative;
-  height: 100vh
+  min-height: 100vh; /* Asegura que el body tenga al menos la altura de la ventana */
+  overflow-y: auto; /* Permite el desplazamiento vertical */
 }
+
 
 .container {
   left: 0;
