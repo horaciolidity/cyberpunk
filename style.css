@@ -661,3 +661,50 @@ body.off::after {
   -webkit-animation-fill-mode: forwards;
   animation-fill-mode: forwards
 }
+/* Estilo del botón */
+.styled-button {
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 20px;
+  text-transform: uppercase;
+  color: #db0e15;
+  background: rgba(219, 14, 21, 0.2);
+  border: 2px solid #d7001e;
+  text-shadow: 0 0 5px rgba(219, 14, 21, .8);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.styled-button:hover {
+  background: rgba(219, 14, 21, 0.5);
+  border-color: #ff474c;
+  text-shadow: 0 0 8px rgba(219, 14, 21, 1);
+}
+
+/* Estilo del input */
+.styled-input {
+  border: 2px solid #d7001e;
+  background: transparent;
+  color: #db0e15;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 18px;
+  padding: 10px;
+  margin-top: 10px;
+  width: calc(100% - 24px);
+  max-width: 300px;
+  text-shadow: 0 0 5px rgba(219, 14, 21, .8);
+  outline: none;
+}
+
+.styled-input::placeholder {
+  color: #db0e15;
+  opacity: 0.7;
+}
+
+.styled-input:focus {
+  border-color: #ff474c;
+  text-shadow: 0 0 8px rgba(219, 14, 21, 1);
+}
+
