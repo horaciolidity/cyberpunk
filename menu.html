@@ -139,7 +139,56 @@
   border-radius: 50%;
   box-shadow: 0 0 10px red;
 }
+ /* Linternas */
+    .lantern {
+      position: absolute;
+      top: 10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
 
+    .lantern.red {
+      background-color: darkred;
+      right: 50px;
+    }
+
+    .lantern.green {
+      background-color: darkgreen;
+      right: 20px;
+    }
+
+    /* Animaciones */
+    .active.red {
+      animation: blink-red 1s infinite;
+    }
+
+    .active.green {
+      animation: blink-green 1s infinite;
+    }
+
+    @keyframes blink-red {
+      0%, 50% {
+        background-color: red;
+        box-shadow: 0 0 15px red;
+      }
+      51%, 100% {
+        background-color: darkred;
+        box-shadow: none;
+      }
+    }
+
+    @keyframes blink-green {
+      0%, 50% {
+        background-color: green;
+        box-shadow: 0 0 15px green;
+      }
+      51%, 100% {
+        background-color: darkgreen;
+        box-shadow: none;
+      }
+    }
   </style>
 </head>
 <body class="dark-theme">
@@ -166,6 +215,8 @@
       <p>1. Quantum Spectre: 50 USDT </p>
      
       <div class="tradingview-widget">
+        <div class="lantern red" id="lanternRed"></div>
+      <div class="lantern green" id="lanternGreen"></div>
            <div id="red-guide-1" class="guide red"><span></span></div>
 
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
@@ -200,6 +251,8 @@
       <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
       <p>Máximo para alquilar: $200</p>
       <div class="tradingview-widget">
+        <div class="lantern red" id="lanternRed"></div>
+      <div class="lantern green" id="lanternGreen"></div>
           <div id="red-guide-1" class="guide red"><span></span></div>
 
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ETHUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
@@ -235,6 +288,8 @@
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
       <div class="tradingview-widget">
+        <div class="lantern red" id="lanternRed"></div>
+      <div class="lantern green" id="lanternGreen"></div>
     <div id="red-guide-1" class="guide red"><span></span></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BCHUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
@@ -269,6 +324,8 @@
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
       <div class="tradingview-widget">
+        <div class="lantern red" id="lanternRed"></div>
+      <div class="lantern green" id="lanternGreen"></div>
     <div id="red-guide-1" class="guide red"><span></span></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:WLDUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
@@ -303,6 +360,8 @@
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
       <div class="tradingview-widget">
+        <div class="lantern red" id="lanternRed"></div>
+      <div class="lantern green" id="lanternGreen"></div>
     <div id="red-guide-1" class="guide red"><span></span></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:DOGEUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
@@ -337,6 +396,8 @@
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
       <div class="tradingview-widget">
+        <div class="lantern red" id="lanternRed"></div>
+      <div class="lantern green" id="lanternGreen"></div>
     <div id="red-guide-1" class="guide red"><span></span></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ENAUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
@@ -370,6 +431,8 @@
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
       <div class="tradingview-widget">
+        <div class="lantern red" id="lanternRed"></div>
+      <div class="lantern green" id="lanternGreen"></div>
     <div id="red-guide-1" class="guide red"><span></span></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:COWUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
@@ -412,6 +475,22 @@
     }, Math.random() * 3000 + 2000);
   });
 }
+     function toggleLanterns() {
+      const redLantern = document.getElementById('lanternRed');
+      const greenLantern = document.getElementById('lanternGreen');
+
+      // Simulación de destellos
+      setInterval(() => {
+        redLantern.classList.toggle('active');
+      }, Math.random() * 1000 + 500); // Tiempo aleatorio entre destellos
+
+      setInterval(() => {
+        greenLantern.classList.toggle('active');
+      }, Math.random() * 1200 + 600);
+    }
+
+    // Inicia la simulación
+    toggleLanterns();
 
   </script>
 </body>
