@@ -54,9 +54,9 @@
     }
 
     .tradingview-widget {
-      margin: 10px 0; /* Reducido */
+      margin: 5px 0; /* Reducido */
       width: 100%;
-      height: 300px; /* Reducido */
+      height: 250px; /* Reducido */
       border: 2px solid #22edfc;
       border-radius: 5px;
       overflow: hidden;
@@ -103,18 +103,39 @@
   animation: blink 1s infinite;
 }
 
-    .guide.red {
-      background-color: red;
-    }
+   .guide.red {
+  background-color: red;
+  animation: blinkRed 1s infinite, flashGreen 5s infinite;
+}
 
-    .guide.green {
-      background-color: green;
-    }
+@keyframes flashGreen {
+  0%, 90% { box-shadow: none; }
+  91%, 100% { box-shadow: 0 0 15px green; }
+}
+    .status {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  justify-content: center;
+  border: 1px solid #22edfc; /* Borde decorativo */
+  padding: 5px;
+  border-radius: 5px;
+}
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
+.status-label {
+  font-size: 1em;
+  color: #db0e15;
+  margin-right: 10px;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  box-shadow: 0 0 10px red;
+}
+
   </style>
 </head>
 <body class="dark-theme">
@@ -132,11 +153,16 @@
     <!-- Bot 1 -->
     <div class="bot-card">
       <h3>Bot 1 - BTC/USDT</h3>
+      <div class="status">
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
+</div>
+
       <p>Profit: 2% diario | Congelamiento: 30 días | Fee de Retiro: 5,7%</p>
       <p>Máximo para alquilar: $50</p>
       <div class="tradingview-widget">
-       <div id="red-guide-1" class="guide red"><span>SELL</span></div>
-    <div id="green-guide-1" class="guide green"><span>BUY</span></div>
+           <div id="red-guide-1" class="guide red"><span></span></div>
+
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
@@ -149,11 +175,16 @@
     <!-- Bot 2 -->
     <div class="bot-card">
       <h3>Bot 2 - BTC/ETH</h3>
+      <div class="status">
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
+</div>
+
       <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
       <p>Máximo para alquilar: $200</p>
       <div class="tradingview-widget">
-      <div id="red-guide-1" class="guide red"><span>SELL</span></div>
-    <div id="green-guide-1" class="guide green"><span>BUY</span></div>
+          <div id="red-guide-1" class="guide red"><span></span></div>
+
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ETHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
@@ -166,11 +197,15 @@
     <!-- Bot 3 -->
     <div class="bot-card">
       <h3>Bot 3 - BCH/USDT</h3>
+      <div class="status">
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
+</div>
+
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
       <div class="tradingview-widget">
-    <div id="red-guide-1" class="guide red"><span>SELL</span></div>
-    <div id="green-guide-1" class="guide green"><span>BUY</span></div>
+    <div id="red-guide-1" class="guide red"><span></span></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BCHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
@@ -188,63 +223,19 @@
   </div>
 
   <script>
-    function moveGuide(guide, containerHeight, min, max) {
-      const currentTop = parseFloat(guide.style.top || 0);
-      const randomOffset = Math.random() * (max - min) + min; // Movimiento suave
-      let newTop = currentTop + randomOffset;
+   function simulateGuides() {
+  const widgets = document.querySelectorAll('.tradingview-widget');
+  widgets.forEach((widget, index) => {
+    const containerHeight = widget.offsetHeight;
+    const redGuide = document.getElementById(`red-guide-${index + 1}`);
 
-      // Limitar el movimiento dentro del contenedor
-      if (newTop < 0) newTop = 0;
-      if (newTop > containerHeight - 2) newTop = containerHeight - 2;
+    // Simulación para la línea roja
+    setInterval(() => {
+      moveGuide(redGuide, containerHeight, -3, 3);
+    }, Math.random() * 3000 + 2000);
+  });
+}
 
-      guide.style.top = newTop + 'px';
-
-      // Mostrar o esconder el texto "BUY" o "SELL" aleatoriamente
-      if (Math.random() < 0.01) { // Baja probabilidad de titilar
-        guide.classList.add('active');
-        setTimeout(() => {
-          guide.classList.remove('active');
-        }, 300); // Duración del titileo
-      }
-    }
-
-    function adjustGreenBelowRed(redGuide, greenGuide, containerHeight) {
-      const redTop = parseFloat(redGuide.style.top || 0);
-      const greenTop = parseFloat(greenGuide.style.top || 0);
-
-      // Si la verde está por encima, ajustarla para que esté justo debajo
-      if (greenTop >= redTop) {
-        greenGuide.style.top = Math.min(redTop + 10, containerHeight - 2) + 'px';
-      }
-    }
-
-    function simulateGuides() {
-      const widgets = document.querySelectorAll('.tradingview-widget');
-      widgets.forEach((widget, index) => {
-        const containerHeight = widget.offsetHeight;
-        const redGuide = document.getElementById(`red-guide-${index + 1}`);
-        const greenGuide = document.getElementById(`green-guide-${index + 1}`);
-
-        // Simulación para la línea roja
-        setInterval(() => {
-          moveGuide(redGuide, containerHeight, -3, 3);
-        }, Math.random() * 3000 + 2000); // Movimiento más esporádico
-
-        // Simulación para la línea verde
-        setInterval(() => {
-          moveGuide(greenGuide, containerHeight, -3, 3);
-          adjustGreenBelowRed(redGuide, greenGuide, containerHeight);
-        }, Math.random() * 3000 + 2000); // Movimiento más esporádico
-      });
-    }
-
-    window.onload = () => {
-      const guides = document.querySelectorAll('.guide');
-      guides.forEach(guide => {
-        guide.style.top = Math.random() * 100 + 'px'; // Posición inicial aleatoria
-      });
-      simulateGuides();
-    };
   </script>
 </body>
 </html>
