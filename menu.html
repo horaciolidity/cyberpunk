@@ -13,6 +13,10 @@
       margin: 0;
       padding: 0;
       height: 100%;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
       overflow-y: scroll;
       font-family: 'Share Tech Mono', monospace;
       color: #db0e15;
@@ -22,52 +26,43 @@
       background: url(https://image.ibb.co/h2hLAJ/bg.png) #000;
     }
 
-    .container {
-      position: relative;
-      top: 50px;
-      width: 90%;
-      max-width: 1080px;
-      margin: 0 auto;
+    .header {
       text-align: center;
+      font-size: 2em;
+      margin: 20px 0;
+      color: #22edfc;
+      text-shadow: 0 0 10px #22edfc;
     }
 
-    .header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: #111;
-      color: #fff;
-      padding: 10px 0;
-      font-size: 1.5em;
-      font-weight: bold;
+    .container {
+      position: relative;
+      margin: 0 auto;
+      width: 90%;
+      max-width: 1080px;
       text-align: center;
-      z-index: 1000;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     .bot-card {
       background-color: #222;
-      margin-bottom: 20px;
+      margin-bottom: 40px;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    .bot-card img {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 10px;
     }
 
     .bot-card h3 {
-      font-size: 1.2em;
+      font-size: 1.5em;
       margin-bottom: 10px;
     }
 
     .bot-card p {
       margin: 5px 0;
+    }
+
+    .tradingview-widget {
+      margin: 20px 0;
+      width: 100%;
+      height: 400px;
     }
 
     .button {
@@ -85,15 +80,6 @@
       background: #b20812;
     }
 
-    .mini-wallet {
-      margin-bottom: 30px;
-    }
-
-    .mini-wallet h4 {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-    }
-
     .theme-button {
       margin-top: 20px;
       padding: 10px 20px;
@@ -108,22 +94,6 @@
     .theme-button:hover {
       background: #1cc0d3;
     }
-
-    @media (max-width: 768px) {
-      body {
-        font-size: 16px;
-      }
-
-      .bot-card {
-        margin-bottom: 15px;
-        padding: 15px;
-      }
-
-      .button {
-        padding: 8px 16px;
-        font-size: 0.9em;
-      }
-    }
   </style>
 </head>
 <body class="dark-theme">
@@ -132,44 +102,97 @@
   <div class="container">
     <h1>Plataforma de Bots de Inversión</h1>
 
+    <!-- Mini billetera -->
     <div class="mini-wallet">
       <h4>Saldo Total: $500</h4>
       <button class="button" onclick="transfer()">Transferir</button>
     </div>
 
+    <!-- Bot 1 -->
     <div class="bot-card">
-      <img src="https://via.placeholder.com/80?text=BTC+USDT" alt="BTC/USDT">
       <h3>Bot 1 - BTC/USDT</h3>
       <p>Profit: 2% diario | Congelamiento: 30 días | Fee de Retiro: 5,7%</p>
       <p>Máximo para alquilar: $50</p>
+      <div class="tradingview-widget">
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script>
+          new TradingView.widget({
+            "container_id": "btc_usdt_chart",
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "D",
+            "theme": "dark",
+            "style": "1",
+            "locale": "es",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_top_toolbar": true,
+            "hide_legend": true
+          });
+        </script>
+      </div>
       <button class="button" onclick="rentBot(1)">Rentar Bot</button>
       <button class="button" onclick="deposit(1)">Depositar</button>
       <button class="button" onclick="withdraw(1)">Retirar</button>
       <button class="button" onclick="buyMore(1)">Rentar Otro Bot</button>
     </div>
 
+    <!-- Bot 2 -->
     <div class="bot-card">
-      <img src="https://via.placeholder.com/80?text=BTC+ETH" alt="BTC/ETH">
       <h3>Bot 2 - BTC/ETH</h3>
       <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
       <p>Máximo para alquilar: $200</p>
+      <div class="tradingview-widget">
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script>
+          new TradingView.widget({
+            "container_id": "btc_eth_chart",
+            "symbol": "BINANCE:BTCETH",
+            "interval": "D",
+            "theme": "dark",
+            "style": "1",
+            "locale": "es",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_top_toolbar": true,
+            "hide_legend": true
+          });
+        </script>
+      </div>
       <button class="button" onclick="rentBot(2)">Rentar Bot</button>
       <button class="button" onclick="deposit(2)">Depositar</button>
       <button class="button" onclick="withdraw(2)">Retirar</button>
       <button class="button" onclick="buyMore(2)">Rentar Otro Bot</button>
     </div>
 
+    <!-- Bot 3 -->
     <div class="bot-card">
-      <img src="https://via.placeholder.com/80?text=BTC+ETC" alt="BTC/ETC">
       <h3>Bot 3 - BTC/ETC</h3>
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
+      <div class="tradingview-widget">
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script>
+          new TradingView.widget({
+            "container_id": "btc_etc_chart",
+            "symbol": "BINANCE:BTCETC",
+            "interval": "D",
+            "theme": "dark",
+            "style": "1",
+            "locale": "es",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_top_toolbar": true,
+            "hide_legend": true
+          });
+        </script>
+      </div>
       <button class="button" onclick="rentBot(3)">Rentar Bot</button>
       <button class="button" onclick="deposit(3)">Depositar</button>
       <button class="button" onclick="withdraw(3)">Retirar</button>
       <button class="button" onclick="buyMore(3)">Rentar Otro Bot</button>
     </div>
 
+    <!-- Botones de cambio de tema y soporte -->
     <button class="theme-button" onclick="changeTheme('dark')">Tema Oscuro</button>
     <button class="theme-button" onclick="changeTheme('light')">Tema Claro</button>
     <button class="button">Llamar a Soporte</button>
