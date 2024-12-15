@@ -13,10 +13,6 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
       overflow-y: scroll;
       font-family: 'Share Tech Mono', monospace;
       color: #db0e15;
@@ -27,14 +23,27 @@
     }
 
     .container {
-      position: absolute;
-      top: 50%;
-      transform: translate(0, -50%);
-      left: 0;
-      right: 0;
+      position: relative;
+      top: 50px;
       width: 90%;
       max-width: 1080px;
+      margin: 0 auto;
       text-align: center;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #111;
+      color: #fff;
+      padding: 10px 0;
+      font-size: 1.5em;
+      font-weight: bold;
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     .bot-card {
@@ -43,6 +52,13 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .bot-card img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 10px;
     }
 
     .bot-card h3 {
@@ -93,7 +109,6 @@
       background: #1cc0d3;
     }
 
-    /* Mobile Responsiveness */
     @media (max-width: 768px) {
       body {
         font-size: 16px;
@@ -112,20 +127,21 @@
   </style>
 </head>
 <body class="dark-theme">
+  <div class="header">ÁREA de comandos de Bots</div>
+
   <div class="container">
     <h1>Plataforma de Bots de Inversión</h1>
 
-    <!-- Mini billetera -->
     <div class="mini-wallet">
       <h4>Saldo Total: $500</h4>
       <button class="button" onclick="transfer()">Transferir</button>
     </div>
 
-    <!-- Cards de los Bots -->
     <div class="bot-card">
+      <img src="https://via.placeholder.com/80?text=BTC+USDT" alt="BTC/USDT">
       <h3>Bot 1 - BTC/USDT</h3>
       <p>Profit: 2% diario | Congelamiento: 30 días | Fee de Retiro: 5,7%</p>
-      <p>Maximo para alquilar: $50</p>
+      <p>Máximo para alquilar: $50</p>
       <button class="button" onclick="rentBot(1)">Rentar Bot</button>
       <button class="button" onclick="deposit(1)">Depositar</button>
       <button class="button" onclick="withdraw(1)">Retirar</button>
@@ -133,9 +149,10 @@
     </div>
 
     <div class="bot-card">
+      <img src="https://via.placeholder.com/80?text=BTC+ETH" alt="BTC/ETH">
       <h3>Bot 2 - BTC/ETH</h3>
       <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
-      <p>Maximo para alquilar: $200</p>
+      <p>Máximo para alquilar: $200</p>
       <button class="button" onclick="rentBot(2)">Rentar Bot</button>
       <button class="button" onclick="deposit(2)">Depositar</button>
       <button class="button" onclick="withdraw(2)">Retirar</button>
@@ -143,6 +160,7 @@
     </div>
 
     <div class="bot-card">
+      <img src="https://via.placeholder.com/80?text=BTC+ETC" alt="BTC/ETC">
       <h3>Bot 3 - BTC/ETC</h3>
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
@@ -152,7 +170,6 @@
       <button class="button" onclick="buyMore(3)">Rentar Otro Bot</button>
     </div>
 
-    <!-- Botones de cambio de tema y soporte -->
     <button class="theme-button" onclick="changeTheme('dark')">Tema Oscuro</button>
     <button class="theme-button" onclick="changeTheme('light')">Tema Claro</button>
     <button class="button">Llamar a Soporte</button>
