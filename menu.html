@@ -13,23 +13,17 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
       overflow-y: scroll;
       font-family: 'Share Tech Mono', monospace;
       color: #db0e15;
-      font-size: 26px;
-      font-weight: 300;
-      text-shadow: 0 0 5px rgba(219, 14, 21, .8);
+      font-size: 14px; /* Reducida */
       background: url(https://image.ibb.co/h2hLAJ/bg.png) #000;
     }
 
     .header {
       text-align: center;
-      font-size: 2em;
-      margin: 20px 0;
+      font-size: 1.5em;
+      margin: 10px 0;
       color: #22edfc;
       text-shadow: 0 0 10px #22edfc;
     }
@@ -44,14 +38,14 @@
 
     .bot-card {
       background-color: #222;
-      margin-bottom: 40px;
-      padding: 20px;
+      margin-bottom: 20px; /* Reducido */
+      padding: 10px; /* Reducido */
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .bot-card h3 {
-      font-size: 1.5em;
+      font-size: 1.2em;
       margin-bottom: 10px;
     }
 
@@ -60,22 +54,23 @@
     }
 
     .tradingview-widget {
-      margin: 20px 0;
+      margin: 10px 0; /* Reducido */
       width: 100%;
-      height: 400px;
+      height: 300px; /* Reducido */
       border: 2px solid #22edfc;
       border-radius: 5px;
       overflow: hidden;
+      position: relative;
     }
 
     .button {
-      margin: 10px;
-      padding: 10px 20px;
+      margin: 5px; /* Reducido */
+      padding: 5px 10px; /* Reducido */
       background: #db0e15;
       border: none;
       color: #fff;
       cursor: pointer;
-      font-size: 1em;
+      font-size: 0.9em; /* Reducido */
       border-radius: 5px;
     }
 
@@ -84,95 +79,93 @@
     }
 
     .theme-button {
-      margin-top: 20px;
-      padding: 10px 20px;
+      margin-top: 10px; /* Reducido */
+      padding: 5px 10px; /* Reducido */
       background: #22edfc;
       border: none;
       color: #fff;
       cursor: pointer;
-      font-size: 1em;
+      font-size: 0.9em; /* Reducido */
       border-radius: 5px;
     }
 
     .theme-button:hover {
       background: #1cc0d3;
     }
+
+    .guide {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      left: 0;
+      background-color: transparent;
+      z-index: 10;
+      animation: blink 1s infinite;
+    }
+
+    .guide.red {
+      background-color: red;
+    }
+
+    .guide.green {
+      background-color: green;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
   </style>
 </head>
-<body class="dark-theme">
+<body>
   <div class="header">ÁREA de comandos de Bots</div>
 
   <div class="container">
-    <h1>Plataforma de Bots de Inversión</h1>
-
-    <!-- Mini billetera -->
-    <div class="mini-wallet">
-      <h4>Saldo Total: $500</h4>
-      <button class="button" onclick="transfer()">Transferir</button>
-    </div>
-
-    <!-- Bot 1 -->
     <div class="bot-card">
       <h3>Bot 1 - BTC/USDT</h3>
-      <p>Profit: 2% diario | Congelamiento: 30 días | Fee de Retiro: 5,7%</p>
-      <p>Máximo para alquilar: $50</p>
-      <div class="tradingview-widget">
+      <div class="tradingview-widget" id="widget-1">
+        <div class="guide red" id="red-guide-1"></div>
+        <div class="guide green" id="green-guide-1"></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
-      <button class="button" onclick="rentBot(1)">Rentar Bot</button>
-      <button class="button" onclick="deposit(1)">Depositar</button>
-      <button class="button" onclick="withdraw(1)">Retirar</button>
-      <button class="button" onclick="buyMore(1)">Rentar Otro Bot</button>
     </div>
 
-    <!-- Bot 2 -->
     <div class="bot-card">
       <h3>Bot 2 - BTC/ETH</h3>
-      <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
-      <p>Máximo para alquilar: $200</p>
-      <div class="tradingview-widget">
+      <div class="tradingview-widget" id="widget-2">
+        <div class="guide red" id="red-guide-2"></div>
+        <div class="guide green" id="green-guide-2"></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ETHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
-      <button class="button" onclick="rentBot(2)">Rentar Bot</button>
-      <button class="button" onclick="deposit(2)">Depositar</button>
-      <button class="button" onclick="withdraw(2)">Retirar</button>
-      <button class="button" onclick="buyMore(2)">Rentar Otro Bot</button>
     </div>
-
-    <!-- Bot 3 -->
-    <div class="bot-card">
-      <h3>Bot 3 - BCH/USDT</h3>
-      <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
-      <p>Mínimo para alquilar: $3000</p>
-      <div class="tradingview-widget">
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BCHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
-                width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
-      </div>
-      <button class="button" onclick="rentBot(3)">Rentar Bot</button>
-      <button class="button" onclick="deposit(3)">Depositar</button>
-      <button class="button" onclick="withdraw(3)">Retirar</button>
-      <button class="button" onclick="buyMore(3)">Rentar Otro Bot</button>
-    </div>
-
-    <!-- Botones de cambio de tema y soporte -->
-    <button class="theme-button" onclick="changeTheme('dark')">Tema Oscuro</button>
-    <button class="theme-button" onclick="changeTheme('light')">Tema Claro</button>
-    <button class="button">Llamar a Soporte</button>
-    <button class="button">Reclamar Recompensa</button>
   </div>
 
   <script>
-    function changeTheme(theme) {
-      if (theme === 'dark') {
-        document.body.classList.remove('light-theme');
-        document.body.classList.add('dark-theme');
-      } else {
-        document.body.classList.remove('dark-theme');
-        document.body.classList.add('light-theme');
-      }
+    function moveGuide(guide, containerHeight) {
+      const randomY = Math.random() * containerHeight;
+      guide.style.top = randomY + 'px';
     }
+
+    function simulateGuides() {
+      const widgets = document.querySelectorAll('.tradingview-widget');
+      widgets.forEach((widget, index) => {
+        const containerHeight = widget.offsetHeight;
+        const redGuide = document.getElementById(`red-guide-${index + 1}`);
+        const greenGuide = document.getElementById(`green-guide-${index + 1}`);
+
+        setInterval(() => {
+          moveGuide(redGuide, containerHeight);
+        }, Math.random() * 2000 + 1000); // Movimiento esporádico
+
+        setInterval(() => {
+          moveGuide(greenGuide, containerHeight);
+        }, Math.random() * 2000 + 1000); // Movimiento esporádico
+      });
+    }
+
+    window.onload = simulateGuides;
   </script>
 </body>
 </html>
