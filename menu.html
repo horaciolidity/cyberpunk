@@ -197,34 +197,21 @@
         document.body.classList.add('light-theme');
       }
     }
-      function moveGuide(guide, containerHeight, min, max) {
-      const currentTop = parseFloat(guide.style.top || 0);
-      const randomOffset = Math.random() * (max - min) + min; // Movimiento suave
-      let newTop = currentTop + randomOffset;
-
-      // Limitar el movimiento dentro del contenedor
-      if (newTop < 0) newTop = 0;
-      if (newTop > containerHeight - 2) newTop = containerHeight - 2;
-
-      guide.style.top = newTop + 'px';
-
-      // Mostrar o esconder el texto "BUY" o "SELL" aleatoriamente
-      if (Math.random() < 0.01) { // Baja probabilidad de titilar
-        guide.classList.add('active');
-        setTimeout(() => {
-          guide.classList.remove('active');
-        }, 300); // Duración del titileo
-      }
-    }
-
-    function adjustGreenBelowRed(redGuide, greenGuide, containerHeight) {
+      function moveGuide(redGuide, greenGuide, containerHeight) {
+      // Movimiento restringido de la línea roja
       const redTop = parseFloat(redGuide.style.top || 0);
-      const greenTop = parseFloat(greenGuide.style.top || 0);
+      const redOffset = Math.random() * 10 - 5; // Movimiento limitado (-5px a +5px)
+      let newRedTop = redTop + redOffset;
 
-      // Si la verde está por encima, ajustarla para que esté justo debajo
-      if (greenTop >= redTop) {
-        greenGuide.style.top = Math.min(redTop + 10, containerHeight - 2) + 'px';
-      }
+      // Limitar la línea roja dentro del contenedor
+      if (newRedTop < 0) newRedTop = 0;
+      if (newRedTop > containerHeight - 30) newRedTop = containerHeight - 30; // Máximo permitido
+
+      redGuide.style.top = newRedTop + 'px';
+
+      // Línea verde siempre debajo de la roja
+      const greenTop = newRedTop + 10 + Math.random() * 5; // Margen entre 10px y 15px
+      greenGuide.style.top = Math.min(greenTop, containerHeight - 10) + 'px'; // No exceder contenedor
     }
 
     function simulateGuides() {
@@ -234,26 +221,18 @@
         const redGuide = document.getElementById(`red-guide-${index + 1}`);
         const greenGuide = document.getElementById(`green-guide-${index + 1}`);
 
-        // Simulación para la línea roja
-        setInterval(() => {
-          moveGuide(redGuide, containerHeight, -3, 3);
-        }, Math.random() * 3000 + 2000); // Movimiento más esporádico
+        // Posiciones iniciales
+        redGuide.style.top = '50px';
+        greenGuide.style.top = '60px';
 
-        // Simulación para la línea verde
+        // Intervalos para movimiento
         setInterval(() => {
-          moveGuide(greenGuide, containerHeight, -3, 3);
-          adjustGreenBelowRed(redGuide, greenGuide, containerHeight);
-        }, Math.random() * 3000 + 2000); // Movimiento más esporádico
+          moveGuide(redGuide, greenGuide, containerHeight);
+        }, Math.random() * 3000 + 2000); // Movimientos más esporádicos
       });
     }
 
-    window.onload = () => {
-      const guides = document.querySelectorAll('.guide');
-      guides.forEach(guide => {
-        guide.style.top = Math.random() * 100 + 'px'; // Posición inicial aleatoria
-      });
-      simulateGuides();
-    };
+    window.onload = simulateGuides;
   </script>
 </body>
 </html>
