@@ -191,6 +191,29 @@
         document.body.classList.add('light-theme');
       }
     }
+      function moveGuide(guide, containerHeight) {
+      const randomY = Math.random() * containerHeight;
+      guide.style.top = randomY + 'px';
+    }
+
+    function simulateGuides() {
+      const widgets = document.querySelectorAll('.tradingview-widget');
+      widgets.forEach((widget, index) => {
+        const containerHeight = widget.offsetHeight;
+        const redGuide = document.getElementById(`red-guide-${index + 1}`);
+        const greenGuide = document.getElementById(`green-guide-${index + 1}`);
+
+        setInterval(() => {
+          moveGuide(redGuide, containerHeight);
+        }, Math.random() * 2000 + 1000); // Movimiento esporádico
+
+        setInterval(() => {
+          moveGuide(greenGuide, containerHeight);
+        }, Math.random() * 2000 + 1000); // Movimiento esporádico
+      });
+    }
+
+    window.onload = simulateGuides;
   </script>
 </body>
 </html>
