@@ -63,6 +63,9 @@
       margin: 20px 0;
       width: 100%;
       height: 400px;
+      border: 2px solid #22edfc;
+      border-radius: 5px;
+      overflow: hidden;
     }
 
     .button {
@@ -114,21 +117,8 @@
       <p>Profit: 2% diario | Congelamiento: 30 días | Fee de Retiro: 5,7%</p>
       <p>Máximo para alquilar: $50</p>
       <div class="tradingview-widget">
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script>
-          new TradingView.widget({
-            "container_id": "btc_usdt_chart",
-            "symbol": "BINANCE:BTCUSDT",
-            "interval": "D",
-            "theme": "dark",
-            "style": "1",
-            "locale": "es",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_top_toolbar": true,
-            "hide_legend": true
-          });
-        </script>
+        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
+                width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
       <button class="button" onclick="rentBot(1)">Rentar Bot</button>
       <button class="button" onclick="deposit(1)">Depositar</button>
@@ -142,21 +132,8 @@
       <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
       <p>Máximo para alquilar: $200</p>
       <div class="tradingview-widget">
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script>
-          new TradingView.widget({
-            "container_id": "eth_usdt_chart",
-            "symbol": "BINANCE:ETHUSDT",
-            "interval": "D",
-            "theme": "dark",
-            "style": "1",
-            "locale": "es",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_top_toolbar": true,
-            "hide_legend": true
-          });
-        </script>
+        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ETHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
+                width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
       <button class="button" onclick="rentBot(2)">Rentar Bot</button>
       <button class="button" onclick="deposit(2)">Depositar</button>
@@ -170,21 +147,8 @@
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
       <div class="tradingview-widget">
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script>
-          new TradingView.widget({
-            "container_id": "bch_usdt_chart",
-            "symbol": "BINANCE:BCHUSDT",
-            "interval": "D",
-            "theme": "dark",
-            "style": "1",
-            "locale": "es",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_top_toolbar": true,
-            "hide_legend": true
-          });
-        </script>
+        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BCHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
+                width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
       <button class="button" onclick="rentBot(3)">Rentar Bot</button>
       <button class="button" onclick="deposit(3)">Depositar</button>
