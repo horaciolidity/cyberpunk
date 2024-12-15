@@ -54,18 +54,85 @@
   </div>
 
   <script>
+   // Datos de la red Optimism
+    const optimismConfig = {
+      chainId: '0xa', // ID de la red Optimism (decimal 10, hexadecimal 0xa)
+      chainName: 'Optimism',
+      nativeCurrency: {
+        name: 'Ether',
+        symbol: 'ETH',
+        decimals: 18
+      },
+      rpcUrls: ['https://mainnet.optimism.io'], // RPC público de Optimism
+      blockExplorerUrls: ['https://explorer.optimism.io']
+    };
+
+    // Función para cambiar a Optimism o agregar la red
+    async function switchToOptimism() {
+      try {
+        // Solicitar cambio a la red Optimism
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: optimismConfig.chainId }]
+        });
+        console.log("Conectado a Optimism");
+      } catch (error) {
+        if (error.code === 4902) {
+          // Si la red no está configurada, agregarla
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [optimismConfig]
+            });
+            console.log("Red Optimism agregada y seleccionada.");
+          } catch (addError) {
+            console.error("Error al agregar la red Optimism:", addError);
+          }
+        } else {
+          console.error("Error al cambiar a Optimism:", error);
+        }
+      }
+    }
+
+    // Conectar MetaMask y redirigir al dashboard
     async function connectToWeb3() {
       if (window.ethereum) {
         try {
-          await window.ethereum.request({ method: 'eth_requestAccounts' });
-          console.log("Conectado a la red Optimism");
+          // Cambiar o agregar la red Optimism
+          await switchToOptimism();
+
+          // Solicitar acceso a cuentas
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const userAddress = accounts[0];
+          console.log("Conexión exitosa. Dirección:", userAddress);
+
+          // Guardar la dirección del usuario en localStorage para uso posterior
+          localStorage.setItem("userAddress", userAddress);
+
+          // Redirigir a la página del dashboard
+          window.location.href = "menu.html";
         } catch (error) {
-          console.error("Error al conectar:", error);
+          console.error("Error al conectar con MetaMask:", error);
+          alert("Error al conectar con MetaMask. Por favor, inténtalo nuevamente.");
         }
       } else {
-        alert("Por favor, instala una billetera como MetaMask para continuar.");
+        alert("No se detectó MetaMask. Por favor, instala MetaMask para continuar.");
       }
     }
+
+    // Asignar la función al botón
+    document.getElementById("web3connect").addEventListener("click", connectToWeb3);
+
+    // Comprobar si ya hay una conexión activa (opcional)
+    window.addEventListener("load", async () => {
+      if (window.ethereum) {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          console.log("Usuario ya conectado. Dirección:", accounts[0]);
+          localStorage.setItem("userAddress", accounts[0]);
+        }
+      }
+    });
   </script>
 </body>
 
