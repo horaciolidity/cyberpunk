@@ -139,56 +139,57 @@
   border-radius: 50%;
   box-shadow: 0 0 10px red;
 }
- /* Linternas */
-    .lantern {
-      position: absolute;
-      top: 10px;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    }
+/* Linternas */
+.lantern {
+  position: absolute;
+  top: 10px;
+  width: 10px; /* Reducido a la mitad */
+  height: 10px; /* Reducido a la mitad */
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Ajustado para el nuevo tamaño */
+}
 
-    .lantern.red {
-      background-color: darkred;
-      right: 50px;
-    }
+.lantern.red {
+  background-color: darkred;
+  right: 50px;
+}
 
-    .lantern.green {
-      background-color: darkgreen;
-      right: 20px;
-    }
+.lantern.green {
+  background-color: darkgreen;
+  right: 20px;
+}
 
-    /* Animaciones */
-    .active.red {
-      animation: blink-red 1s infinite;
-    }
+/* Animaciones */
+.active.red {
+  animation: blink-red 1s infinite;
+}
 
-    .active.green {
-      animation: blink-green 1s infinite;
-    }
+.active.green {
+  animation: blink-green 1s infinite;
+}
 
-    @keyframes blink-red {
-      0%, 50% {
-        background-color: red;
-        box-shadow: 0 0 15px red;
-      }
-      51%, 100% {
-        background-color: darkred;
-        box-shadow: none;
-      }
-    }
+@keyframes blink-red {
+  0%, 50% {
+    background-color: red;
+    box-shadow: 0 0 7.5px red; /* Ajustado para el tamaño reducido */
+  }
+  51%, 100% {
+    background-color: darkred;
+    box-shadow: none;
+  }
+}
 
-    @keyframes blink-green {
-      0%, 50% {
-        background-color: green;
-        box-shadow: 0 0 15px green;
-      }
-      51%, 100% {
-        background-color: darkgreen;
-        box-shadow: none;
-      }
-    }
+@keyframes blink-green {
+  0%, 50% {
+    background-color: green;
+    box-shadow: 0 0 7.5px green; /* Ajustado para el tamaño reducido */
+  }
+  51%, 100% {
+    background-color: darkgreen;
+    box-shadow: none;
+  }
+}
+
   </style>
 </head>
 <body class="dark-theme">
