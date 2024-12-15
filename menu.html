@@ -152,7 +152,7 @@
       <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
       <p>Máximo para alquilar: $200</p>
       <div class="tradingview-widget">
-       <div id="red-guide-1" class="guide red"><span>SELL</span></div>
+      <div id="red-guide-1" class="guide red"><span>SELL</span></div>
     <div id="green-guide-1" class="guide green"><span>BUY</span></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ETHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
@@ -169,7 +169,7 @@
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
       <div class="tradingview-widget">
-        <div id="red-guide-1" class="guide red"><span>SELL</span></div>
+    <div id="red-guide-1" class="guide red"><span>SELL</span></div>
     <div id="green-guide-1" class="guide green"><span>BUY</span></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BCHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
@@ -188,30 +188,34 @@
   </div>
 
   <script>
-    function changeTheme(theme) {
-      if (theme === 'dark') {
-        document.body.classList.remove('light-theme');
-        document.body.classList.add('dark-theme');
-      } else {
-        document.body.classList.remove('dark-theme');
-        document.body.classList.add('light-theme');
+    function moveGuide(guide, containerHeight, min, max) {
+      const currentTop = parseFloat(guide.style.top || 0);
+      const randomOffset = Math.random() * (max - min) + min; // Movimiento suave
+      let newTop = currentTop + randomOffset;
+
+      // Limitar el movimiento dentro del contenedor
+      if (newTop < 0) newTop = 0;
+      if (newTop > containerHeight - 2) newTop = containerHeight - 2;
+
+      guide.style.top = newTop + 'px';
+
+      // Mostrar o esconder el texto "BUY" o "SELL" aleatoriamente
+      if (Math.random() < 0.01) { // Baja probabilidad de titilar
+        guide.classList.add('active');
+        setTimeout(() => {
+          guide.classList.remove('active');
+        }, 300); // Duración del titileo
       }
     }
-      function moveGuide(redGuide, greenGuide, containerHeight) {
-      // Movimiento restringido de la línea roja
+
+    function adjustGreenBelowRed(redGuide, greenGuide, containerHeight) {
       const redTop = parseFloat(redGuide.style.top || 0);
-      const redOffset = Math.random() * 10 - 5; // Movimiento limitado (-5px a +5px)
-      let newRedTop = redTop + redOffset;
+      const greenTop = parseFloat(greenGuide.style.top || 0);
 
-      // Limitar la línea roja dentro del contenedor
-      if (newRedTop < 0) newRedTop = 0;
-      if (newRedTop > containerHeight - 30) newRedTop = containerHeight - 30; // Máximo permitido
-
-      redGuide.style.top = newRedTop + 'px';
-
-      // Línea verde siempre debajo de la roja
-      const greenTop = newRedTop + 10 + Math.random() * 5; // Margen entre 10px y 15px
-      greenGuide.style.top = Math.min(greenTop, containerHeight - 10) + 'px'; // No exceder contenedor
+      // Si la verde está por encima, ajustarla para que esté justo debajo
+      if (greenTop >= redTop) {
+        greenGuide.style.top = Math.min(redTop + 10, containerHeight - 2) + 'px';
+      }
     }
 
     function simulateGuides() {
@@ -221,18 +225,26 @@
         const redGuide = document.getElementById(`red-guide-${index + 1}`);
         const greenGuide = document.getElementById(`green-guide-${index + 1}`);
 
-        // Posiciones iniciales
-        redGuide.style.top = '50px';
-        greenGuide.style.top = '60px';
-
-        // Intervalos para movimiento
+        // Simulación para la línea roja
         setInterval(() => {
-          moveGuide(redGuide, greenGuide, containerHeight);
-        }, Math.random() * 3000 + 2000); // Movimientos más esporádicos
+          moveGuide(redGuide, containerHeight, -3, 3);
+        }, Math.random() * 3000 + 2000); // Movimiento más esporádico
+
+        // Simulación para la línea verde
+        setInterval(() => {
+          moveGuide(greenGuide, containerHeight, -3, 3);
+          adjustGreenBelowRed(redGuide, greenGuide, containerHeight);
+        }, Math.random() * 3000 + 2000); // Movimiento más esporádico
       });
     }
 
-    window.onload = simulateGuides;
+    window.onload = () => {
+      const guides = document.querySelectorAll('.guide');
+      guides.forEach(guide => {
+        guide.style.top = Math.random() * 100 + 'px'; // Posición inicial aleatoria
+      });
+      simulateGuides();
+    };
   </script>
 </body>
 </html>
