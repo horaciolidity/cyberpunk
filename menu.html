@@ -197,9 +197,9 @@
         document.body.classList.add('light-theme');
       }
     }
-      function moveGuide(guide, containerHeight, speed) {
+      function moveGuide(guide, containerHeight, min, max) {
       const currentTop = parseFloat(guide.style.top || 0);
-      const randomOffset = Math.random() * 10 - 5; // Movimiento suave (-5px a +5px)
+      const randomOffset = Math.random() * (max - min) + min; // Movimiento suave
       let newTop = currentTop + randomOffset;
 
       // Limitar el movimiento dentro del contenedor
@@ -209,11 +209,21 @@
       guide.style.top = newTop + 'px';
 
       // Mostrar o esconder el texto "BUY" o "SELL" aleatoriamente
-      if (Math.random() < 0.02) { // Baja probabilidad de titilar
+      if (Math.random() < 0.01) { // Baja probabilidad de titilar
         guide.classList.add('active');
         setTimeout(() => {
           guide.classList.remove('active');
-        }, 500); // Duración del titileo
+        }, 300); // Duración del titileo
+      }
+    }
+
+    function adjustGreenBelowRed(redGuide, greenGuide, containerHeight) {
+      const redTop = parseFloat(redGuide.style.top || 0);
+      const greenTop = parseFloat(greenGuide.style.top || 0);
+
+      // Si la verde está por encima, ajustarla para que esté justo debajo
+      if (greenTop >= redTop) {
+        greenGuide.style.top = Math.min(redTop + 10, containerHeight - 2) + 'px';
       }
     }
 
@@ -224,13 +234,16 @@
         const redGuide = document.getElementById(`red-guide-${index + 1}`);
         const greenGuide = document.getElementById(`green-guide-${index + 1}`);
 
+        // Simulación para la línea roja
         setInterval(() => {
-          moveGuide(redGuide, containerHeight, 0.5);
-        }, Math.random() * 500 + 500); // Movimiento frecuente pero suave
+          moveGuide(redGuide, containerHeight, -3, 3);
+        }, Math.random() * 3000 + 2000); // Movimiento más esporádico
 
+        // Simulación para la línea verde
         setInterval(() => {
-          moveGuide(greenGuide, containerHeight, 0.5);
-        }, Math.random() * 500 + 500); // Movimiento frecuente pero suave
+          moveGuide(greenGuide, containerHeight, -3, 3);
+          adjustGreenBelowRed(redGuide, greenGuide, containerHeight);
+        }, Math.random() * 3000 + 2000); // Movimiento más esporádico
       });
     }
 
@@ -241,9 +254,6 @@
       });
       simulateGuides();
     };
-  </script>
-</body>
-</html>
   </script>
 </body>
 </html>
