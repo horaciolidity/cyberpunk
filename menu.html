@@ -117,55 +117,80 @@
     }
   </style>
 </head>
-<body>
+<body class="dark-theme">
   <div class="header">ÁREA de comandos de Bots</div>
 
   <div class="container">
+    <h1>Plataforma de Bots de Inversión</h1>
+
+    <!-- Mini billetera -->
+    <div class="mini-wallet">
+      <h4>Saldo Total: $500</h4>
+      <button class="button" onclick="transfer()">Transferir</button>
+    </div>
+
+    <!-- Bot 1 -->
     <div class="bot-card">
       <h3>Bot 1 - BTC/USDT</h3>
-      <div class="tradingview-widget" id="widget-1">
-        <div class="guide red" id="red-guide-1"></div>
-        <div class="guide green" id="green-guide-1"></div>
+      <p>Profit: 2% diario | Congelamiento: 30 días | Fee de Retiro: 5,7%</p>
+      <p>Máximo para alquilar: $50</p>
+      <div class="tradingview-widget">
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
+      <button class="button" onclick="rentBot(1)">Rentar Bot</button>
+      <button class="button" onclick="deposit(1)">Depositar</button>
+      <button class="button" onclick="withdraw(1)">Retirar</button>
+      <button class="button" onclick="buyMore(1)">Rentar Otro Bot</button>
     </div>
 
+    <!-- Bot 2 -->
     <div class="bot-card">
       <h3>Bot 2 - BTC/ETH</h3>
-      <div class="tradingview-widget" id="widget-2">
-        <div class="guide red" id="red-guide-2"></div>
-        <div class="guide green" id="green-guide-2"></div>
+      <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
+      <p>Máximo para alquilar: $200</p>
+      <div class="tradingview-widget">
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ETHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
+      <button class="button" onclick="rentBot(2)">Rentar Bot</button>
+      <button class="button" onclick="deposit(2)">Depositar</button>
+      <button class="button" onclick="withdraw(2)">Retirar</button>
+      <button class="button" onclick="buyMore(2)">Rentar Otro Bot</button>
     </div>
+
+    <!-- Bot 3 -->
+    <div class="bot-card">
+      <h3>Bot 3 - BCH/USDT</h3>
+      <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
+      <p>Mínimo para alquilar: $3000</p>
+      <div class="tradingview-widget">
+        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BCHUSDT&interval=D&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
+                width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <button class="button" onclick="rentBot(3)">Rentar Bot</button>
+      <button class="button" onclick="deposit(3)">Depositar</button>
+      <button class="button" onclick="withdraw(3)">Retirar</button>
+      <button class="button" onclick="buyMore(3)">Rentar Otro Bot</button>
+    </div>
+
+    <!-- Botones de cambio de tema y soporte -->
+    <button class="theme-button" onclick="changeTheme('dark')">Tema Oscuro</button>
+    <button class="theme-button" onclick="changeTheme('light')">Tema Claro</button>
+    <button class="button">Llamar a Soporte</button>
+    <button class="button">Reclamar Recompensa</button>
   </div>
 
   <script>
-    function moveGuide(guide, containerHeight) {
-      const randomY = Math.random() * containerHeight;
-      guide.style.top = randomY + 'px';
+    function changeTheme(theme) {
+      if (theme === 'dark') {
+        document.body.classList.remove('light-theme');
+        document.body.classList.add('dark-theme');
+      } else {
+        document.body.classList.remove('dark-theme');
+        document.body.classList.add('light-theme');
+      }
     }
-
-    function simulateGuides() {
-      const widgets = document.querySelectorAll('.tradingview-widget');
-      widgets.forEach((widget, index) => {
-        const containerHeight = widget.offsetHeight;
-        const redGuide = document.getElementById(`red-guide-${index + 1}`);
-        const greenGuide = document.getElementById(`green-guide-${index + 1}`);
-
-        setInterval(() => {
-          moveGuide(redGuide, containerHeight);
-        }, Math.random() * 2000 + 1000); // Movimiento esporádico
-
-        setInterval(() => {
-          moveGuide(greenGuide, containerHeight);
-        }, Math.random() * 2000 + 1000); // Movimiento esporádico
-      });
-    }
-
-    window.onload = simulateGuides;
   </script>
 </body>
 </html>
