@@ -189,6 +189,44 @@
     box-shadow: none;
   }
 }
+    /* New section for the header and referal stats */
+    .referal-stats {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around;
+      color: #22edfc;
+    }
+
+    .referal-box {
+      background-color: #333;
+      padding: 10px;
+      border-radius: 5px;
+      width: 25%;
+    }
+
+    .referal-box h4 {
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+
+    .referal-box p {
+      font-size: 0.9em;
+    }
+
+    .referal-button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background: #22edfc;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9em;
+      border-radius: 5px;
+    }
+
+    .referal-button:hover {
+      background: #1cc0d3;
+    }
 
   </style>
 </head>
@@ -197,6 +235,19 @@
 
   <div class="container">
     <h1>Plataforma de Bots de Inversión</h1>
+
+     <!-- Referal Stats Section -->
+    <div class="referal-stats">
+      <div class="referal-box">
+        <h4>Contador de Referidos</h4>
+        <p>Referidos: 10</p>
+      </div>
+      <div class="referal-box">
+        <h4>Saldo de Referido</h4>
+        <p>$50</p>
+        <button class="referal-button" onclick="claimReferralRewards()">Cobrar Referidos</button>
+      </div>
+    </div>
 
     <!-- Mini billetera -->
     <div class="mini-wallet">
@@ -493,6 +544,65 @@ document.querySelectorAll('.tradingview-widget').forEach((widget, index) => {
     }
   }, 2000); // Cambia cada 2 segundos
 });
+     function claimReferralRewards() {
+      alert("¡Recompensas de referidos reclamadas!");
+    }
+
+    function transfer() {
+      alert("Transferencia en proceso...");
+    }
+
+    function deposit(botId) {
+      alert("Depósito para el bot " + botId);
+    }
+
+    function withdraw(botId) {
+      alert("Retiro para el bot " + botId);
+    }
+
+    function showDetails(botId) {
+      alert("Mostrando detalles del Bot " + botId);
+    }
+
+    function analyzePerformance(botId) {
+      alert("Analizando rendimiento del Bot " + botId);
+    }
+
+    function customizeBot(botId) {
+      alert("Configurando el Bot " + botId);
+    }
+
+    function enableNotifications(botId) {
+      alert("Notificaciones activadas para el Bot " + botId);
+    }
+
+    function viewHistory(botId) {
+      alert("Mostrando historial del Bot " + botId);
+    }
+
+    function compareBots() {
+      alert("Comparando Bots...");
+    }
+
+    function switchBot(botId) {
+      alert("Cambiando de Bot " + botId);
+    }
+
+    function getTips() {
+      alert("Obteniendo consejos de trading...");
+    }
+
+    function claimRewards() {
+      alert("Recompensas reclamadas.");
+    }
+
+    function exportReport(botId) {
+      alert("Informe exportado para el Bot " + botId);
+    }
+
+    function askQuestion(botId) {
+      alert("Haciendo una pregunta sobre el Bot " + botId);
+    }
 
   </script>
 </body>
