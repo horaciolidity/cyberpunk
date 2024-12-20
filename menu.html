@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plataforma de Bots</title>
   <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+
   <style>
     @import url(https://fonts.googleapis.com/css?family=Share+Tech+Mono);
 
@@ -248,6 +250,7 @@
         <button class="referal-button" onclick="claimReferralRewards()">Cobrar Referidos</button>
       </div>
     </div>
+<button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
 
     <!-- Mini billetera -->
     <div class="mini-wallet">
@@ -562,94 +565,127 @@
   </div>
 
   <script>
-   function simulateGuides() {
-  const widgets = document.querySelectorAll('.tradingview-widget');
-  widgets.forEach((widget, index) => {
-    const containerHeight = widget.offsetHeight;
-    const redGuide = document.getElementById(`red-guide-${index + 1}`);
+   let web3;
+  let contract;
 
-    // Simulación para la línea roja
+  // Inicializa Web3 y conecta a MetaMask
+  if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    window.ethereum.request({ method: 'eth_requestAccounts' })
+      .then(() => {
+        console.log("Conexión a MetaMask exitosa");
+        initContract();
+      })
+      .catch(console.error);
+  } else {
+    alert("Por favor, instala MetaMask para continuar.");
+  }
+
+  // Inicializa el contrato en la red Optimism
+  function initContract() {
+    const contractABI = [/* ABI del contrato */];
+    const contractAddress = "0x..."; // Dirección del contrato
+    contract = new web3.eth.Contract(contractABI, contractAddress);
+  }
+
+  // Función para interactuar con el contrato
+  async function claimRewards() {
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+    try {
+      const result = await contract.methods.claimRewards().send({ from: userAddress });
+      console.log("Recompensas reclamadas:", result);
+      alert("Recompensas reclamadas correctamente.");
+    } catch (error) {
+      console.error("Error al reclamar recompensas:", error);
+      alert("Error al reclamar recompensas.");
+    }
+  }
+
+  // Funciones existentes
+  function simulateGuides() {
+    const widgets = document.querySelectorAll('.tradingview-widget');
+    widgets.forEach((widget, index) => {
+      const containerHeight = widget.offsetHeight;
+      const redGuide = document.getElementById(`red-guide-${index + 1}`);
+
+      setInterval(() => {
+        moveGuide(redGuide, containerHeight, -3, 3);
+      }, Math.random() * 3000 + 2000);
+    });
+  }
+
+  document.querySelectorAll('.tradingview-widget').forEach((widget, index) => {
+    const redLantern = widget.querySelector('.lantern.red');
+    const greenLantern = widget.querySelector('.lantern.green');
+
     setInterval(() => {
-      moveGuide(redGuide, containerHeight, -3, 3);
-    }, Math.random() * 3000 + 2000);
+      const isActive = Math.random() > 0.5;
+      if (isActive) {
+        redLantern.classList.add('active');
+        greenLantern.classList.remove('active');
+      } else {
+        redLantern.classList.remove('active');
+        greenLantern.classList.add('active');
+      }
+    }, 2000);
   });
-}
-     // Activa las linternas dinámicamente en todos los gráficos
-document.querySelectorAll('.tradingview-widget').forEach((widget, index) => {
-  const redLantern = widget.querySelector('.lantern.red');
-  const greenLantern = widget.querySelector('.lantern.green');
 
-  // Simula una actividad específica por gráfico
-  setInterval(() => {
-    const isActive = Math.random() > 0.5; // Ejemplo de activación aleatoria
-    if (isActive) {
-      redLantern.classList.add('active');
-      greenLantern.classList.remove('active');
-    } else {
-      redLantern.classList.remove('active');
-      greenLantern.classList.add('active');
-    }
-  }, 2000); // Cambia cada 2 segundos
-});
-     function claimReferralRewards() {
-      alert("¡Recompensas de referidos reclamadas!");
-    }
+  function claimReferralRewards() {
+    alert("¡Recompensas de referidos reclamadas!");
+  }
 
-    function transfer() {
-      alert("Transferencia en proceso...");
-    }
+  function transfer() {
+    alert("Transferencia en proceso...");
+  }
 
-    function deposit(botId) {
-      alert("Depósito para el bot " + botId);
-    }
+  function deposit(botId) {
+    alert("Depósito para el bot " + botId);
+  }
 
-    function withdraw(botId) {
-      alert("Retiro para el bot " + botId);
-    }
+  function withdraw(botId) {
+    alert("Retiro para el bot " + botId);
+  }
 
-    function showDetails(botId) {
-      alert("Mostrando detalles del Bot " + botId);
-    }
+  function showDetails(botId) {
+    alert("Mostrando detalles del Bot " + botId);
+  }
 
-    function analyzePerformance(botId) {
-      alert("Analizando rendimiento del Bot " + botId);
-    }
+  function analyzePerformance(botId) {
+    alert("Analizando rendimiento del Bot " + botId);
+  }
 
-    function customizeBot(botId) {
-      alert("Configurando el Bot " + botId);
-    }
+  function customizeBot(botId) {
+    alert("Configurando el Bot " + botId);
+  }
 
-    function enableNotifications(botId) {
-      alert("Notificaciones activadas para el Bot " + botId);
-    }
+  function enableNotifications(botId) {
+    alert("Notificaciones activadas para el Bot " + botId);
+  }
 
-    function viewHistory(botId) {
-      alert("Mostrando historial del Bot " + botId);
-    }
+  function viewHistory(botId) {
+    alert("Mostrando historial del Bot " + botId);
+  }
 
-    function compareBots() {
-      alert("Comparando Bots...");
-    }
+  function compareBots() {
+    alert("Comparando Bots...");
+  }
 
-    function switchBot(botId) {
-      alert("Cambiando de Bot " + botId);
-    }
+  function switchBot(botId) {
+    alert("Cambiando de Bot " + botId);
+  }
 
-    function getTips() {
-      alert("Obteniendo consejos de trading...");
-    }
+  function getTips() {
+    alert("Obteniendo consejos de trading...");
+  }
 
-    function claimRewards() {
-      alert("Recompensas reclamadas.");
-    }
+  function exportReport(botId) {
+    alert("Informe exportado para el Bot " + botId);
+  }
 
-    function exportReport(botId) {
-      alert("Informe exportado para el Bot " + botId);
-    }
-
-    function askQuestion(botId) {
-      alert("Haciendo una pregunta sobre el Bot " + botId);
-    }
+  function askQuestion(botId) {
+    alert("Haciendo una pregunta sobre el Bot " + botId);
+  }
 
   </script>
 </body>
