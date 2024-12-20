@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plataforma de Bots</title>
   <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
 
   <style>
     @import url(https://fonts.googleapis.com/css?family=Share+Tech+Mono);
@@ -229,7 +229,23 @@
     .referal-button:hover {
       background: #1cc0d3;
     }
-
+.container {
+      margin-top: 20px;
+    }
+    .info-box {
+      background-color: #1e1e1e;
+      padding: 20px;
+      margin: 10px auto;
+      border-radius: 10px;
+      max-width: 500px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .info-box h3 {
+      margin: 0 0 10px;
+    }
+    .info-box p {
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body class="dark-theme">
@@ -252,9 +268,20 @@
     </div>
 <button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
 
-    <!-- Mini billetera -->
-    <div class="mini-wallet">
-      <h4>Saldo Total: $500</h4>
+    <h1>Información de la Cuenta MetaMask</h1>
+  <div class="container">
+    <div class="info-box">
+      <h3>Dirección Conectada:</h3>
+      <p id="account">Conectando...</p>
+    </div>
+    <div class="info-box">
+      <h3>Saldo en ETH:</h3>
+      <p id="balanceEth">Cargando...</p>
+    </div>
+    <div class="info-box">
+      <h3>Saldo en USDT:</h3>
+      <p id="balanceUsdt">Cargando...</p>
+    </div>
       <button class="button" onclick="transfer()">Transferir</button>
     </div>
 
@@ -566,20 +593,45 @@
 
   <script>
    let web3;
-  let contract;
+    const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; // Dirección de USDT en Ethereum Mainnet
+    const usdtABI = [
+      {
+        "constant": true,
+        "inputs": [{ "name": "_owner", "type": "address" }],
+        "name": "balanceOf",
+        "outputs": [{ "name": "balance", "type": "uint256" }],
+        "type": "function"
+      }
+    ];
 
-  // Inicializa Web3 y conecta a MetaMask
-  if (window.ethereum) {
-    web3 = new Web3(window.ethereum);
-    window.ethereum.request({ method: 'eth_requestAccounts' })
-      .then(() => {
-        console.log("Conexión a MetaMask exitosa");
-        initContract();
-      })
-      .catch(console.error);
-  } else {
-    alert("Por favor, instala MetaMask para continuar.");
-  }
+    // Inicializa Web3 y conecta a MetaMask
+    window.addEventListener('load', async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        web3 = new Web3(window.ethereum);
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const accounts = await web3.eth.getAccounts();
+          const account = accounts[0];
+
+          // Muestra la dirección de la cuenta conectada
+          document.getElementById('account').textContent = account;
+
+          // Muestra el saldo en ETH
+          const balance = await web3.eth.getBalance(account);
+          document.getElementById('balanceEth').textContent = `${web3.utils.fromWei(balance, 'ether')} ETH`;
+
+          // Muestra el saldo en USDT
+          const usdtContract = new web3.eth.Contract(usdtABI, usdtContractAddress);
+          const usdtBalance = await usdtContract.methods.balanceOf(account).call();
+          document.getElementById('balanceUsdt').textContent = `${(usdtBalance / 1e6).toFixed(2)} USDT`;
+        } catch (error) {
+          console.error("Error al conectar a MetaMask:", error);
+          alert("No se pudo conectar a MetaMask. Revisa la consola para más detalles.");
+        }
+      } else {
+        alert("MetaMask no está instalado. Por favor, instálalo para continuar.");
+      }
+    });
 
   // Inicializa el contrato en la red Optimism
   function initContract() {
