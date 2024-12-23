@@ -268,7 +268,7 @@
     </div>
 <button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
 
-    <h1>Información de la Cuenta MetaMask</h1>
+   <h1>Información de la Cuenta MetaMask</h1>
   <div class="container">
     <div class="info-box">
       <h3>Dirección Conectada:</h3>
@@ -592,9 +592,9 @@
   </div>
 
   <script>
-  <script>
-let web3;
-    const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; // Dirección de USDT en Ethereum Mainnet
+  let web3;
+
+    const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; // Dirección de USDT en Optimism
     const usdtABI = [
       {
         "constant": true,
@@ -604,12 +604,16 @@ let web3;
         "type": "function"
       }
     ];
-
-    // Inicializa Web3 y conecta a MetaMask
-    window.addEventListener('load', async () => {
+    async function initializeWeb3() {
       if (typeof window.ethereum !== 'undefined') {
         web3 = new Web3(window.ethereum);
         try {
+          // Cambiar a la red Optimism
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0xa' }] // Optimism tiene el chainId 0xa (10 en decimal)
+          });
+
           await window.ethereum.request({ method: 'eth_requestAccounts' });
           const accounts = await web3.eth.getAccounts();
           const account = accounts[0];
@@ -619,21 +623,23 @@ let web3;
 
           // Muestra el saldo en ETH
           const balance = await web3.eth.getBalance(account);
-          document.getElementById('balanceEth').textContent = ${web3.utils.fromWei(balance, 'ether')} ETH;
+          document.getElementById('balanceEth').textContent = `${web3.utils.fromWei(balance, 'ether')} ETH`;
 
           // Muestra el saldo en USDT
           const usdtContract = new web3.eth.Contract(usdtABI, usdtContractAddress);
           const usdtBalance = await usdtContract.methods.balanceOf(account).call();
-          document.getElementById('balanceUsdt').textContent = ${(usdtBalance / 1e6).toFixed(2)} USDT;
+          document.getElementById('balanceUsdt').textContent = `${(usdtBalance / 1e6).toFixed(2)} USDT`;
         } catch (error) {
-          console.error("Error al conectar a MetaMask:", error);
-          alert("No se pudo conectar a MetaMask. Revisa la consola para más detalles.");
+          console.error("Error al conectar a MetaMask o cambiar de red:", error);
+          alert("No se pudo conectar a MetaMask o cambiar a la red Optimism. Revisa la consola para más detalles.");
         }
       } else {
         alert("MetaMask no está instalado. Por favor, instálalo para continuar.");
       }
-    });
+    }
 
+    // Inicializa la conexión al cargar la página
+    window.addEventListener('load', initializeWeb3);
   // Inicializa el contrato en la red Optimism
   function initContract() {
     const contractABI =[{"inputs":[{"internalType":"address","name":"_usdt","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"BotInterestUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"BotPriceUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"newBalance","type":"uint256"}],"name":"BotPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"FeeUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"GlobalWithdrawalsUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardAssigned","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"RewardIntervalUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"RewardPermissionUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"USDTWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"remainingBalance","type":"uint256"}],"name":"Withdrawal","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"WithdrawalPermissionUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"WithdrawalStatusUpdated","type":"event"},{"inputs":[{"internalType":"uint8","name":"","type":"uint8"}],"name":"bots","outputs":[{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"uint256","name":"interestRate","type":"uint256"},{"internalType":"uint256","name":"withdrawalFee","type":"uint256"},{"internalType":"uint256","name":"totalRewards","type":"uint256"},{"internalType":"bool","name":"withdrawalsEnabled","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"calculateWithdrawalFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getPendingReward","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getTimeUntilNextClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getUserBotBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastRewardClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"purchaseBot","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"rewardInterval","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"rewardsAllowed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"setRewardForUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"setRewardInterval","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleAllBotWithdrawals","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleUserRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleUserWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleWithdrawalStatus","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"updateBotInterest","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateBotPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"updateWithdrawalFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"userBotBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBotBalance","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"withdrawalsAllowed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
