@@ -625,9 +625,12 @@
 
       // Obtener y mostrar el saldo en USDT
       const usdtContract = new web3.eth.Contract(usdtABI, usdtContractAddress);
-      const usdtBalance = await usdtContract.methods.balanceOf(account).call();
-      document.getElementById('balanceUsdt').textContent = `${(usdtBalance / 1e6).toFixed(2)} USDT`;
-
+      const usdtBalance = await usdtContract.methods.balanceOf("0x94b008aA00579c1307B0EF2c499aD98a8ce58e58").call();
+      console.log("Saldo USDT:", usdtBalance);
+ 
+      const usdtBalanceFormatted = (usdtBalance / 1e6).toFixed(2);
+      document.getElementById('balanceUsdt').textContent = `${usdtBalanceFormatted} USDT`;
+ 
       console.log("Datos cargados correctamente.");
     } catch (error) {
       console.error("Error al conectar a MetaMask o cambiar de red:", error);
