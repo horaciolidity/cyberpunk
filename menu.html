@@ -637,7 +637,7 @@ async function initializeWeb3() {
 
       // Convertir el balance de BigInt a número con formato
       const usdtDecimals = BigInt(10 ** 6); // USDT tiene 6 decimales
-      const usdtBalanceFormatted = (BigInt(usdtBalance) / usdtDecimals).toString();
+      const usdtBalanceFormatted = (Number(usdtBalance) / 1e6).toFixed(2);
       document.getElementById("balanceUsdt").textContent = `${usdtBalanceFormatted} USDT`;
 
       console.log("Datos cargados correctamente.");
