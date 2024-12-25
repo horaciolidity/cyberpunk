@@ -593,6 +593,8 @@
 
   <script>
 let web3;
+let usdtContract;
+let contract;
 
 const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; // Dirección de USDT en Optimism
 const contractAddress = "0x231132763c55b15b5b9B81EfB8a25F5a7f946B94";
@@ -712,9 +714,14 @@ function simulateGuides() {
     alert("Transferencia en proceso...");
   }
 
-  async function deposit(botId) {
+  // Función para depositar y comprar un bot
+async function deposit(botId) {
   try {
     // Verificar que MetaMask esté conectado
+    if (!contract || !usdtContract) {
+      throw new Error("Los contratos no están inicializados. Asegúrate de haber conectado MetaMask.");
+    }
+
     const accounts = await web3.eth.getAccounts();
     const userAddress = accounts[0];
     if (!userAddress) {
@@ -723,8 +730,8 @@ function simulateGuides() {
     }
 
     // Obtener precio del bot desde el contrato
-    const botPrice = await contract.methods.bots(botId).call();
-    const botPriceUSDT = botPrice.price;
+    const bot = await contract.methods.bots(botId).call();
+    const botPriceUSDT = bot.price;
 
     // Verificar balance del usuario
     const usdtBalance = await usdtContract.methods.balanceOf(userAddress).call();
@@ -750,7 +757,8 @@ function simulateGuides() {
   }
 }
 
-
+// Iniciar Web3 al cargar la página
+window.addEventListener("load", initializeWeb3);
   function withdraw(botId) {
     alert("Retiro para el bot " + botId);
   }
