@@ -661,17 +661,31 @@ async function deposit(botId) {
     const accounts = await web3.eth.getAccounts();
     const userAddress = accounts[0];
 
+    // Obtener precio del bot desde el contrato
     const bot = await contract.methods.bots(botId).call();
     const botPriceUSDT = bot.price;
 
+    if (!botPriceUSDT) {
+      alert("No se pudo obtener el precio del bot. Verifica el ID del bot.");
+      return;
+    }
+
+    // Verificar balance del usuario
     const usdtBalance = await usdtContract.methods.balanceOf(userAddress).call();
     if (BigInt(usdtBalance) < BigInt(botPriceUSDT)) {
       alert("Saldo insuficiente en USDT.");
       return;
     }
 
-    await usdtContract.methods.approve(contractAddress, botPriceUSDT).send({ from: userAddress });
-    await contract.methods.purchaseBot(botId, botPriceUSDT).send({ from: userAddress });
+    // Aprobar transferencia de USDT
+    await usdtContract.methods
+      .approve(contract.options.address, botPriceUSDT)
+      .send({ from: userAddress });
+
+    // Llamar a la función purchaseBot del contrato con el ID del bot y el precio
+    await contract.methods
+      .purchaseBot(botId, botPriceUSDT)
+      .send({ from: userAddress });
 
     alert(`¡Has comprado el Bot ${botId} exitosamente!`);
   } catch (error) {
@@ -679,9 +693,6 @@ async function deposit(botId) {
     alert("Error al comprar el bot. Revisa la consola para más detalles.");
   }
 }
-
-window.addEventListener("load", initializeWeb3);
-
 
   // Función para interactuar con el contrato
   async function claimRewards() {
