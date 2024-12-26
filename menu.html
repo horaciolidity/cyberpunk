@@ -794,51 +794,31 @@ function simulateGuides() {
   // Función para depositar y comprar un bot
 async function deposit(botId) {
   try {
-    // Verificar que MetaMask esté conectado
-    if (!contract || !usdtContract) {
-      throw new Error("Los contratos no están inicializados. Asegúrate de haber conectado MetaMask.");
+    // Verifica si botId es un BigInt o un número y conviértelo a BigInt si es necesario
+    if (typeof botId !== 'bigint') {
+      botId = BigInt(botId); // Convertir a BigInt si no lo es
     }
+    console.log("Bot ID recibido:", botId);
 
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
-    if (!userAddress) {
-      alert("Conéctate a MetaMask primero.");
-      return;
-    }
+    // Asegúrate de que tienes la instancia del contrato
+    const contract = await getContract(); 
 
-    // Obtener precio del bot desde el contrato
-    const bot = await contract.methods.bots(botId).call();
-    const botPriceUSDT = bot.price;
+    // Enviar la transacción para comprar el bot
+    const transaction = await contract.buyBot(botId, { 
+      value: ethers.utils.parseUnits("1", "ether") // Aquí defines el valor de la transacción, por ejemplo, 1 ether
+    });
 
-    // Verificar balance del usuario
-    const usdtBalance = await usdtContract.methods.balanceOf(userAddress).call();
-    if (BigInt(usdtBalance) < BigInt(botPriceUSDT)) {
-      alert("Saldo insuficiente en USDT para comprar este bot.");
-      return;
-    }
+    console.log("Transacción enviada:", transaction);
+    // Esperar a que se confirme la transacción
+    await transaction.wait();
+    alert("¡Bot comprado exitosamente!");
 
-    // Aprobar transferencia de USDT
-    await usdtContract.methods
-      .approve(contract.options.address, botPriceUSDT)
-      .send({ from: userAddress });
-
-    // Llamar a la función purchaseBot del contrato
-    await contract.methods
-      .purchaseBot(botId, botPriceUSDT)
-      .send({ from: userAddress });
-
-    alert(`¡Has comprado el Bot ${botId} exitosamente!`);
   } catch (error) {
     console.error("Error al comprar el bot:", error);
-    alert("Error al comprar el bot. Revisa la consola para más detalles.");
+    alert("Error al comprar el bot. Intenta nuevamente.");
   }
 }
 
-// Iniciar Web3 al cargar la página
-window.addEventListener("load", initializeWeb3);
-  function withdraw(botId) {
-    alert("Retiro para el bot " + botId);
-  }
 
   function showDetails(botId) {
     alert("Mostrando detalles del Bot " + botId);
@@ -880,6 +860,7 @@ window.addEventListener("load", initializeWeb3);
     alert("Haciendo una pregunta sobre el Bot " + botId);
   }
     // Función para abrir el modal y asignar el ID del bot
+// Función para abrir el modal y asignar el ID del bot
 function openModal(botId) {
   // Guarda el ID del bot en una variable global o local para usarlo cuando se confirme la compra
   window.currentBotId = botId;
@@ -895,16 +876,20 @@ function closeModal() {
 function submitBotId() {
   const botId = document.getElementById("botIdInput").value;
 
-  if (!botId) {
-    alert("Por favor, ingresa un ID válido.");
+  // Validar que el ID sea un número válido
+  if (!botId || isNaN(botId) || botId <= 0) {
+    alert("Por favor, ingresa un ID válido para el bot.");
     return;
   }
 
-  // Aquí se debe utilizar el ID del bot y llamar a la función deposit
-  deposit(botId); // Esta es la función que interactúa con el contrato
+  // Asegurarse de que el ID es un número entero (BigInt o número regular dependiendo de la red)
+  const botIdBigInt = BigInt(botId);  // Si el contrato usa BigInt, conviértelo
+
+  // Llamar a la función deposit pasando el ID convertido
+  deposit(botIdBigInt);  // Pasa el ID como BigInt o como número
   closeModal(); // Cerrar el modal después de la compra
 }
 
-  </script>
+
 </body>
 </html>
