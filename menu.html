@@ -246,6 +246,42 @@
     .info-box p {
       margin: 5px 0;
     }
+
+     .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 300px;
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
   </style>
 </head>
 <body class="dark-theme">
@@ -314,7 +350,7 @@
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
      <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" onclick="openModal(1)">Depositar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -359,7 +395,7 @@
         </div>
 
      <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" onclick="openModal(1)">Depositar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -402,7 +438,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" onclick="openModal(1)">Depositar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -444,7 +480,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" onclick="openModal(1)">Depositar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -487,7 +523,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" onclick="openModal(1)">Depositar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -529,7 +565,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" onclick="openModal(1)">Depositar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -570,7 +606,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" onclick="openModal(1)">Depositar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -592,6 +628,17 @@
     <button class="button">Llamar a Soporte</button>
     <button class="button">Reclamar Recompensa</button>
   </div>
+
+  <!-- Modal para ingresar el ID del bot -->
+<div id="botModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Comprar Bot</h2>
+    <p>Ingresa el ID del bot que deseas comprar:</p>
+    <input type="number" id="botIdInput" placeholder="Ingresa el ID del bot" min="0" required>
+    <button class="button primary" onclick="submitBotId()">Comprar</button>
+  </div>
+</div>
 
   <script>
 let web3;
@@ -832,6 +879,32 @@ window.addEventListener("load", initializeWeb3);
   function askQuestion(botId) {
     alert("Haciendo una pregunta sobre el Bot " + botId);
   }
+    // Función para abrir el modal y asignar el ID del bot
+function openModal(botId) {
+  // Guarda el ID del bot en una variable global o local para usarlo cuando se confirme la compra
+  window.currentBotId = botId;
+  document.getElementById("botModal").style.display = "block";
+}
+
+// Función para cerrar el modal
+function closeModal() {
+  document.getElementById("botModal").style.display = "none";
+}
+
+// Función para tomar el ID del bot ingresado por el usuario y llamar a la función deposit
+function submitBotId() {
+  const botId = document.getElementById("botIdInput").value;
+
+  if (!botId) {
+    alert("Por favor, ingresa un ID válido.");
+    return;
+  }
+
+  // Aquí se debe utilizar el ID del bot y llamar a la función deposit
+  deposit(botId); // Esta es la función que interactúa con el contrato
+  closeModal(); // Cerrar el modal después de la compra
+}
+
   </script>
 </body>
 </html>
