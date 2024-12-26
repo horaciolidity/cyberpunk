@@ -6,6 +6,8 @@
   <title>Plataforma de Bots</title>
   <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.umd.min.js"></script>
+
 
   <style>
     @import url(https://fonts.googleapis.com/css?family=Share+Tech+Mono);
@@ -663,20 +665,6 @@ window.addEventListener("load", initializeWeb3);
     
  
 
-  // Función para interactuar con el contrato
-  async function claimRewards() {
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
-    try {
-      const result = await contract.methods.claimRewards().send({ from: userAddress });
-      console.log("Recompensas reclamadas:", result);
-      alert("Recompensas reclamadas correctamente.");
-    } catch (error) {
-      console.error("Error al reclamar recompensas:", error);
-      alert("Error al reclamar recompensas.");
-    }
-  }
-
 function simulateGuides() {
   const widgets = document.querySelectorAll('.tradingview-widget');
   widgets.forEach((widget, index) => {
@@ -705,102 +693,50 @@ function simulateGuides() {
     }, 2000);
   });
 
-  function claimReferralRewards() {
-    alert("¡Recompensas de referidos reclamadas!");
-  }
+ async function updateBotInfo(botId) {
+  // Obtener información del contrato
+  const bot = await contract.bots(botId); // Bot ID: 0-4
+  const userBalance = await contract.getUserBotBalance(userAddress, botId);
+  const pendingRewards = await contract.getPendingReward(userAddress);
+  const withdrawalFee = await contract.calculateWithdrawalFee(botId, userBalance);
 
-  function transfer() {
-    alert("Transferencia en proceso...");
-  }
+  // Actualizar la UI con la información obtenida
+  document.getElementById(`bot-${botId}-status`).innerText = bot.withdrawalsEnabled ? "Bot activo" : "Bot inactivo";
+  document.getElementById(`bot-${botId}-status-indicator`).style.backgroundColor = bot.withdrawalsEnabled ? "green" : "red";
+  document.getElementById(`bot-${botId}-profit`).innerText = `Profit: ${bot.interestRate / 100}% diario`;
+  document.getElementById(`bot-${botId}-max-rent`).innerText = `Máximo para alquilar: $${bot.price / 10 ** 6}`;
+  document.getElementById(`bot-${botId}-balance`).innerText = `${userBalance / 10 ** 6} USDT`;
+  document.getElementById(`bot-${botId}-profit-amount`).innerText = `${pendingRewards / 10 ** 6} USDT`;
+  document.getElementById(`bot-${botId}-fee`).innerText = `${withdrawalFee / 10 ** 6}%`;
+}
 
-  // Función para depositar y comprar un bot
+// Llamar a la función para Bot 2
+updateBotInfo(2);
 async function deposit(botId) {
-  try {
-    // Verificar que MetaMask esté conectado
-    if (!contract || !usdtContract) {
-      throw new Error("Los contratos no están inicializados. Asegúrate de haber conectado MetaMask.");
-    }
-
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
-    if (!userAddress) {
-      alert("Conéctate a MetaMask primero.");
-      return;
-    }
-
-    // Obtener precio del bot desde el contrato
-    const bot = await contract.methods.bots(botId).call();
-    const botPriceUSDT = bot.price;
-
-    // Verificar balance del usuario
-    const usdtBalance = await usdtContract.methods.balanceOf(userAddress).call();
-    if (BigInt(usdtBalance) < BigInt(botPriceUSDT)) {
-      alert("Saldo insuficiente en USDT para comprar este bot.");
-      return;
-    }
-
-    // Aprobar transferencia de USDT
-    await usdtContract.methods
-      .approve(contract.options.address, botPriceUSDT)
-      .send({ from: userAddress });
-
-    // Llamar a la función purchaseBot del contrato
-    await contract.methods
-      .purchaseBot(botId, botPriceUSDT)
-      .send({ from: userAddress });
-
-    alert(`¡Has comprado el Bot ${botId} exitosamente!`);
-  } catch (error) {
-    console.error("Error al comprar el bot:", error);
-    alert("Error al comprar el bot. Revisa la consola para más detalles.");
+  const amount = prompt("Ingresa la cantidad de USDT para depositar:");
+  if (amount) {
+    // Interacción con contrato
+    await contract.purchaseBot(botId, ethers.utils.parseUnits(amount, 6));
+    alert("Depósito exitoso.");
+    updateBotInfo(botId); // Actualizar la información después de realizar la acción
   }
 }
 
-// Iniciar Web3 al cargar la página
-window.addEventListener("load", initializeWeb3);
-  function withdraw(botId) {
-    alert("Retiro para el bot " + botId);
+async function withdraw(botId) {
+  const amount = prompt("Ingresa la cantidad de USDT para retirar:");
+  if (amount) {
+    await contract.withdrawBotBalance(botId, ethers.utils.parseUnits(amount, 6));
+    alert("Retiro exitoso.");
+    updateBotInfo(botId); // Actualizar la información después de realizar la acción
   }
+}
 
-  function showDetails(botId) {
-    alert("Mostrando detalles del Bot " + botId);
-  }
+async function claimRewards() {
+  // Reclamar recompensas
+  await contract.claimRewards();
+  alert("Recompensas reclamadas.");
+}
 
-  function analyzePerformance(botId) {
-    alert("Analizando rendimiento del Bot " + botId);
-  }
-
-  function customizeBot(botId) {
-    alert("Configurando el Bot " + botId);
-  }
-
-  function enableNotifications(botId) {
-    alert("Notificaciones activadas para el Bot " + botId);
-  }
-
-  function viewHistory(botId) {
-    alert("Mostrando historial del Bot " + botId);
-  }
-
-  function compareBots() {
-    alert("Comparando Bots...");
-  }
-
-  function switchBot(botId) {
-    alert("Cambiando de Bot " + botId);
-  }
-
-  function getTips() {
-    alert("Obteniendo consejos de trading...");
-  }
-
-  function exportReport(botId) {
-    alert("Informe exportado para el Bot " + botId);
-  }
-
-  function askQuestion(botId) {
-    alert("Haciendo una pregunta sobre el Bot " + botId);
-  }
   </script>
 </body>
 </html>
