@@ -791,22 +791,14 @@ function simulateGuides() {
     alert("Transferencia en proceso...");
   }
 
-  // Función para depositar y comprar un bot
-async function deposit(botId) {
+  async function deposit(botId) {
   try {
-    // Verifica si botId es un BigInt o un número y conviértelo a BigInt si es necesario
-    if (typeof botId !== 'bigint') {
-      botId = BigInt(botId); // Convertir a BigInt si no lo es
-    }
+    // Verifica si botId es BigInt o número
     console.log("Bot ID recibido:", botId);
 
-    // Asegúrate de que tienes la instancia del contrato
-    const contract = await getContract(); 
-
-    // Enviar la transacción para comprar el bot
-    const transaction = await contract.buyBot(botId, { 
-      value: ethers.utils.parseUnits("1", "ether") // Aquí defines el valor de la transacción, por ejemplo, 1 ether
-    });
+    // Aquí debes llamar a tu contrato, pasándole el ID del bot
+    const contract = await getContract(); // Asegúrate de tener la instancia del contrato
+    const transaction = await contract.buyBot(botId, { value: ethers.utils.parseUnits("1", "ether") });
 
     console.log("Transacción enviada:", transaction);
     // Esperar a que se confirme la transacción
@@ -818,7 +810,6 @@ async function deposit(botId) {
     alert("Error al comprar el bot. Intenta nuevamente.");
   }
 }
-
 
   function showDetails(botId) {
     alert("Mostrando detalles del Bot " + botId);
