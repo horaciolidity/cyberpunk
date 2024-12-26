@@ -669,7 +669,7 @@ async function initializeWeb3() {
       // Cambiar a la red Optimism
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0xa" }]
+        params: [{ chainId: "0xa" }] // Optimism
       });
 
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -685,6 +685,7 @@ async function initializeWeb3() {
       document.getElementById("balanceEth").textContent = `${web3.utils.fromWei(ethBalance, "ether")} ETH`;
 
       const usdtBalance = await usdtContract.methods.balanceOf(account).call();
+      console.log("USDT Balance:", usdtBalance); // Verificar que el saldo se obtiene correctamente
       const usdtBalanceFormatted = (Number(usdtBalance) / 1e6).toFixed(2);
       document.getElementById("balanceUsdt").textContent = `${usdtBalanceFormatted} USDT`;
 
@@ -697,6 +698,7 @@ async function initializeWeb3() {
     alert("MetaMask no está instalado. Por favor, instálalo para continuar.");
   }
 }
+
 
 async function deposit(botId) {
   if (!contract || !usdtContract) {
@@ -791,23 +793,49 @@ function simulateGuides() {
     alert("Transferencia en proceso...");
   }
 
-  async function deposit(botId) {
+ async function deposit(botId) {
+  if (!contract || !usdtContract) {
+    alert("Los contratos no están inicializados. Por favor, recarga la página.");
+    return;
+  }
+
   try {
-    // Verifica si botId es BigInt o número
-    console.log("Bot ID recibido:", botId);
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
 
-    // Aquí debes llamar a tu contrato, pasándole el ID del bot
-    const contract = await getContract(); // Asegúrate de tener la instancia del contrato
-    const transaction = await contract.buyBot(botId, { value: ethers.utils.parseUnits("1", "ether") });
+    // Obtener precio del bot desde el contrato
+    const bot = await contract.methods.bots(botId).call();
+    const botPriceUSDT = bot.price;
+    console.log("Precio del bot:", botPriceUSDT);
 
-    console.log("Transacción enviada:", transaction);
-    // Esperar a que se confirme la transacción
-    await transaction.wait();
-    alert("¡Bot comprado exitosamente!");
+    if (!botPriceUSDT) {
+      alert("No se pudo obtener el precio del bot. Verifica el ID del bot.");
+      return;
+    }
 
+    // Verificar balance del usuario
+    const usdtBalance = await usdtContract.methods.balanceOf(userAddress).call();
+    console.log("Saldo en USDT:", usdtBalance); // Verificar el balance de USDT
+    
+    if (BigInt(usdtBalance) < BigInt(botPriceUSDT)) {
+      alert("Saldo insuficiente en USDT.");
+      return;
+    }
+
+    // Aprobar transferencia de USDT
+    await usdtContract.methods
+      .approve(contract.options.address, botPriceUSDT)
+      .send({ from: userAddress });
+
+    // Llamar a la función purchaseBot del contrato con el ID del bot y el precio
+    await contract.methods
+      .purchaseBot(botId, botPriceUSDT)
+      .send({ from: userAddress });
+
+    alert(`¡Has comprado el Bot ${botId} exitosamente!`);
   } catch (error) {
     console.error("Error al comprar el bot:", error);
-    alert("Error al comprar el bot. Intenta nuevamente.");
+    alert("Error al comprar el bot. Revisa la consola para más detalles.");
   }
 }
 
