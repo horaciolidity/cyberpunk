@@ -669,7 +669,7 @@ async function initializeWeb3() {
       // Cambiar a la red Optimism
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0xa" }] // Optimism
+        params: [{ chainId: "0xa" }]
       });
 
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -685,7 +685,6 @@ async function initializeWeb3() {
       document.getElementById("balanceEth").textContent = `${web3.utils.fromWei(ethBalance, "ether")} ETH`;
 
       const usdtBalance = await usdtContract.methods.balanceOf(account).call();
-      console.log("USDT Balance:", usdtBalance); // Verificar que el saldo se obtiene correctamente
       const usdtBalanceFormatted = (Number(usdtBalance) / 1e6).toFixed(2);
       document.getElementById("balanceUsdt").textContent = `${usdtBalanceFormatted} USDT`;
 
@@ -698,7 +697,6 @@ async function initializeWeb3() {
     alert("MetaMask no está instalado. Por favor, instálalo para continuar.");
   }
 }
-
 
 async function deposit(botId) {
   if (!contract || !usdtContract) {
