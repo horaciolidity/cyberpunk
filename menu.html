@@ -801,6 +801,29 @@ async function claimRewards() {
   await contract.claimRewards();
   alert("Recompensas reclamadas.");
 }
+    document.getElementById("buyBotButton").addEventListener("click", async () => {
+    const amountInUsdt = parseFloat(document.getElementById("usdtAmount").value); // Obtener la cantidad introducida por el usuario
+
+    if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
+        alert("Please enter a valid amount");
+        return;
+    }
+
+    // Convertir la cantidad a micro-unidades de USDT (1 USDT = 1,000,000 micro-unidades)
+    const amountInMicroUnits = amountInUsdt * 10**6;  
+
+    console.log("Amount to send to contract (in micro-units):", amountInMicroUnits);
+
+    // Suponiendo que 'contract' es la instancia del contrato en tu DApp
+    try {
+        await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+        alert("Bot purchased successfully!");
+    } catch (error) {
+        console.error("Error purchasing bot:", error);
+        alert("Failed to purchase bot. Please check your balance and try again.");
+    }
+});
+
 
   </script>
 </body>
