@@ -645,16 +645,24 @@ async function initializeWeb3() {
       const ethBalance = await web3.eth.getBalance(account);
       document.getElementById("balanceEth").textContent = `${web3.utils.fromWei(ethBalance, "ether")} ETH`;
 
-      // Obtener y mostrar el saldo en USDT
-      const usdtContract = new web3.eth.Contract(usdtABI, usdtContractAddress);
-      const usdtBalance = await usdtContract.methods.balanceOf(account).call();
+      // Inicializar el contrato de USDT
+      usdtContract = new web3.eth.Contract(usdtABI, usdtContractAddress);
 
-      // Convertir el balance de BigInt a número con formato
-      const usdtDecimals = BigInt(10 ** 6); // USDT tiene 6 decimales
-      const usdtBalanceFormatted = (Number(usdtBalance) / 1e6).toFixed(2);
+      // Obtener y mostrar el saldo en USDT
+      const usdtBalance = await usdtContract.methods.balanceOf(account).call();
+      const usdtBalanceFormatted = (Number(usdtBalance) / 1e6).toFixed(2); // USDT tiene 6 decimales
       document.getElementById("balanceUsdt").textContent = `${usdtBalanceFormatted} USDT`;
 
-      console.log("Datos cargados correctamente.");
+      // Inicializar el contrato principal
+      contract = new web3.eth.Contract(contractABI, contractAddress);
+
+      // Verificar si la red y los contratos están configurados correctamente
+      console.log("Conexión establecida correctamente:");
+      console.log("Cuenta conectada:", account);
+      console.log("Saldo en ETH:", web3.utils.fromWei(ethBalance, "ether"), "ETH");
+      console.log("Saldo en USDT:", usdtBalanceFormatted, "USDT");
+
+      alert("Conexión exitosa a MetaMask y la red Optimism.");
     } catch (error) {
       console.error("Error al conectar a MetaMask o cambiar de red:", error);
       alert("Error al conectar a MetaMask o cambiar de red. Revisa la consola para más detalles.");
@@ -666,7 +674,7 @@ async function initializeWeb3() {
 
 // Iniciar al cargar la página
 window.addEventListener("load", initializeWeb3);
-    
+
  
 
 function simulateGuides() {
@@ -716,13 +724,55 @@ function simulateGuides() {
 
 // Llamar a la función para Bot 2
 updateBotInfo(2);
+
 async function deposit(botId) {
-  const amount = prompt("Ingresa la cantidad de USDT para depositar:");
-  if (amount) {
-    // Interacción con contrato
-    await contract.purchaseBot(botId, ethers.utils.parseUnits(amount, 6));
+  try {
+    const account = (await web3.eth.getAccounts())[0]; // Obtener la cuenta conectada
+    if (!account) {
+      alert("No se detectó ninguna cuenta conectada. Asegúrate de estar conectado a MetaMask.");
+      return;
+    }
+
+    const amount = prompt("Ingresa la cantidad de USDT para depositar (en números):");
+    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+      alert("Por favor, ingresa una cantidad válida mayor a 0.");
+      return;
+    }
+
+    const amountInWei = web3.utils.toWei(amount, "mwei"); // Convertir la cantidad a Wei (USDT tiene 6 decimales)
+
+    // Verificar si el usuario tiene saldo suficiente en USDT
+    const usdtBalance = await usdtContract.methods.balanceOf(account).call();
+    if (BigInt(usdtBalance) < BigInt(amountInWei)) {
+      alert("Saldo insuficiente en USDT para realizar el depósito.");
+      return;
+    }
+
+    // Verificar si ya existe suficiente permiso
+    const currentAllowance = await usdtContract.methods.allowance(account, contractAddress).call();
+    if (BigInt(currentAllowance) < BigInt(amountInWei)) {
+      // Aprobar al contrato principal para usar los fondos del usuario
+      const approvalTx = await usdtContract.methods
+        .approve(contractAddress, amountInWei)
+        .send({ from: account });
+
+      console.log("Transacción de aprobación enviada:", approvalTx.transactionHash);
+    } else {
+      console.log("El contrato ya tiene suficiente permiso para gastar los USDT.");
+    }
+
+    // Interactuar con el contrato para realizar la compra
+    const depositTx = await contract.methods
+      .purchaseBot(botId, amountInWei)
+      .send({ from: account });
+
+    console.log("Transacción de depósito enviada:", depositTx.transactionHash);
+
     alert("Depósito exitoso.");
-    updateBotInfo(botId); // Actualizar la información después de realizar la acción
+    await updateBotInfo(botId); // Actualizar la información después de realizar la acción
+  } catch (error) {
+    console.error("Error al realizar el depósito:", error);
+    alert("Ocurrió un error al intentar realizar el depósito. Revisa la consola para más detalles.");
   }
 }
 
