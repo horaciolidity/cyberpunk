@@ -751,40 +751,57 @@ async function deposit(botId) {
 
     const amountInWei = web3.utils.toWei(amount, "mwei"); // Convertir la cantidad a Wei (USDT tiene 6 decimales)
 
-    // Verificar si el usuario tiene saldo suficiente en USDT
+    // Verificar saldo de USDT
     const usdtBalance = await usdtContract.methods.balanceOf(account).call();
     if (BigInt(usdtBalance) < BigInt(amountInWei)) {
       alert("Saldo insuficiente en USDT para realizar el depósito.");
       return;
     }
 
-    // Verificar si ya existe suficiente permiso
+    // Verificar permiso actual
     const currentAllowance = await usdtContract.methods.allowance(account, contractAddress).call();
     if (BigInt(currentAllowance) < BigInt(amountInWei)) {
-      // Aprobar al contrato principal para usar los fondos del usuario
+      // Estimar gas para aprobación
+      const approveGasEstimate = await usdtContract.methods
+        .approve(contractAddress, amountInWei)
+        .estimateGas({ from: account });
+      console.log("Gas estimado para aprobación:", approveGasEstimate);
+
+      // Enviar transacción de aprobación
       const approvalTx = await usdtContract.methods
         .approve(contractAddress, amountInWei)
-        .send({ from: account });
-
+        .send({ from: account, gas: approveGasEstimate });
       console.log("Transacción de aprobación enviada:", approvalTx.transactionHash);
     } else {
       console.log("El contrato ya tiene suficiente permiso para gastar los USDT.");
     }
 
-    // Interactuar con el contrato para realizar la compra
+    // Estimar gas para el depósito
+    const depositGasEstimate = await contract.methods
+      .purchaseBot(botId, amountInWei)
+      .estimateGas({ from: account });
+    console.log("Gas estimado para depósito:", depositGasEstimate);
+
+    // Enviar transacción de depósito
     const depositTx = await contract.methods
       .purchaseBot(botId, amountInWei)
-      .send({ from: account });
-
+      .send({ from: account, gas: depositGasEstimate });
     console.log("Transacción de depósito enviada:", depositTx.transactionHash);
 
     alert("Depósito exitoso.");
-    await updateBotInfo(botId); // Actualizar la información después de realizar la acción
+    await updateBotInfo(botId); // Actualizar información del bot
   } catch (error) {
-    console.error("Error al realizar el depósito:", error);
-    alert("Ocurrió un error al intentar realizar el depósito. Revisa la consola para más detalles.");
+    if (error.code === 4001) {
+      alert("Transacción rechazada por el usuario.");
+    } else if (error.message.includes("gas required exceeds")) {
+      alert("La transacción requiere más gas del permitido. Revisa los detalles.");
+    } else {
+      console.error("Error al realizar el depósito:", error);
+      alert("Ocurrió un error al intentar realizar el depósito. Revisa la consola para más detalles.");
+    }
   }
 }
+
 
 async function withdraw(botId) {
   const amount = prompt("Ingresa la cantidad de USDT para retirar:");
