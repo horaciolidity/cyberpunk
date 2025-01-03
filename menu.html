@@ -317,7 +317,7 @@
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
      <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" data-bot-id="0" onclick="purchaseBot(event)">Comprar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -362,7 +362,7 @@
         </div>
 
      <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" data-bot-id="1" onclick="purchaseBot(event)">Comprar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -405,7 +405,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" data-bot-id="2" onclick="purchaseBot(event)">Comprar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -447,7 +447,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" data-bot-id="3" onclick="purchaseBot(event)">Comprar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -490,7 +490,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" data-bot-id="4" onclick="purchaseBot(event)">Comprar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -532,7 +532,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" data-bot-id="5" onclick="purchaseBot(event)">Comprar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -573,7 +573,7 @@
         </div>
 
    <div class="button-group">
-  <button class="button secondary" onclick="deposit(1)">Depositar</button>
+    <button class="button secondary" data-bot-id="6" onclick="purchaseBot(event)">Comprar</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -595,6 +595,13 @@
     <button class="button">Llamar a Soporte</button>
     <button class="button">Reclamar Recompensa</button>
   </div>
+  <select id="botIdSelect">
+  <option value="0">Bot 0</option>
+  <option value="1">Bot 1</option>
+  <option value="2">Bot 2</option>
+  <option value="3">Bot 3</option>
+  <!-- Agrega más bots según sea necesario -->
+</select>
 
   <script>
 let web3;
@@ -735,54 +742,27 @@ function simulateGuides() {
 // Llamar a la función para Bot 2
 updateBotInfo(2);
 
-async function deposit(botId) {
+document.querySelectorAll(".button.secondary").forEach(button => {
+  button.addEventListener("click", purchaseBot);
+});
+
+async function purchaseBot(event) {
+  const botId = parseInt(event.target.getAttribute("data-bot-id")); // Obtener el botId desde el botón
+  const amountInUsdt = parseFloat(document.getElementById("usdtAmount").value); // Obtener la cantidad en USDT
+
+  if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
+    alert("Please enter a valid amount");
+    return;
+  }
+
+  const amountInMicroUnits = amountInUsdt * 10**6;
+
   try {
-    const account = (await web3.eth.getAccounts())[0]; // Obtener la cuenta conectada
-    if (!account) {
-      alert("No se detectó ninguna cuenta conectada. Asegúrate de estar conectado a MetaMask.");
-      return;
-    }
-
-    const amount = prompt("Ingresa la cantidad de USDT para depositar (en números):");
-    if (!amount || isNaN(amount) || Number(amount) <= 0) {
-      alert("Por favor, ingresa una cantidad válida mayor a 0.");
-      return;
-    }
-
-    const amountInWei = web3.utils.toWei(amount, "mwei"); // Convertir la cantidad a Wei (USDT tiene 6 decimales)
-
-    // Verificar si el usuario tiene saldo suficiente en USDT
-    const usdtBalance = await usdtContract.methods.balanceOf(account).call();
-    if (BigInt(usdtBalance) < BigInt(amountInWei)) {
-      alert("Saldo insuficiente en USDT para realizar el depósito.");
-      return;
-    }
-
-    // Verificar si ya existe suficiente permiso
-    const currentAllowance = await usdtContract.methods.allowance(account, contractAddress).call();
-    if (BigInt(currentAllowance) < BigInt(amountInWei)) {
-      // Aprobar al contrato principal para usar los fondos del usuario
-      const approvalTx = await usdtContract.methods
-        .approve(contractAddress, amountInWei)
-        .send({ from: account });
-
-      console.log("Transacción de aprobación enviada:", approvalTx.transactionHash);
-    } else {
-      console.log("El contrato ya tiene suficiente permiso para gastar los USDT.");
-    }
-
-    // Interactuar con el contrato para realizar la compra
-    const depositTx = await contract.methods
-      .purchaseBot(botId, amountInWei)
-      .send({ from: account });
-
-    console.log("Transacción de depósito enviada:", depositTx.transactionHash);
-
-    alert("Depósito exitoso.");
-    await updateBotInfo(botId); // Actualizar la información después de realizar la acción
+    await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+    alert("Bot purchased successfully!");
   } catch (error) {
-    console.error("Error al realizar el depósito:", error);
-    alert("Ocurrió un error al intentar realizar el depósito. Revisa la consola para más detalles.");
+    console.error("Error purchasing bot:", error);
+    alert("Failed to purchase bot. Please check your balance and try again.");
   }
 }
 
