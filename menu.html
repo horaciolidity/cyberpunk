@@ -318,8 +318,8 @@
       </div>
      <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="0" placeholder="Cantidad en USDT">
-    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
-       <button class="button danger" onclick="withdraw(1)">Retirar</button>
+  <button class="button primary">Comprar Bot</button>
+  <button class="button danger" onclick="withdraw(0)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -364,8 +364,8 @@
 
      <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="1" placeholder="Cantidad en USDT">
-    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
-       <button class="button danger" onclick="withdraw(1)">Retirar</button>
+  <button class="button primary">Comprar Bot</button>
+  <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -408,8 +408,8 @@
 
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="2" placeholder="Cantidad en USDT">
-    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
-     <button class="button danger" onclick="withdraw(1)">Retirar</button>
+  <button class="button primary">Comprar Bot</button>
+  <button class="button danger" onclick="withdraw(2)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -451,8 +451,8 @@
 
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="3" placeholder="Cantidad en USDT">
-    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button> 
-     <button class="button danger" onclick="withdraw(1)">Retirar</button>
+  <button class="button primary">Comprar Bot</button>
+  <button class="button danger" onclick="withdraw(3)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -495,8 +495,8 @@
 
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="4" placeholder="Cantidad en USDT">
-    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
-     <button class="button danger" onclick="withdraw(1)">Retirar</button>
+  <button class="button primary">Comprar Bot</button>
+  <button class="button danger" onclick="withdraw(4)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -538,8 +538,8 @@
 
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="5" placeholder="Cantidad en USDT">
-    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
-     <button class="button danger" onclick="withdraw(1)">Retirar</button>
+  <button class="button primary">Comprar Bot</button>
+     <button class="button danger" onclick="withdraw(5)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -580,8 +580,8 @@
 
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="6" placeholder="Cantidad en USDT">
-    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
-     <button class="button danger" onclick="withdraw(1)">Retirar</button>
+  <button class="button primary">Comprar Bot</button>
+     <button class="button danger" onclick="withdraw(6)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -697,6 +697,44 @@ async function initializeWeb3() {
 // Iniciar al cargar la página
 window.addEventListener("load", initializeWeb3);
 
+
+    async function purchaseBot(event) {
+  try {
+    const botCard = event.target.closest(".bot-card");
+    const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
+    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
+
+    if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
+      alert("Por favor, ingresa una cantidad válida en USDT.");
+      return;
+    }
+
+    const amountInMicroUnits = amountInUsdt * 10 ** 6;
+
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+
+    // Aprobación de USDT
+    alert(`Aprobando transferencia de ${amountInUsdt} USDT...`);
+    await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
+    alert("¡Aprobación completada!");
+
+    // Compra del bot
+    alert(`Comprando el bot ${botId} con ${amountInUsdt} USDT...`);
+    const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+
+    alert("¡Compra completada exitosamente!");
+    console.log("Detalles de la transacción:", tx);
+
+    // Actualizar la información del bot
+    await updateBotInfo(botId);
+  } catch (error) {
+    console.error("Error al comprar el bot:", error);
+    alert("Hubo un problema al intentar comprar el bot. Verifica tu saldo y permisos.");
+  }
+}
+
+
  
 
 function simulateGuides() {
@@ -727,25 +765,29 @@ function simulateGuides() {
     }, 2000);
   });
 
- async function updateBotInfo(botId) {
-  // Obtener información del contrato
-  const bot = await contract.bots(botId); // Bot ID: 0-4
-  const userBalance = await contract.getUserBotBalance(userAddress, botId);
-  const pendingRewards = await contract.getPendingReward(userAddress);
-  const withdrawalFee = await contract.calculateWithdrawalFee(botId, userBalance);
+async function updateBotInfo(botId) {
+  try {
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
 
-  // Actualizar la UI con la información obtenida
-  document.getElementById(`bot-${botId}-status`).innerText = bot.withdrawalsEnabled ? "Bot activo" : "Bot inactivo";
-  document.getElementById(`bot-${botId}-status-indicator`).style.backgroundColor = bot.withdrawalsEnabled ? "green" : "red";
-  document.getElementById(`bot-${botId}-profit`).innerText = `Profit: ${bot.interestRate / 100}% diario`;
-  document.getElementById(`bot-${botId}-max-rent`).innerText = `Máximo para alquilar: $${bot.price / 10 ** 6}`;
-  document.getElementById(`bot-${botId}-balance`).innerText = `${userBalance / 10 ** 6} USDT`;
-  document.getElementById(`bot-${botId}-profit-amount`).innerText = `${pendingRewards / 10 ** 6} USDT`;
-  document.getElementById(`bot-${botId}-fee`).innerText = `${withdrawalFee / 10 ** 6}%`;
+    const bot = await contract.methods.bots(botId).call();
+    const userBalance = await contract.methods.getUserBotBalance(userAddress, botId).call();
+    const pendingRewards = await contract.methods.getPendingReward(userAddress).call();
+    const withdrawalFee = await contract.methods.calculateWithdrawalFee(botId, userBalance).call();
+
+    // Actualizar la UI
+    const botCard = document.querySelector(`.bot-card[data-bot-id="${botId}"]`);
+    botCard.querySelector(".status-label").textContent = bot.withdrawalsEnabled ? "Bot activo" : "Bot inactivo";
+    botCard.querySelector(".status-indicator").style.backgroundColor = bot.withdrawalsEnabled ? "green" : "red";
+    botCard.querySelector(".bot-balance").textContent = `${(userBalance / 10 ** 6).toFixed(2)} USDT`;
+    botCard.querySelector(".bot-profit").textContent = `${(pendingRewards / 10 ** 6).toFixed(2)} USDT`;
+    botCard.querySelector(".bot-fee").textContent = `${(withdrawalFee / 10 ** 6).toFixed(2)}%`;
+  } catch (error) {
+    console.error("Error al actualizar la información del bot:", error);
+    alert("No se pudo actualizar la información del bot.");
+  }
 }
 
-// Llamar a la función para Bot 2
-updateBotInfo(2);
 
 
 document.querySelectorAll(".button.primary").forEach(button => {
@@ -793,42 +835,48 @@ document.querySelectorAll(".button.primary").forEach(button => {
 
 
 async function withdraw(botId) {
-  const amount = prompt("Ingresa la cantidad de USDT para retirar:");
-  if (amount) {
-    await contract.withdrawBotBalance(botId, ethers.utils.parseUnits(amount, 6));
-    alert("Retiro exitoso.");
-    updateBotInfo(botId); // Actualizar la información después de realizar la acción
+  try {
+    const amount = prompt("Ingresa la cantidad de USDT para retirar:");
+    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+      alert("Por favor, ingresa una cantidad válida para retirar.");
+      return;
+    }
+
+    const amountInMicroUnits = amount * 10 ** 6;
+
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+
+    alert("Realizando el retiro...");
+    const tx = await contract.methods.withdrawBotBalance(botId, amountInMicroUnits).send({ from: userAddress });
+
+    alert("¡Retiro exitoso!");
+    console.log("Detalles de la transacción:", tx);
+
+    // Actualizar la información del bot
+    await updateBotInfo(botId);
+  } catch (error) {
+    console.error("Error al retirar fondos:", error);
+    alert("Hubo un problema al intentar retirar los fondos.");
   }
 }
 
+
 async function claimRewards() {
-  // Reclamar recompensas
-  await contract.claimRewards();
-  alert("Recompensas reclamadas.");
+  try {
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+
+    alert("Reclamando recompensas...");
+    const tx = await contract.methods.claimRewards().send({ from: userAddress });
+
+    alert("¡Recompensas reclamadas exitosamente!");
+    console.log("Detalles de la transacción:", tx);
+  } catch (error) {
+    console.error("Error al reclamar recompensas:", error);
+    alert("No se pudieron reclamar las recompensas. Intenta nuevamente.");
+  }
 }
-    document.getElementById("buyBotButton").addEventListener("click", async () => {
-    const amountInUsdt = parseFloat(document.getElementById("usdtAmount").value); // Obtener la cantidad introducida por el usuario
-
-    if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
-        alert("Please enter a valid amount");
-        return;
-    }
-
-    // Convertir la cantidad a micro-unidades de USDT (1 USDT = 1,000,000 micro-unidades)
-    const amountInMicroUnits = amountInUsdt * 10**6;  
-
-    console.log("Amount to send to contract (in micro-units):", amountInMicroUnits);
-
-    // Suponiendo que 'contract' es la instancia del contrato en tu DApp
-    try {
-        await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
-        alert("Bot purchased successfully!");
-    } catch (error) {
-        console.error("Error purchasing bot:", error);
-        alert("Failed to purchase bot. Please check your balance and try again.");
-    }
-});
-
 
   </script>
 </body>
