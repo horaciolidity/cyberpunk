@@ -317,8 +317,9 @@
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
      <div class="button-group">
-    <button class="button secondary" data-bot-id="0" onclick="purchaseBot(event)">Comprar</button>
-  <button class="button danger" onclick="withdraw(1)">Retirar</button>
+<input type="number" class="usdtAmount" data-bot-id="0" placeholder="Cantidad en USDT">
+    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
+       <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -362,8 +363,9 @@
         </div>
 
      <div class="button-group">
-    <button class="button secondary" data-bot-id="1" onclick="purchaseBot(event)">Comprar</button>
-  <button class="button danger" onclick="withdraw(1)">Retirar</button>
+<input type="number" class="usdtAmount" data-bot-id="1" placeholder="Cantidad en USDT">
+    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
+       <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -405,8 +407,9 @@
         </div>
 
    <div class="button-group">
-    <button class="button secondary" data-bot-id="2" onclick="purchaseBot(event)">Comprar</button>
-  <button class="button danger" onclick="withdraw(1)">Retirar</button>
+<input type="number" class="usdtAmount" data-bot-id="2" placeholder="Cantidad en USDT">
+    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
+     <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -447,8 +450,9 @@
         </div>
 
    <div class="button-group">
-    <button class="button secondary" data-bot-id="3" onclick="purchaseBot(event)">Comprar</button>
-  <button class="button danger" onclick="withdraw(1)">Retirar</button>
+<input type="number" class="usdtAmount" data-bot-id="3" placeholder="Cantidad en USDT">
+    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button> 
+     <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -490,8 +494,9 @@
         </div>
 
    <div class="button-group">
-    <button class="button secondary" data-bot-id="4" onclick="purchaseBot(event)">Comprar</button>
-  <button class="button danger" onclick="withdraw(1)">Retirar</button>
+<input type="number" class="usdtAmount" data-bot-id="4" placeholder="Cantidad en USDT">
+    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
+     <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -532,8 +537,9 @@
         </div>
 
    <div class="button-group">
-    <button class="button secondary" data-bot-id="5" onclick="purchaseBot(event)">Comprar</button>
-  <button class="button danger" onclick="withdraw(1)">Retirar</button>
+<input type="number" class="usdtAmount" data-bot-id="5" placeholder="Cantidad en USDT">
+    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
+     <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -573,8 +579,9 @@
         </div>
 
    <div class="button-group">
-    <button class="button secondary" data-bot-id="6" onclick="purchaseBot(event)">Comprar</button>
-  <button class="button danger" onclick="withdraw(1)">Retirar</button>
+<input type="number" class="usdtAmount" data-bot-id="6" placeholder="Cantidad en USDT">
+    <button class="button primary" onclick="purchaseBot(event)">Comprar Bot</button>
+     <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -742,30 +749,29 @@ function simulateGuides() {
 // Llamar a la función para Bot 2
 updateBotInfo(2);
 
-document.querySelectorAll(".button.secondary").forEach(button => {
-  button.addEventListener("click", purchaseBot);
+
+
+document.querySelectorAll(".button.primary").forEach(button => {
+  button.addEventListener("click", async (event) => {
+    const botId = event.target.closest(".bot-card").querySelector("input").getAttribute("data-bot-id"); // Obtener el botId
+    const amountInUsdt = parseFloat(event.target.closest(".bot-card").querySelector(".usdtAmount").value); // Obtener la cantidad en USDT
+
+    if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
+      alert("Please enter a valid amount");
+      return;
+    }
+
+    const amountInMicroUnits = amountInUsdt * 10**6;
+
+    try {
+      await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+      alert("Bot purchased successfully!");
+    } catch (error) {
+      console.error("Error purchasing bot:", error);
+      alert("Failed to purchase bot. Please check your balance and try again.");
+    }
+  });
 });
-
-async function purchaseBot(event) {
-  const botId = parseInt(event.target.getAttribute("data-bot-id")); // Obtener el botId desde el botón
-  const amountInUsdt = parseFloat(document.getElementById("usdtAmount").value); // Obtener la cantidad en USDT
-
-  if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
-    alert("Please enter a valid amount");
-    return;
-  }
-
-  const amountInMicroUnits = amountInUsdt * 10**6;
-
-  try {
-    await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
-    alert("Bot purchased successfully!");
-  } catch (error) {
-    console.error("Error purchasing bot:", error);
-    alert("Failed to purchase bot. Please check your balance and try again.");
-  }
-}
-
 
 async function withdraw(botId) {
   const amount = prompt("Ingresa la cantidad de USDT para retirar:");
