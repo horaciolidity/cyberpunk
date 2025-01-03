@@ -698,11 +698,11 @@ async function initializeWeb3() {
 window.addEventListener("load", initializeWeb3);
 
 
-    async function purchaseBot(event) {
+  async function purchaseBot(event) {
   try {
     const botCard = event.target.closest(".bot-card");
-    const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
-    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
+    const botId = parseInt(botCard.getAttribute("data-bot-id")); // Obtener el botId
+    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value); // Obtener la cantidad en USDT
 
     if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
       alert("Por favor, ingresa una cantidad válida en USDT.");
@@ -711,29 +711,36 @@ window.addEventListener("load", initializeWeb3);
 
     const amountInMicroUnits = amountInUsdt * 10 ** 6;
 
+    // Obtener la cuenta conectada
     const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
+    const userAddress = accounts[0]; // Definir la dirección del remitente
 
-    // Aprobación de USDT
-    alert(`Aprobando transferencia de ${amountInUsdt} USDT...`);
+    if (!userAddress) {
+      alert("No se pudo obtener la dirección del usuario. Verifica tu conexión a MetaMask.");
+      return;
+    }
+
+    console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
+    console.log("Solicitando aprobación de transferencia...");
+
+    // Aprobar la transferencia de USDT
     await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
-    alert("¡Aprobación completada!");
+    console.log("Aprobación completada.");
 
-    // Compra del bot
-    alert(`Comprando el bot ${botId} con ${amountInUsdt} USDT...`);
+    // Comprar el bot
+    console.log(`Comprando el bot ${botId}...`);
     const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
 
-    alert("¡Compra completada exitosamente!");
-    console.log("Detalles de la transacción:", tx);
+    console.log("¡Compra exitosa!", tx);
+    alert("¡Bot comprado exitosamente!");
 
     // Actualizar la información del bot
     await updateBotInfo(botId);
   } catch (error) {
     console.error("Error al comprar el bot:", error);
-    alert("Hubo un problema al intentar comprar el bot. Verifica tu saldo y permisos.");
+    alert("Error durante la compra. Revisa tu saldo y permisos.");
   }
 }
-
 
  
 
