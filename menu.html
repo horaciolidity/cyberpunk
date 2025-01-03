@@ -746,28 +746,41 @@ function simulateGuides() {
 updateBotInfo(2);
 
 
-
 document.querySelectorAll(".button.primary").forEach(button => {
   button.addEventListener("click", async (event) => {
-    const botId = event.target.closest(".bot-card").querySelector("input").getAttribute("data-bot-id"); // Obtener el botId
-    const amountInUsdt = parseFloat(event.target.closest(".bot-card").querySelector(".usdtAmount").value); // Obtener la cantidad en USDT
+    const botCard = event.target.closest(".bot-card");
+    const botId = botCard.querySelector("input").getAttribute("data-bot-id"); // Obtener el botId
+    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value); // Obtener la cantidad en USDT
 
     if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
-      alert("Please enter a valid amount");
+      alert("Por favor, ingresa una cantidad válida en USDT.");
       return;
     }
 
-    const amountInMicroUnits = amountInUsdt * 10**6;
+    // Conversión a micro-unidades (USDT tiene 6 decimales)
+    const amountInMicroUnits = amountInUsdt * 10 ** 6;
 
     try {
-      await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
-      alert("Bot purchased successfully!");
+      // Paso 1: Aprobar la transferencia de USDT
+      alert("Aprobando la transferencia de USDT...");
+      await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
+      alert("¡Transferencia aprobada!");
+
+      // Paso 2: Llamar a la función purchaseBot
+      alert("Realizando la compra del bot...");
+      const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+
+      alert("¡Transacción enviada! Esperando confirmación...");
+      console.log("Detalles de la transacción:", tx);
+
+      alert("¡Bot comprado exitosamente!");
     } catch (error) {
-      console.error("Error purchasing bot:", error);
-      alert("Failed to purchase bot. Please check your balance and try again.");
+      console.error("Error durante la transacción:", error);
+      alert("No se pudo completar la compra. Por favor, verifica tu saldo e inténtalo de nuevo.");
     }
   });
 });
+
 
 async function withdraw(botId) {
   const amount = prompt("Ingresa la cantidad de USDT para retirar:");
