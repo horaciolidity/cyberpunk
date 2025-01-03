@@ -610,6 +610,8 @@
 let web3;
 let usdtContract;
 let contract;
+let userAddress;
+
 
 const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; // Dirección de USDT en Optimism
 const contractAddress = "0x231132763c55b15b5b9B81EfB8a25F5a7f946B94";
@@ -747,38 +749,46 @@ updateBotInfo(2);
 
 
 document.querySelectorAll(".button.primary").forEach(button => {
-  button.addEventListener("click", async (event) => {
-    const botCard = event.target.closest(".bot-card");
-    const botId = botCard.querySelector("input").getAttribute("data-bot-id"); // Obtener el botId
-    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value); // Obtener la cantidad en USDT
+    button.addEventListener("click", async (event) => {
+        try {
+            const botCard = event.target.closest(".bot-card");
+            if (!botCard) {
+                alert("Error: No se pudo determinar el bot seleccionado.");
+                return;
+            }
 
-    if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
-      alert("Por favor, ingresa una cantidad válida en USDT.");
-      return;
-    }
+            // Obtener el `botId` y la cantidad en USDT
+            const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
+            const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
 
-    // Conversión a micro-unidades (USDT tiene 6 decimales)
-    const amountInMicroUnits = amountInUsdt * 10 ** 6;
+            if (isNaN(botId)) {
+                alert("Error: El ID del bot no es válido.");
+                return;
+            }
 
-    try {
-      // Paso 1: Aprobar la transferencia de USDT
-      alert("Aprobando la transferencia de USDT...");
-      await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
-      alert("¡Transferencia aprobada!");
+            if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
+                alert("Por favor, ingresa una cantidad válida en USDT.");
+                return;
+            }
 
-      // Paso 2: Llamar a la función purchaseBot
-      alert("Realizando la compra del bot...");
-      const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+            const amountInMicroUnits = amountInUsdt * 10 ** 6;
+            console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
 
-      alert("¡Transacción enviada! Esperando confirmación...");
-      console.log("Detalles de la transacción:", tx);
+            // Aprobar la transferencia de USDT
+            console.log("Solicitando aprobación de transferencia...");
+            await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
+            console.log("Aprobación completada.");
 
-      alert("¡Bot comprado exitosamente!");
-    } catch (error) {
-      console.error("Error durante la transacción:", error);
-      alert("No se pudo completar la compra. Por favor, verifica tu saldo e inténtalo de nuevo.");
-    }
-  });
+            // Realizar la compra del bot
+            console.log("Intentando realizar la compra...");
+            const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+            alert("¡Compra exitosa!");
+            console.log("Detalles de la transacción:", tx);
+        } catch (error) {
+            console.error("Error al comprar el bot:", error);
+            alert("Error durante la compra. Por favor, verifica tu saldo y vuelve a intentar.");
+        }
+    });
 });
 
 
