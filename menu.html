@@ -698,11 +698,21 @@ async function initializeWeb3() {
 window.addEventListener("load", initializeWeb3);
 
 
-  async function purchaseBot(event) {
+async function purchaseBot(event) {
   try {
     const botCard = event.target.closest(".bot-card");
-    const botId = parseInt(botCard.getAttribute("data-bot-id")); // Obtener el botId
-    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value); // Obtener la cantidad en USDT
+    if (!botCard) {
+      alert("Error: No se pudo determinar el bot seleccionado.");
+      return;
+    }
+
+    const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
+    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
+
+    if (isNaN(botId)) {
+      alert("Error: El ID del bot no es válido.");
+      return;
+    }
 
     if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
       alert("Por favor, ingresa una cantidad válida en USDT.");
@@ -711,38 +721,27 @@ window.addEventListener("load", initializeWeb3);
 
     const amountInMicroUnits = amountInUsdt * 10 ** 6;
 
-    // Obtener la cuenta conectada
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0]; // Definir la dirección del remitente
-
-    if (!userAddress) {
-      alert("No se pudo obtener la dirección del usuario. Verifica tu conexión a MetaMask.");
-      return;
-    }
-
     console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
-    console.log("Solicitando aprobación de transferencia...");
 
     // Aprobar la transferencia de USDT
+    console.log("Solicitando aprobación de transferencia...");
     await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
     console.log("Aprobación completada.");
 
-    // Comprar el bot
-    console.log(`Comprando el bot ${botId}...`);
+    // Realizar la compra del bot
+    console.log("Intentando realizar la compra...");
     const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
-
-    console.log("¡Compra exitosa!", tx);
-    alert("¡Bot comprado exitosamente!");
+    alert("¡Compra exitosa!");
+    console.log("Detalles de la transacción:", tx);
 
     // Actualizar la información del bot
     await updateBotInfo(botId);
   } catch (error) {
     console.error("Error al comprar el bot:", error);
-    alert("Error durante la compra. Revisa tu saldo y permisos.");
+    alert("Error durante la compra. Por favor, verifica tu saldo y vuelve a intentar.");
   }
 }
 
- 
 
 function simulateGuides() {
   const widgets = document.querySelectorAll('.tradingview-widget');
@@ -884,6 +883,11 @@ async function claimRewards() {
     alert("No se pudieron reclamar las recompensas. Intenta nuevamente.");
   }
 }
+    document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".button.primary").forEach(button => {
+    button.addEventListener("click", purchaseBot);
+  });
+});
 
   </script>
 </body>
