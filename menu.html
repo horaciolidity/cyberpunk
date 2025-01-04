@@ -654,12 +654,15 @@ async function initializeWeb3() {
       });
 
       // Solicitar cuentas a MetaMask
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const account = accounts[0];
-      if (!account) {
-        throw new Error("No se pudo obtener la cuenta de MetaMask.");
-      }
+            const accounts = await web3.eth.getAccounts();
+            userAddress = accounts[0]; // Obtiene y guarda la dirección conectada
+            if (!userAddress) {
+                throw new Error("No se pudo obtener la cuenta de MetaMask.");
+            }
 
+
+  // Actualizar UI
+            document.getElementById("account").textContent = userAddress;
       // Mostrar la dirección conectada
       document.getElementById("account").textContent = account;
 
@@ -699,47 +702,50 @@ window.addEventListener("load", initializeWeb3);
 
 
 async function purchaseBot(event) {
-  try {
-    const botCard = event.target.closest(".bot-card");
-    if (!botCard) {
-      alert("Error: No se pudo determinar el bot seleccionado.");
-      return;
+    try {
+        const accounts = await web3.eth.getAccounts();
+        userAddress = accounts[0]; // Obtiene la dirección del usuario conectado
+
+        const botCard = event.target.closest(".bot-card");
+        if (!botCard) {
+            alert("Error: No se pudo determinar el bot seleccionado.");
+            return;
+        }
+
+        const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
+        const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
+
+        if (isNaN(botId)) {
+            alert("Error: El ID del bot no es válido.");
+            return;
+        }
+
+        if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
+            alert("Por favor, ingresa una cantidad válida en USDT.");
+            return;
+        }
+
+        const amountInMicroUnits = amountInUsdt * 10 ** 6;
+
+        console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
+
+        // Aprobar la transferencia de USDT
+        console.log("Solicitando aprobación de transferencia...");
+        await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
+        console.log("Aprobación completada.");
+
+        // Realizar la compra del bot
+        console.log("Intentando realizar la compra...");
+        const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+        alert("¡Compra exitosa!");
+        console.log("Detalles de la transacción:", tx);
+
+        // Actualizar la información del bot
+        await updateBotInfo(botId);
+    } catch (error) {
+        console.error("Error al comprar el bot:", error);
+        alert("Error durante la compra. Por favor, verifica tu saldo y vuelve a intentar.");
     }
-
-    const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
-    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
-
-    if (isNaN(botId)) {
-      alert("Error: El ID del bot no es válido.");
-      return;
-    }
-
-    if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
-      alert("Por favor, ingresa una cantidad válida en USDT.");
-      return;
-    }
-
-    const amountInMicroUnits = amountInUsdt * 10 ** 6;
-
-    console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
-
-    // Aprobar la transferencia de USDT
-    console.log("Solicitando aprobación de transferencia...");
-    await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
-    console.log("Aprobación completada.");
-
-    // Realizar la compra del bot
-    console.log("Intentando realizar la compra...");
-    const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
-    alert("¡Compra exitosa!");
-    console.log("Detalles de la transacción:", tx);
-
-    // Actualizar la información del bot
-    await updateBotInfo(botId);
-  } catch (error) {
-    console.error("Error al comprar el bot:", error);
-    alert("Error durante la compra. Por favor, verifica tu saldo y vuelve a intentar.");
-  }
 }
 
 
