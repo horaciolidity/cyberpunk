@@ -653,39 +653,41 @@ async function initializeWeb3() {
         params: [{ chainId: "0xa" }] // Chain ID para Optimism
       });
 
-     // Solicitar cuentas a MetaMask
+      // Solicitar cuentas a MetaMask
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
       const account = accounts[0];
       if (!account) {
         throw new Error("No se pudo obtener la cuenta de MetaMask.");
       }
 
+      // Guardar la dirección del usuario globalmente
+      userAddress = account;
 
-  
       // Mostrar la dirección conectada
-      document.getElementById("account").textContent = account;
+      document.getElementById("account").textContent = userAddress;
 
       // Obtener y mostrar el saldo en ETH
-      const ethBalance = await web3.eth.getBalance(account);
+      const ethBalance = await web3.eth.getBalance(userAddress);
       document.getElementById("balanceEth").textContent = `${web3.utils.fromWei(ethBalance, "ether")} ETH`;
 
       // Inicializar el contrato de USDT
       usdtContract = new web3.eth.Contract(usdtABI, usdtContractAddress);
 
       // Obtener y mostrar el saldo en USDT
-      const usdtBalance = await usdtContract.methods.balanceOf(account).call();
+      const usdtBalance = await usdtContract.methods.balanceOf(userAddress).call();
       const usdtBalanceFormatted = (Number(usdtBalance) / 1e6).toFixed(2); // USDT tiene 6 decimales
       document.getElementById("balanceUsdt").textContent = `${usdtBalanceFormatted} USDT`;
 
       // Inicializar el contrato principal
       contract = new web3.eth.Contract(contractABI, contractAddress);
 
-      // Verificar si la red y los contratos están configurados correctamente
+      // Confirmar conexión en la consola
       console.log("Conexión establecida correctamente:");
-      console.log("Cuenta conectada:", account);
+      console.log("Cuenta conectada:", userAddress);
       console.log("Saldo en ETH:", web3.utils.fromWei(ethBalance, "ether"), "ETH");
       console.log("Saldo en USDT:", usdtBalanceFormatted, "USDT");
 
+      // Notificar éxito al usuario
       alert("Conexión exitosa a MetaMask y la red Optimism.");
     } catch (error) {
       console.error("Error al conectar a MetaMask o cambiar de red:", error);
@@ -700,21 +702,30 @@ async function initializeWeb3() {
 window.addEventListener("load", initializeWeb3);
 
 
+
 async function purchaseBot(event) {
     try {
+        // Obtener la dirección del usuario conectado
         const accounts = await web3.eth.getAccounts();
-        userAddress = accounts[0]; // Obtiene la dirección del usuario conectado
+        userAddress = accounts[0]; 
+        if (!userAddress) {
+            alert("No se pudo obtener la cuenta de usuario conectada. Intenta reconectar MetaMask.");
+            return;
+        }
 
+        // Obtener la tarjeta del bot correspondiente al botón presionado
         const botCard = event.target.closest(".bot-card");
         if (!botCard) {
             alert("Error: No se pudo determinar el bot seleccionado.");
             return;
         }
 
+        // Extraer ID del bot y cantidad ingresada
         const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
         const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
 
-        if (isNaN(botId)) {
+        // Validaciones
+        if (isNaN(botId) || botId < 0 || botId > 6) {
             alert("Error: El ID del bot no es válido.");
             return;
         }
@@ -724,9 +735,16 @@ async function purchaseBot(event) {
             return;
         }
 
-        const amountInMicroUnits = amountInUsdt * 10 ** 6;
+        const amountInMicroUnits = Math.floor(amountInUsdt * 10 ** 6); // Convertir a micro-unidades
 
         console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
+
+        // Verificar saldo en USDT antes de continuar
+        const userBalance = await usdtContract.methods.balanceOf(userAddress).call();
+        if (parseInt(userBalance) < amountInMicroUnits) {
+            alert("Saldo insuficiente en USDT para completar la compra.");
+            return;
+        }
 
         // Aprobar la transferencia de USDT
         console.log("Solicitando aprobación de transferencia...");
@@ -736,18 +754,27 @@ async function purchaseBot(event) {
         // Realizar la compra del bot
         console.log("Intentando realizar la compra...");
         const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
-        alert("¡Compra exitosa!");
-        console.log("Detalles de la transacción:", tx);
+        console.log("Compra exitosa:", tx);
+        alert("¡Compra realizada con éxito!");
 
-        // Actualizar la información del bot
+        // Actualizar la información del bot después de la compra
         await updateBotInfo(botId);
     } catch (error) {
         console.error("Error al comprar el bot:", error);
-        alert("Error durante la compra. Por favor, verifica tu saldo y vuelve a intentar.");
+
+        // Identificar y manejar errores específicos
+        if (error.code === 4001) {
+            alert("Transacción rechazada por el usuario.");
+        } else if (error.message.includes("insufficient funds")) {
+            alert("Fondos insuficientes para pagar la comisión de la red.");
+        } else {
+            alert("Error durante la compra. Revisa la consola para más detalles.");
+        }
     }
 }
 
 
+    
 function simulateGuides() {
   const widgets = document.querySelectorAll('.tradingview-widget');
   widgets.forEach((widget, index) => {
