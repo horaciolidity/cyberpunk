@@ -653,16 +653,15 @@ async function initializeWeb3() {
         params: [{ chainId: "0xa" }] // Chain ID para Optimism
       });
 
-      // Solicitar cuentas a MetaMask
-            const accounts = await web3.eth.getAccounts();
-            userAddress = accounts[0]; // Obtiene y guarda la dirección conectada
-            if (!userAddress) {
-                throw new Error("No se pudo obtener la cuenta de MetaMask.");
-            }
+     // Solicitar cuentas a MetaMask
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      const account = accounts[0];
+      if (!account) {
+        throw new Error("No se pudo obtener la cuenta de MetaMask.");
+      }
 
 
-  // Actualizar UI
-            document.getElementById("account").textContent = userAddress;
+  
       // Mostrar la dirección conectada
       document.getElementById("account").textContent = account;
 
