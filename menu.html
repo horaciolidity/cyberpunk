@@ -900,8 +900,14 @@ async function withdraw(botId) {
 }
 async function analyzePerformance(botId) {
   try {
+    // Asegurarte de que se obtiene la dirección del usuario
     const accounts = await web3.eth.getAccounts();
     const userAddress = accounts[0];
+
+    if (!userAddress) {
+      alert("No se pudo obtener la cuenta conectada. Asegúrate de estar conectado a MetaMask.");
+      return;
+    }
 
     // Obtener detalles del bot desde el contrato
     const botBalance = BigInt(await contract.methods.getUserBotBalance(userAddress, botId).call());
@@ -909,7 +915,7 @@ async function analyzePerformance(botId) {
     const lastClaim = BigInt(await contract.methods.lastRewardClaim(userAddress).call());
     const bot = await contract.methods.bots(botId).call();
 
-    // Convertir BigInt a Number para operaciones y formateo
+    // Convertir valores BigInt a Number para su manejo
     const balanceFormatted = Number(botBalance) / 1e6;
     const rewardsFormatted = Number(pendingRewards) / 1e6;
     const lastClaimDate = new Date(Number(lastClaim) * 1000).toLocaleString();
@@ -920,16 +926,20 @@ async function analyzePerformance(botId) {
       - Saldo: ${balanceFormatted.toFixed(2)} USDT
       - Recompensas Pendientes: ${rewardsFormatted.toFixed(2)} USDT
       - Última Fecha de Reclamo: ${lastClaimDate}
-      - Interés: ${(bot.interestRate / 100).toFixed(2)}%
+      - Interés: ${(Number(bot.interestRate) / 100).toFixed(2)}%
       - Retiros Habilitados: ${bot.withdrawalsEnabled ? "Sí" : "No"}
     `);
   } catch (error) {
     console.error("Error al analizar el rendimiento:", error);
-    alert("Hubo un problema al intentar analizar el rendimiento. Por favor, inténtalo nuevamente.");
+
+    // Identificar posibles errores
+    if (error.message.includes("Cannot mix BigInt")) {
+      alert("Hubo un problema al procesar valores del contrato. Asegúrate de estar conectado correctamente.");
+    } else {
+      alert("Hubo un problema al intentar analizar el rendimiento. Revisa la consola para más detalles.");
+    }
   }
 }
-
-
 
     async function viewHistory(botId) {
   try {
