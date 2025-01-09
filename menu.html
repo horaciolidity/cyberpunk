@@ -904,21 +904,21 @@ async function analyzePerformance(botId) {
     const userAddress = accounts[0];
 
     // Obtener detalles del bot desde el contrato
-    const botBalance = await contract.methods.getUserBotBalance(userAddress, botId).call();
-    const pendingRewards = await contract.methods.getPendingReward(userAddress).call();
-    const lastClaim = await contract.methods.lastRewardClaim(userAddress).call();
+    const botBalance = BigInt(await contract.methods.getUserBotBalance(userAddress, botId).call());
+    const pendingRewards = BigInt(await contract.methods.getPendingReward(userAddress).call());
+    const lastClaim = BigInt(await contract.methods.lastRewardClaim(userAddress).call());
     const bot = await contract.methods.bots(botId).call();
 
-    // Formatear datos
-    const balanceFormatted = (botBalance / 1e6).toFixed(2);
-    const rewardsFormatted = (pendingRewards / 1e6).toFixed(2);
-    const lastClaimDate = new Date(lastClaim * 1000).toLocaleString();
+    // Convertir BigInt a Number para operaciones y formateo
+    const balanceFormatted = Number(botBalance) / 1e6;
+    const rewardsFormatted = Number(pendingRewards) / 1e6;
+    const lastClaimDate = new Date(Number(lastClaim) * 1000).toLocaleString();
 
     // Mostrar los datos en la interfaz
     alert(`
       Rendimiento del Bot ${botId}:
-      - Saldo: ${balanceFormatted} USDT
-      - Recompensas Pendientes: ${rewardsFormatted} USDT
+      - Saldo: ${balanceFormatted.toFixed(2)} USDT
+      - Recompensas Pendientes: ${rewardsFormatted.toFixed(2)} USDT
       - Última Fecha de Reclamo: ${lastClaimDate}
       - Interés: ${(bot.interestRate / 100).toFixed(2)}%
       - Retiros Habilitados: ${bot.withdrawalsEnabled ? "Sí" : "No"}
@@ -928,6 +928,7 @@ async function analyzePerformance(botId) {
     alert("Hubo un problema al intentar analizar el rendimiento. Por favor, inténtalo nuevamente.");
   }
 }
+
 
 
     async function viewHistory(botId) {
