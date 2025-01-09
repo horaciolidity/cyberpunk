@@ -898,6 +898,75 @@ async function withdraw(botId) {
     alert("Hubo un problema al intentar retirar los fondos.");
   }
 }
+async function analyzePerformance(botId) {
+  try {
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+
+    // Obtener detalles del bot desde el contrato
+    const botBalance = await contract.methods.getUserBotBalance(userAddress, botId).call();
+    const pendingRewards = await contract.methods.getPendingReward(userAddress).call();
+    const lastClaim = await contract.methods.lastRewardClaim(userAddress).call();
+    const bot = await contract.methods.bots(botId).call();
+
+    // Formatear datos
+    const balanceFormatted = (botBalance / 1e6).toFixed(2);
+    const rewardsFormatted = (pendingRewards / 1e6).toFixed(2);
+    const lastClaimDate = new Date(lastClaim * 1000).toLocaleString();
+
+    // Mostrar los datos en la interfaz
+    alert(`
+      Rendimiento del Bot ${botId}:
+      - Saldo: ${balanceFormatted} USDT
+      - Recompensas Pendientes: ${rewardsFormatted} USDT
+      - Última Fecha de Reclamo: ${lastClaimDate}
+      - Interés: ${(bot.interestRate / 100).toFixed(2)}%
+      - Retiros Habilitados: ${bot.withdrawalsEnabled ? "Sí" : "No"}
+    `);
+  } catch (error) {
+    console.error("Error al analizar el rendimiento:", error);
+    alert("Hubo un problema al intentar analizar el rendimiento. Por favor, inténtalo nuevamente.");
+  }
+}
+
+
+    async function viewHistory(botId) {
+  try {
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+
+    // Obtener eventos del contrato relacionados con el usuario
+    const pastEvents = await contract.getPastEvents("allEvents", {
+      filter: { user: userAddress },
+      fromBlock: 0, // Cambiar por el bloque de despliegue del contrato para optimizar
+      toBlock: "latest"
+    });
+
+    // Filtrar eventos específicos relacionados con el botId
+    const botEvents = pastEvents.filter(event => {
+      return event.returnValues.botId == botId;
+    });
+
+    if (botEvents.length === 0) {
+      alert(`No hay transacciones registradas para el Bot ${botId}.`);
+      return;
+    }
+
+    // Formatear el historial
+    const history = botEvents.map(event => {
+      const eventType = event.event;
+      const amount = (event.returnValues.amount / 1e6).toFixed(2);
+      const timestamp = new Date(event.returnValues.timestamp * 1000).toLocaleString();
+      return `${timestamp} - ${eventType}: ${amount} USDT`;
+    }).join("\n");
+
+    // Mostrar el historial
+    alert(`Historial de Transacciones para el Bot ${botId}:\n\n${history}`);
+  } catch (error) {
+    console.error("Error al ver el historial:", error);
+    alert("Hubo un problema al intentar obtener el historial de transacciones.");
+  }
+}
 
 
 async function claimRewards() {
