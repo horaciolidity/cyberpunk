@@ -808,22 +808,28 @@ async function updateBotInfo(botId) {
     const accounts = await web3.eth.getAccounts();
     const userAddress = accounts[0];
 
+    // Llamada al contrato para obtener la información del bot
     const bot = await contract.methods.bots(botId).call();
     const userBalance = await contract.methods.getUserBotBalance(userAddress, botId).call();
-    const pendingRewards = await contract.methods.getPendingReward(userAddress).call();
+    const pendingRewards = await contract.methods.getPendingReward(userAddress, botId).call();
     const withdrawalFee = await contract.methods.calculateWithdrawalFee(botId, userBalance).call();
 
-    // Actualizar la UI
+    // Actualizar la UI para el bot correspondiente
     const botCard = document.querySelector(`.bot-card[data-bot-id="${botId}"]`);
     botCard.querySelector(".status-label").textContent = bot.withdrawalsEnabled ? "Bot activo" : "Bot inactivo";
     botCard.querySelector(".status-indicator").style.backgroundColor = bot.withdrawalsEnabled ? "green" : "red";
-    botCard.querySelector(".bot-balance").textContent = `${(userBalance / 10 ** 6).toFixed(2)} USDT`;
-    botCard.querySelector(".bot-profit").textContent = `${(pendingRewards / 10 ** 6).toFixed(2)} USDT`;
-    botCard.querySelector(".bot-fee").textContent = `${(withdrawalFee / 10 ** 6).toFixed(2)}%`;
+    botCard.querySelector(".bot-info p:first-child").textContent = `Saldo: ${(userBalance / 10 ** 6).toFixed(2)} USDT`;
+    botCard.querySelector(".bot-info p:nth-child(2)").textContent = `Profit: ${(pendingRewards / 10 ** 6).toFixed(2)} USDT`;
+    botCard.querySelector(".bot-info p:last-child").textContent = `Fee: ${(withdrawalFee / 10 ** 6).toFixed(2)}%`;
   } catch (error) {
     console.error("Error al actualizar la información del bot:", error);
     alert("No se pudo actualizar la información del bot.");
   }
+}
+
+// Actualizar la información de todos los bots al cargar la página
+for (let i = 0; i <= 6; i++) {
+  updateBotInfo(i);
 }
 
 
