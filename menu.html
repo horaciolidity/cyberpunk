@@ -319,7 +319,10 @@
      <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="0" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
+       <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
+
   <button class="button danger" onclick="withdraw(0)">Retirar</button>
+       
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -365,6 +368,8 @@
      <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="1" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
+       <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
+
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -409,6 +414,8 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="2" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
+     <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
+
   <button class="button danger" onclick="withdraw(2)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -452,6 +459,8 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="3" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
+     <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
+
   <button class="button danger" onclick="withdraw(3)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -496,6 +505,8 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="4" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
+     <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
+
   <button class="button danger" onclick="withdraw(4)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -539,6 +550,8 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="5" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
+     <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
+
      <button class="button danger" onclick="withdraw(5)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -581,6 +594,8 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="6" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
+     <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
+
      <button class="button danger" onclick="withdraw(6)">Retirar</button>
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
@@ -680,6 +695,11 @@ async function initializeWeb3() {
 
       // Inicializar el contrato principal
       contract = new web3.eth.Contract(contractABI, contractAddress);
+
+      for (let botId = 0; botId <= 6; botId++) {
+      await updateBotInfo(botId, userAddress);
+    }
+
 
       // Confirmar conexión en la consola
       console.log("Conexión establecida correctamente:");
@@ -805,19 +825,21 @@ function simulateGuides() {
 
 async function updateBotInfo(botId, userAddress) {
   try {
+    // Obtener detalles del bot desde el contrato
     const bot = await contract.methods.bots(botId).call();
     const userBalance = await contract.methods.getUserBotBalance(userAddress, botId).call();
     const pendingRewards = await contract.methods.getPendingReward(userAddress, botId).call();
     const withdrawalFee = await contract.methods.calculateWithdrawalFee(botId, userBalance).call();
+    const timeUntilNextClaim = await contract.methods.getTimeUntilNextClaim(userAddress, botId).call();
 
-    // Selecciona la tarjeta del bot
+    // Selecciona la tarjeta del bot en el DOM
     const botCard = document.querySelector(`.bot-card:nth-child(${botId + 1})`);
     if (!botCard) {
       console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
       return;
     }
 
-    // Actualizar la información de estado
+    // Actualizar estado del bot (activo/inactivo)
     const statusLabel = botCard.querySelector(".status-label");
     const statusIndicator = botCard.querySelector(".status-indicator");
     statusLabel.textContent = bot.withdrawalsEnabled ? "Bot activo" : "Bot inactivo";
@@ -830,8 +852,57 @@ async function updateBotInfo(botId, userAddress) {
       <p><strong>Profit:</strong> ${(pendingRewards / 10 ** 6).toFixed(2)} USDT</p>
       <p><strong>Fee %:</strong> ${(withdrawalFee / 10 ** 6).toFixed(2)}%</p>
     `;
+
+    // Manejar el botón de "Reclamar Recompensas"
+    const claimButton = botCard.querySelector(".button.success");
+    if (timeUntilNextClaim > 0) {
+      claimButton.disabled = true;
+      claimButton.title = `Espera ${Math.ceil(timeUntilNextClaim / 3600)} horas para reclamar.`;
+    } else {
+      claimButton.disabled = false;
+      claimButton.title = "Puedes reclamar tu recompensa.";
+    }
+
+    // Agregar evento al botón si no está ya configurado
+    if (!claimButton.dataset.listenerAdded) {
+      claimButton.addEventListener("click", async () => {
+        try {
+          alert(`Reclamando recompensas del Bot ${botId}...`);
+          const tx = await contract.methods.claimRewards(botId).send({ from: userAddress });
+          alert("¡Recompensas reclamadas exitosamente!");
+          console.log("Detalles de la transacción:", tx);
+          await updateBotInfo(botId, userAddress); // Actualizar después de reclamar
+        } catch (error) {
+          console.error("Error al reclamar recompensas:", error);
+          alert("No se pudieron reclamar las recompensas. Intenta nuevamente.");
+        }
+      });
+      claimButton.dataset.listenerAdded = true; // Asegurar que solo se agrega una vez
+    }
   } catch (error) {
     console.error("Error al actualizar la información del bot:", error);
+
+    // Manejar errores específicos
+    if (error.message.includes("revert")) {
+      alert("Hubo un problema al obtener los datos del bot. Verifica la conexión con el contrato.");
+    } else {
+      alert("Ocurrió un error inesperado. Consulta la consola para más detalles.");
+    }
+  }
+}
+
+    async function claimRewards(botId) {
+  try {
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+    alert(`Reclamando recompensas del Bot ${botId}...`);
+    const tx = await contract.methods.claimRewards(botId).send({ from: userAddress });
+    alert("¡Recompensas reclamadas exitosamente!");
+    console.log("Detalles de la transacción:", tx);
+    await updateBotInfo(botId, userAddress);
+  } catch (error) {
+    console.error("Error al reclamar recompensas:", error);
+    alert("Error al reclamar recompensas. Intenta nuevamente.");
   }
 }
 
