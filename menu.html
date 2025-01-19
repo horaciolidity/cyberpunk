@@ -803,7 +803,6 @@ function simulateGuides() {
     }, 2000);
   });
 
-// Función para actualizar la información del bot
 async function updateBotInfo(botId, userAddress) {
   try {
     const bot = await contract.methods.bots(botId).call();
@@ -811,21 +810,30 @@ async function updateBotInfo(botId, userAddress) {
     const pendingRewards = await contract.methods.getPendingReward(userAddress, botId).call();
     const withdrawalFee = await contract.methods.calculateWithdrawalFee(botId, userBalance).call();
 
-    // Actualizar la UI
-    const botCard = document.querySelector(`.bot-card[data-bot-id="${botId}"]`);
-    botCard.querySelector(".status-label").textContent = bot.withdrawalsEnabled ? "Bot activo" : "Bot inactivo";
-    botCard.querySelector(".status-indicator").style.backgroundColor = bot.withdrawalsEnabled ? "green" : "red";
-    botCard.querySelector(".bot-balance").textContent = `${(userBalance / 10 ** 6).toFixed(2)} USDT`;
-    botCard.querySelector(".bot-profit").textContent = `${(pendingRewards / 10 ** 6).toFixed(2)} USDT`;
-    botCard.querySelector(".bot-fee").textContent = `${(withdrawalFee / 10 ** 6).toFixed(2)}%`;
+    // Selecciona la tarjeta del bot
+    const botCard = document.querySelector(`.bot-card:nth-child(${botId + 1})`);
+    if (!botCard) {
+      console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
+      return;
+    }
+
+    // Actualizar la información de estado
+    const statusLabel = botCard.querySelector(".status-label");
+    const statusIndicator = botCard.querySelector(".status-indicator");
+    statusLabel.textContent = bot.withdrawalsEnabled ? "Bot activo" : "Bot inactivo";
+    statusIndicator.style.backgroundColor = bot.withdrawalsEnabled ? "green" : "red";
+
+    // Actualizar la información del bot
+    const botInfo = botCard.querySelector(".bot-info");
+    botInfo.innerHTML = `
+      <p><strong>Saldo:</strong> ${(userBalance / 10 ** 6).toFixed(2)} USDT</p>
+      <p><strong>Profit:</strong> ${(pendingRewards / 10 ** 6).toFixed(2)} USDT</p>
+      <p><strong>Fee %:</strong> ${(withdrawalFee / 10 ** 6).toFixed(2)}%</p>
+    `;
   } catch (error) {
     console.error("Error al actualizar la información del bot:", error);
-    alert("No se pudo actualizar la información del bot.");
   }
 }
-
-// Llamar a la función para conectar MetaMask
-connectMetaMask();
 
 
 
