@@ -733,76 +733,86 @@ async function initializeWeb3() {
 window.addEventListener("load", initializeWeb3);
 
 
-
 async function purchaseBot(event) {
-    try {
-        // Obtener la dirección del usuario conectado
-        const accounts = await web3.eth.getAccounts();
-        userAddress = accounts[0]; 
-        if (!userAddress) {
-            alert("No se pudo obtener la cuenta de usuario conectada. Intenta reconectar MetaMask.");
-            return;
-        }
-
-        // Obtener la tarjeta del bot correspondiente al botón presionado
-        const botCard = event.target.closest(".bot-card");
-        if (!botCard) {
-            alert("Error: No se pudo determinar el bot seleccionado.");
-            return;
-        }
-
-        // Extraer ID del bot y cantidad ingresada
-        const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
-        const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
-
-        // Validaciones
-        if (isNaN(botId) || botId < 0 || botId > 6) {
-            alert("Error: El ID del bot no es válido.");
-            return;
-        }
-
-        if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
-            alert("Por favor, ingresa una cantidad válida en USDT.");
-            return;
-        }
-
-        const amountInMicroUnits = Math.floor(amountInUsdt * 10 ** 6); // Convertir a micro-unidades
-
-        console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
-
-        // Verificar saldo en USDT antes de continuar
-        const userBalance = await usdtContract.methods.balanceOf(userAddress).call();
-        if (parseInt(userBalance) < amountInMicroUnits) {
-            alert("Saldo insuficiente en USDT para completar la compra.");
-            return;
-        }
-
-        // Aprobar la transferencia de USDT
-        console.log("Solicitando aprobación de transferencia...");
-        await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
-        console.log("Aprobación completada.");
-
-        // Realizar la compra del bot
-        console.log("Intentando realizar la compra...");
-        const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
-        console.log("Compra exitosa:", tx);
-        alert("¡Compra realizada con éxito!");
-
-        // Actualizar la información del bot después de la compra
-        await updateBotInfo(botId);
-    } catch (error) {
-        console.error("Error al comprar el bot:", error);
-
-        // Identificar y manejar errores específicos
-        if (error.code === 4001) {
-            alert("Transacción rechazada por el usuario.");
-        } else if (error.message.includes("insufficient funds")) {
-            alert("Fondos insuficientes para pagar la comisión de la red.");
-        } else {
-            alert("Error durante la compra. Revisa la consola para más detalles.");
-        }
+  try {
+    // Obtener la dirección del usuario conectado
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+    if (!userAddress) {
+      alert("No se pudo obtener la cuenta de usuario conectada. Intenta reconectar MetaMask.");
+      return;
     }
+
+    // Obtener la tarjeta del bot correspondiente al botón presionado
+    const botCard = event.target.closest(".bot-card");
+    if (!botCard) {
+      alert("Error: No se pudo determinar el bot seleccionado.");
+      return;
+    }
+
+    // Extraer ID del bot y cantidad ingresada
+    const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
+    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
+
+    // Validaciones
+    if (isNaN(botId) || botId < 0 || botId > 6) {
+      alert("Error: El ID del bot no es válido.");
+      return;
+    }
+
+    if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
+      alert("Por favor, ingresa una cantidad válida en USDT.");
+      return;
+    }
+
+    // Convertir el monto a micro-unidades
+    const amountInMicroUnits = BigInt(Math.floor(amountInUsdt * 10 ** 6));
+
+    console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
+
+    // Verificar saldo en USDT antes de continuar
+    const userBalance = BigInt(await usdtContract.methods.balanceOf(userAddress).call());
+    if (amountInMicroUnits > userBalance) {
+      alert("Saldo insuficiente en USDT para completar la compra.");
+      return;
+    }
+
+    // Confirmar compra con el usuario
+    const confirmation = confirm(`Vas a comprar el Bot ${botId} con ${(Number(amountInMicroUnits) / 1e6).toFixed(2)} USDT. ¿Deseas continuar?`);
+    if (!confirmation) {
+      alert("Compra cancelada.");
+      return;
+    }
+
+    // Aprobar la transferencia de USDT
+    console.log("Solicitando aprobación de transferencia...");
+    await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
+    console.log("Aprobación completada.");
+
+    // Realizar la compra del bot
+    console.log("Intentando realizar la compra...");
+    const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+    console.log("Compra exitosa:", tx);
+    alert("¡Compra realizada con éxito!");
+
+    // Actualizar la información del bot después de la compra
+    await updateBotInfo(botId, userAddress);
+  } catch (error) {
+    console.error("Error al comprar el bot:", error);
+
+    // Identificar y manejar errores específicos
+    if (error.code === 4001) {
+      alert("Transacción rechazada por el usuario.");
+    } else if (error.message.includes("insufficient funds")) {
+      alert("Fondos insuficientes para pagar la comisión de la red.");
+    } else if (error.message.includes("revert")) {
+      alert("El contrato rechazó la transacción. Verifica las condiciones para comprar este bot.");
+    } else {
+      alert("Error durante la compra. Revisa la consola para más detalles.");
+    }
+  }
 }
+
 
 
     
@@ -838,13 +848,13 @@ async function updateBotInfo(botId, userAddress) {
   try {
     // Obtener detalles del bot desde el contrato
     const bot = await contract.methods.bots(botId).call();
-    const userBalance = await contract.methods.getUserBotBalance(userAddress, botId).call();
-    const pendingRewards = await contract.methods.getPendingReward(userAddress, botId).call();
-    const withdrawalFee = await contract.methods.calculateWithdrawalFee(botId, userBalance).call();
-    const timeUntilNextClaim = await contract.methods.getTimeUntilNextClaim(userAddress, botId).call();
+    const userBalance = BigInt(await contract.methods.getUserBotBalance(userAddress, botId).call());
+    const pendingRewards = BigInt(await contract.methods.getPendingReward(userAddress, botId).call());
+    const withdrawalFee = BigInt(await contract.methods.calculateWithdrawalFee(botId, userBalance).call());
+    const timeUntilNextClaim = BigInt(await contract.methods.getTimeUntilNextClaim(userAddress, botId).call());
 
-    // Selecciona la tarjeta del bot en el DOM
-    const botCard = document.querySelector(`.bot-card:nth-child(${botId + 1})`);
+    // Seleccionar la tarjeta del bot en el DOM
+    const botCard = document.querySelector(`.bot-card[data-bot-id="${botId}"]`);
     if (!botCard) {
       console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
       return;
@@ -859,16 +869,16 @@ async function updateBotInfo(botId, userAddress) {
     // Actualizar la información del bot
     const botInfo = botCard.querySelector(".bot-info");
     botInfo.innerHTML = `
-      <p><strong>Saldo:</strong> ${(userBalance / 10 ** 6).toFixed(2)} USDT</p>
-      <p><strong>Profit:</strong> ${(pendingRewards / 10 ** 6).toFixed(2)} USDT</p>
-      <p><strong>Fee %:</strong> ${(withdrawalFee / 10 ** 6).toFixed(2)}%</p>
+      <p><strong>Saldo:</strong> ${(Number(userBalance) / 1e6).toFixed(2)} USDT</p>
+      <p><strong>Profit:</strong> ${(Number(pendingRewards) / 1e6).toFixed(2)} USDT</p>
+      <p><strong>Fee %:</strong> ${(Number(withdrawalFee) / 1e6).toFixed(2)}%</p>
     `;
 
     // Manejar el botón de "Reclamar Recompensas"
     const claimButton = botCard.querySelector(".button.success");
     if (timeUntilNextClaim > 0) {
       claimButton.disabled = true;
-      claimButton.title = `Espera ${Math.ceil(timeUntilNextClaim / 3600)} horas para reclamar.`;
+      claimButton.title = `Espera ${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas para reclamar.`;
     } else {
       claimButton.disabled = false;
       claimButton.title = "Puedes reclamar tu recompensa.";
@@ -901,6 +911,8 @@ async function updateBotInfo(botId, userAddress) {
     }
   }
 }
+
+
 
     async function claimRewards(botId) {
   try {
@@ -1000,33 +1012,64 @@ async function showUserDetails(botId) {
 
 
 
-    
 async function withdraw(botId) {
   try {
+    // Solicitar al usuario la cantidad de USDT para retirar
     const amount = prompt("Ingresa la cantidad de USDT para retirar:");
     if (!amount || isNaN(amount) || Number(amount) <= 0) {
       alert("Por favor, ingresa una cantidad válida para retirar.");
       return;
     }
 
-    const amountInMicroUnits = amount * 10 ** 6;
+    // Convertir el monto a micro-unidades (BigInt para evitar errores de precisión)
+    const amountInMicroUnits = BigInt(Math.floor(Number(amount) * 10 ** 6));
 
+    // Obtener la dirección del usuario conectado
     const accounts = await web3.eth.getAccounts();
     const userAddress = accounts[0];
+    if (!userAddress) {
+      alert("No se pudo obtener la cuenta conectada. Asegúrate de estar conectado a MetaMask.");
+      return;
+    }
 
+    // Verificar el saldo del usuario en el bot
+    const userBalance = BigInt(await contract.methods.getUserBotBalance(userAddress, botId).call());
+    if (amountInMicroUnits > userBalance) {
+      alert("Saldo insuficiente para retirar la cantidad solicitada.");
+      return;
+    }
+
+    // Confirmar retiro con el usuario
+    const confirmation = confirm(`Vas a retirar ${(Number(amountInMicroUnits) / 1e6).toFixed(2)} USDT del Bot ${botId}. ¿Deseas continuar?`);
+    if (!confirmation) {
+      alert("Operación cancelada.");
+      return;
+    }
+
+    // Realizar el retiro
     alert("Realizando el retiro...");
     const tx = await contract.methods.withdrawBotBalance(botId, amountInMicroUnits).send({ from: userAddress });
 
+    // Notificar éxito al usuario
     alert("¡Retiro exitoso!");
     console.log("Detalles de la transacción:", tx);
 
     // Actualizar la información del bot
-    await updateBotInfo(botId);
+    await updateBotInfo(botId, userAddress);
   } catch (error) {
     console.error("Error al retirar fondos:", error);
-    alert("Hubo un problema al intentar retirar los fondos.");
+
+    // Identificar posibles errores
+    if (error.code === 4001) {
+      alert("Operación cancelada por el usuario.");
+    } else if (error.message.includes("revert")) {
+      alert("El contrato rechazó la transacción. Verifica las condiciones para retirar.");
+    } else {
+      alert("Ocurrió un error inesperado. Consulta la consola para más detalles.");
+    }
   }
 }
+
 async function analyzePerformance(botId) {
   try {
     // Asegurarte de que se obtiene la dirección del usuario
