@@ -322,9 +322,11 @@
        <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
 
   <button class="button danger" onclick="withdraw(0)">Retirar</button>
-       
+  <button class="button info" onclick="showUserDetails(0)">📝 Ver Detalles</button>
+
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
+       
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
   <button class="button primary" onclick="customizeBot(1)">⚙️ Configuración Personalizada</button>
   <button class="button secondary" onclick="enableNotifications(1)">🔔 Activar Notificaciones</button>
@@ -371,6 +373,8 @@
        <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
 
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
+  <button class="button info" onclick="showUserDetails(0)">📝 Ver Detalles</button>
+
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -417,6 +421,8 @@
      <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
 
   <button class="button danger" onclick="withdraw(2)">Retirar</button>
+  <button class="button info" onclick="showUserDetails(0)">📝 Ver Detalles</button>
+
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -462,6 +468,8 @@
      <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
 
   <button class="button danger" onclick="withdraw(3)">Retirar</button>
+  <button class="button info" onclick="showUserDetails(0)">📝 Ver Detalles</button>
+
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
@@ -508,7 +516,8 @@
      <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
 
   <button class="button danger" onclick="withdraw(4)">Retirar</button>
-  
+  <button class="button info" onclick="showUserDetails(0)">📝 Ver Detalles</button>
+
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
   <button class="button primary" onclick="customizeBot(1)">⚙️ Configuración Personalizada</button>
@@ -553,7 +562,8 @@
      <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
 
      <button class="button danger" onclick="withdraw(5)">Retirar</button>
-  
+     <button class="button info" onclick="showUserDetails(0)">📝 Ver Detalles</button>
+
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
   <button class="button primary" onclick="customizeBot(1)">⚙️ Configuración Personalizada</button>
@@ -597,7 +607,8 @@
      <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
 
      <button class="button danger" onclick="withdraw(6)">Retirar</button>
-  
+     <button class="button info" onclick="showUserDetails(0)">📝 Ver Detalles</button>
+
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
   <button class="button primary" onclick="customizeBot(1)">⚙️ Configuración Personalizada</button>
@@ -951,7 +962,45 @@ document.querySelectorAll(".button.primary").forEach(button => {
     });
 });
 
+async function showUserDetails(botId) {
+  try {
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
 
+    if (!userAddress) {
+      alert("No se pudo obtener la cuenta conectada. Asegúrate de estar conectado a MetaMask.");
+      return;
+    }
+
+    // Obtener datos del usuario y bot desde el contrato
+    const userBalance = await contract.methods.getUserBotBalance(userAddress, botId).call();
+    const pendingRewards = await contract.methods.getPendingReward(userAddress, botId).call();
+    const botDetails = await contract.methods.bots(botId).call();
+
+    // Calcular el porcentaje de ganancia
+    const balance = parseFloat(userBalance) / 1e6;
+    const rewards = parseFloat(pendingRewards) / 1e6;
+    const profitPercentage = rewards > 0 ? ((rewards / balance) * 100).toFixed(2) : 0;
+
+    // Mostrar los detalles en un modal o alerta
+    alert(`
+      Detalles del Bot ${botId}:
+      - Saldo: ${balance.toFixed(2)} USDT
+      - Recompensas Pendientes: ${rewards.toFixed(2)} USDT
+      - Porcentaje de Ganancia: ${profitPercentage}%
+      - Interés Diario: ${(botDetails.interestRate / 100).toFixed(2)}%
+      - Retiros Habilitados: ${botDetails.withdrawalsEnabled ? "Sí" : "No"}
+    `);
+  } catch (error) {
+    console.error("Error al obtener detalles del bot:", error);
+    alert("No se pudieron obtener los detalles del bot. Intenta nuevamente.");
+  }
+}
+
+
+
+
+    
 async function withdraw(botId) {
   try {
     const amount = prompt("Ingresa la cantidad de USDT para retirar:");
