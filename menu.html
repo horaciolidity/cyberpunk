@@ -867,20 +867,24 @@ function simulateGuides() {
 
 async function updateAllBots() {
   try {
+    if (!web3Ready) {
+      console.warn("Web3 no está listo. Esperando...");
+      return; // Salir si Web3 no está listo
+    }
+
     const accounts = await web3.eth.getAccounts();
     const userAddress = accounts[0];
 
-    for (let botId = 0; botId <= 6; botId++) { // Cambiar el rango según la cantidad de bots
+    for (let botId = 0; botId <= 6; botId++) {
       const botDetails = await contract.methods.getBotDetails(userAddress, botId).call();
 
       const userBalance = (botDetails.userBalance / 1e6).toFixed(2);
       const pendingRewards = (botDetails.pendingRewards / 1e6).toFixed(2);
       const withdrawalFee = (botDetails.withdrawalFee / 1e6).toFixed(2);
-      const timeUntilNextClaim = Math.ceil(botDetails.timeUntilNextClaim / 3600); // En horas
+      const timeUntilNextClaim = Math.ceil(botDetails.timeUntilNextClaim / 3600);
       const rewardsAvailable = botDetails.rewardsAvailable;
       const userTotalBalance = (botDetails.userTotalBalance / 1e6).toFixed(2);
 
-      // Actualizar el HTML dinámicamente
       document.getElementById(`userBalance${botId}`).textContent = userBalance;
       document.getElementById(`pendingRewards${botId}`).textContent = pendingRewards;
       document.getElementById(`withdrawalFee${botId}`).textContent = `${withdrawalFee}%`;
@@ -899,8 +903,6 @@ async function updateAllBots() {
   }
 }
 
-// Llamar a la función para actualizar todos los bots al cargar la página
-document.addEventListener("DOMContentLoaded", updateAllBots);
 
     async function claimRewards(botId) {
   try {
