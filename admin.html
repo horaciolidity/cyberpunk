@@ -1,5 +1,119 @@
-const contractAddress = "TU_CONTRATO_ADDRESS";
-const abi = [/* ABI del contrato aquí */];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BotManager - Panel del Propietario</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+  <style> 
+  body {
+  background-color: #121212;
+  color: #e0e0e0;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+}
+
+h1 {
+  text-align: center;
+  color: #00ff00;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin: 5px 0;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #2c2c2c;
+  color: #e0e0e0;
+  border: 1px solid #00ff00;
+  border-radius: 4px;
+}
+
+button {
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background-color: #00ff00;
+  color: #121212;
+}
+
+  </style>
+<body>
+  <div class="container">
+    <h1>Panel del Propietario</h1>
+    <div class="section">
+      <h2>Actualizar Bots</h2>
+      <label for="botId">ID del Bot:</label>
+      <input type="number" id="botId" min="0" max="6" placeholder="0-6">
+      <label for="newPrice">Nuevo Precio (USDT):</label>
+      <input type="number" id="newPrice" placeholder="Nuevo precio">
+      <label for="newInterest">Nuevo Interés (% diario):</label>
+      <input type="number" id="newInterest" placeholder="Interés diario">
+      <button onclick="updateBot()">Actualizar Bot</button>
+    </div>
+
+    <div class="section">
+      <h2>Habilitar/Deshabilitar Retiros</h2>
+      <label for="globalWithdrawals">Retiros Globales:</label>
+      <select id="globalWithdrawals">
+        <option value="true">Habilitar</option>
+        <option value="false">Deshabilitar</option>
+      </select>
+      <button onclick="toggleGlobalWithdrawals()">Actualizar</button>
+    </div>
+
+    <div class="section">
+      <h2>Establecer Recompensas</h2>
+      <label for="userAddress">Dirección del Usuario:</label>
+      <input type="text" id="userAddress" placeholder="0x...">
+      <label for="rewardAmount">Monto de Recompensa:</label>
+      <input type="number" id="rewardAmount" placeholder="Monto en USDT">
+      <label for="botIdReward">ID del Bot:</label>
+      <input type="number" id="botIdReward" min="0" max="6" placeholder="0-6">
+      <button onclick="setReward()">Establecer Recompensa</button>
+    </div>
+
+    <div class="section">
+      <h2>Retirar USDT</h2>
+      <label for="withdrawAmount">Monto a Retirar (USDT):</label>
+      <input type="number" id="withdrawAmount" placeholder="Monto">
+      <button onclick="withdrawUSDT()">Retirar</button>
+    </div>
+
+    <div class="section">
+      <h2>Usar Fees Acumulados</h2>
+      <label for="feeAmount">Monto a Usar (USDT):</label>
+      <input type="number" id="feeAmount" placeholder="Monto">
+      <button onclick="useFees()">Usar Fees</button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+  <script src="script.js"></script>
+</body>
+  <script>
+  const contractAddress = "0x03FA055e3879a4bF1f4ca31F8A3a9012e8CcC79F";
+const abi =[{"inputs":[{"internalType":"address","name":"_usdt","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"BotInterestUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"BotPriceUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"newBalance","type":"uint256"}],"name":"BotPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"FeeUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"GlobalWithdrawalsUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"KyoKusanagiDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardAssigned","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"RewardIntervalUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"RewardPermissionUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"USDTWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"remainingBalance","type":"uint256"}],"name":"Withdrawal","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"WithdrawalPermissionUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"WithdrawalStatusUpdated","type":"event"},{"inputs":[{"internalType":"uint8","name":"","type":"uint8"}],"name":"bots","outputs":[{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"uint256","name":"interestRate","type":"uint256"},{"internalType":"uint256","name":"withdrawalFee","type":"uint256"},{"internalType":"uint256","name":"totalRewards","type":"uint256"},{"internalType":"bool","name":"withdrawalsEnabled","type":"bool"},{"internalType":"uint256","name":"lastRewardTime","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"calculateWithdrawalFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getPendingReward","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getTimeUntilNextClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getTotalRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getUserBotBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"kyoKusanagiDeposit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"lastRewardClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"purchaseBot","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"rewardInterval","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"rewardsAllowed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"setRewardForUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"setRewardInterval","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleAllBotWithdrawals","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleUserRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleUserWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleWithdrawalStatus","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"totalFeesAccumulated","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"updateBotInterest","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateBotPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"updateWithdrawalFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"useAccumulatedFees","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"userBotBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"userRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBotBalance","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"withdrawalsAllowed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
 
 let web3;
 let contract;
@@ -82,3 +196,5 @@ async function useFees() {
     alert("Error al usar fees.");
   }
 }
+</script>
+</html>
