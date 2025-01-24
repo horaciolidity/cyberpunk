@@ -724,12 +724,13 @@ async function initializeWeb3() {
 
       // Inicializar el contrato principal
       contract = new web3.eth.Contract(contractABI, contractAddress);
+      web3Ready = true;
+
 
       for (let botId = 0; botId <= 6; botId++) {
       await updateBotInfo(botId, userAddress);
     }
 
-      web3Ready = true;
 
       // Confirmar conexión en la consola
       console.log("Conexión establecida correctamente:");
@@ -842,24 +843,17 @@ async function updateBotInfo(botId) {
       return;
     }
 
-    // Obtener detalles del usuario y el bot desde el contrato
     const userBalance = BigInt(await contract.methods.getUserBotBalance(userAddress, botId).call());
     const pendingRewards = BigInt(await contract.methods.getPendingReward(userAddress, botId).call());
     const withdrawalFee = BigInt(await contract.methods.calculateWithdrawalFee(botId, userBalance).call());
     const timeUntilNextClaim = BigInt(await contract.methods.getTimeUntilNextClaim(userAddress, botId).call());
 
-    // Calcular el total (saldo + recompensas pendientes)
-    const total = userBalance + pendingRewards;
-    const totalFormatted = Number(total) / 1e6; // Convertir a USDT con 6 decimales
-
-    // Seleccionar el elemento del DOM correspondiente al bot
     const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
     if (!botInfo) {
       console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
       return;
     }
 
-    // Actualizar los datos en el HTML
     botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
     botInfo.querySelector(`#pendingRewards${botId}`).textContent = (Number(pendingRewards) / 1e6).toFixed(2);
     botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)}%`;
@@ -867,11 +861,11 @@ async function updateBotInfo(botId) {
       Number(timeUntilNextClaim) > 0 ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible";
     botInfo.querySelector(`#claimNotice${botId}`).textContent =
       pendingRewards > 0n && timeUntilNextClaim === 0n ? "¡Recompensa disponible!" : "No disponible";
-    botInfo.querySelector(`#userTotalBalance${botId}`).textContent = totalFormatted.toFixed(2); // Mostrar el total
   } catch (error) {
     console.error(`Error al actualizar el bot ${botId}:`, error);
   }
 }
+
 
 
     
