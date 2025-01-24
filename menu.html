@@ -843,17 +843,20 @@ async function updateBotInfo(botId) {
       return;
     }
 
+    // Obtener datos del contrato
     const userBalance = BigInt(await contract.methods.getUserBotBalance(userAddress, botId).call());
     const pendingRewards = BigInt(await contract.methods.getPendingReward(userAddress, botId).call());
     const withdrawalFee = BigInt(await contract.methods.calculateWithdrawalFee(botId, userBalance).call());
     const timeUntilNextClaim = BigInt(await contract.methods.getTimeUntilNextClaim(userAddress, botId).call());
 
+    // Seleccionar la tarjeta del bot
     const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
     if (!botInfo) {
       console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
       return;
     }
 
+    // Actualizar los datos en el DOM
     botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
     botInfo.querySelector(`#pendingRewards${botId}`).textContent = (Number(pendingRewards) / 1e6).toFixed(2);
     botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)}%`;
@@ -861,12 +864,11 @@ async function updateBotInfo(botId) {
       Number(timeUntilNextClaim) > 0 ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible";
     botInfo.querySelector(`#claimNotice${botId}`).textContent =
       pendingRewards > 0n && timeUntilNextClaim === 0n ? "¡Recompensa disponible!" : "No disponible";
+    botInfo.querySelector(`#userTotalBalance${botId}`).textContent = ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
   } catch (error) {
     console.error(`Error al actualizar el bot ${botId}:`, error);
   }
 }
-
-
 
     
 function simulateGuides() {
