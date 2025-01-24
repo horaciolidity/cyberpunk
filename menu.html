@@ -729,12 +729,16 @@ async function initializeWeb3() {
       await updateBotInfo(botId, userAddress);
     }
 
+      web3Ready = true;
 
       // Confirmar conexión en la consola
       console.log("Conexión establecida correctamente:");
       console.log("Cuenta conectada:", userAddress);
       console.log("Saldo en ETH:", web3.utils.fromWei(ethBalance, "ether"), "ETH");
       console.log("Saldo en USDT:", usdtBalanceFormatted, "USDT");
+      
+      updateAllBots();
+
 
       // Notificar éxito al usuario
       alert("Conexión exitosa a MetaMask y la red Optimism.");
