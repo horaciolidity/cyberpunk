@@ -911,7 +911,6 @@ async function updateAllBots() {
     for (let botId = 0; botId <= 6; botId++) {
       await updateBotInfo(botId);
 
-      const botDetails = await contract.methods.getBotDetails(userAddress, botId).call();
 
       const userBalance = (botDetails.userBalance / 1e6).toFixed(2);
       const pendingRewards = (botDetails.pendingRewards / 1e6).toFixed(2);
