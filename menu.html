@@ -658,13 +658,10 @@ let web3;
 let usdtContract;
 let contract;
 let userAddress;
+let web3Ready = false; 
 
-
-const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; // Dirección de USDT en Optimism
+const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; 
 const contractAddress = "0x03FA055e3879a4bF1f4ca31F8A3a9012e8CcC79F";
-
-
-
     
 const usdtABI = [
   {"inputs":[{"internalType":"address","name":"_l2Bridge","type":"address"},{"internalType":"address","name":"_l1Token","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
