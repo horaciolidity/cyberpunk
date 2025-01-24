@@ -1,242 +1,84 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+const contractAddress = "TU_CONTRATO_ADDRESS";
+const abi = [/* ABI del contrato aquí */];
 
-  <title>Bot Manager Panel</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f9;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
-    }
-    header {
-      text-align: center;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border-radius: 10px;
-    }
-    .card {
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-      padding: 20px;
-    }
-    .card h2 {
-      margin-top: 0;
-    }
-    .card button {
-      padding: 10px 20px;
-      margin-top: 10px;
-      background-color: #4CAF50;
-      border: none;
-      color: white;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .card button:hover {
-      background-color: #45a049;
-    }
-    .row {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-    }
-    .column {
-      flex: 1;
-    }
-    .input-group {
-      margin: 10px 0;
-    }
-    .input-group label {
-      font-weight: bold;
-    }
-    .input-group input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .status {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 18px;
-      color: #333;
-    }
-    .status.success {
-      color: green;
-    }
-    .status.error {
-      color: red;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>Bot Manager Panel</h1>
-    </header>
-    <div class="card">
-      <h2>Bot Settings</h2>
-      <div class="row">
-        <div class="column">
-          <div class="input-group">
-            <label for="botId">Bot ID</label>
-            <input type="number" id="botId" placeholder="Enter Bot ID (0-6)" />
-          </div>
-        </div>
-        <div class="column">
-          <div class="input-group">
-            <label for="botPrice">Bot Price (USDT)</label>
-            <input type="number" id="botPrice" placeholder="Enter New Price" />
-          </div>
-        </div>
-      </div>
-      <button onclick="updateBotPrice()">Update Bot Price</button>
-      <div class="status" id="botStatus"></div>
-    </div>
-    <div class="card">
-      <h2>Deposit Kyo Kusanagi</h2>
-      <div class="input-group">
-        <label for="depositAmount">Deposit Amount (USDT)</label>
-        <input type="number" id="depositAmount" placeholder="Enter Amount to Deposit" />
-      </div>
-      <button onclick="depositKyoKusanagi()">Deposit</button>
-      <div class="status" id="depositStatus"></div>
-    </div>
-    <div class="card">
-      <h2>Bot Withdrawal Management</h2>
-      <div class="row">
-        <div class="column">
-          <div class="input-group">
-            <label for="withdrawBotId">Bot ID for Withdrawal</label>
-            <input type="number" id="withdrawBotId" placeholder="Enter Bot ID (0-6)" />
-          </div>
-          <div class="input-group">
-            <label for="withdrawAmount">Amount to Withdraw (USDT)</label>
-            <input type="number" id="withdrawAmount" placeholder="Enter Amount to Withdraw" />
-          </div>
-          <button onclick="withdrawBotBalance()">Withdraw</button>
-        </div>
-        <div class="column">
-          <button onclick="toggleBotStatus()">Enable/Disable Bot Withdrawals</button>
-        </div>
-      </div>
-      <div class="status" id="withdrawStatus"></div>
-    </div>
-  </div>
+let web3;
+let contract;
+let userAccount;
 
-    <script>
-  let web3;
-  let contract;
-  const contractAddress = '0x03FA055e3879a4bF1f4ca31F8A3a9012e8CcC79F';
-  const abi = [{"inputs":[{"internalType":"address","name":"_usdt","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"BotInterestUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"BotPriceUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"newBalance","type":"uint256"}],"name":"BotPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"FeeUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"GlobalWithdrawalsUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"KyoKusanagiDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardAssigned","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"RewardIntervalUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"RewardPermissionUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"USDTWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"remainingBalance","type":"uint256"}],"name":"Withdrawal","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"WithdrawalPermissionUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"WithdrawalStatusUpdated","type":"event"},{"inputs":[{"internalType":"uint8","name":"","type":"uint8"}],"name":"bots","outputs":[{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"uint256","name":"interestRate","type":"uint256"},{"internalType":"uint256","name":"withdrawalFee","type":"uint256"},{"internalType":"uint256","name":"totalRewards","type":"uint256"},{"internalType":"bool","name":"withdrawalsEnabled","type":"bool"},{"internalType":"uint256","name":"lastRewardTime","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"calculateWithdrawalFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getPendingReward","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getTimeUntilNextClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getTotalRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getUserBotBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"kyoKusanagiDeposit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"lastRewardClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"purchaseBot","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"rewardInterval","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"rewardsAllowed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"setRewardForUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"setRewardInterval","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleAllBotWithdrawals","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleUserRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleUserWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleWithdrawalStatus","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"totalFeesAccumulated","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"updateBotInterest","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateBotPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"updateWithdrawalFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"useAccumulatedFees","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"userBotBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"userRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBotBalance","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"withdrawalsAllowed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
-
-  // Asegúrate de que MetaMask esté disponible y se pueda conectar
-  async function connectToMetaMask() {
-    if (typeof window.ethereum !== 'undefined') {
-      // Usamos Web3.js con MetaMask
-      web3 = new Web3(window.ethereum);
-      try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const accounts = await web3.eth.getAccounts();
-        console.log("Connected account:", accounts[0]);
-        
-        // Instanciamos el contrato
-        contract = new web3.eth.Contract(abi, contractAddress);
-        
-        // Llamamos a una función simple para verificar la conexión
-        const balance = await contract.methods.balanceOf(accounts[0]).call();
-        console.log("Balance:", balance);
-        
-      } catch (error) {
-        console.error("Error al conectar con MetaMask", error);
-      }
-    } else {
-      console.log("MetaMask no está instalado");
-    }
+window.onload = async () => {
+  if (typeof window.ethereum !== 'undefined') {
+    web3 = new Web3(window.ethereum);
+    await ethereum.request({ method: 'eth_requestAccounts' });
+    const accounts = await web3.eth.getAccounts();
+    userAccount = accounts[0];
+    contract = new web3.eth.Contract(abi, contractAddress);
+    console.log("Conectado a Web3:", userAccount);
+  } else {
+    alert("MetaMask no está instalado.");
   }
+};
 
-  // Llamada a la función para actualizar el precio del bot
-  async function updateBotPrice() {
-    const botId = document.getElementById('botId').value;
-    const botPrice = document.getElementById('botPrice').value;
-    if (botId && botPrice) {
-      const accounts = await web3.eth.getAccounts();
-      try {
-        await contract.methods.updateBotPrice(botId, botPrice).send({ from: accounts[0] });
-        document.getElementById('botStatus').innerHTML = 'Bot price updated successfully!';
-        document.getElementById('botStatus').classList.add('success');
-      } catch (error) {
-        document.getElementById('botStatus').innerHTML = 'Error updating bot price.';
-        document.getElementById('botStatus').classList.add('error');
-      }
-    } else {
-      document.getElementById('botStatus').innerHTML = 'Please provide both Bot ID and Price.';
-      document.getElementById('botStatus').classList.add('error');
-    }
+async function updateBot() {
+  const botId = parseInt(document.getElementById("botId").value);
+  const newPrice = web3.utils.toWei(document.getElementById("newPrice").value, 'mwei');
+  const newInterest = parseInt(document.getElementById("newInterest").value) * 10000;
+
+  try {
+    await contract.methods.updateBotPrice(botId, newPrice).send({ from: userAccount });
+    await contract.methods.updateBotInterest(botId, newInterest).send({ from: userAccount });
+    alert("Bot actualizado correctamente.");
+  } catch (error) {
+    console.error(error);
+    alert("Error al actualizar el bot.");
   }
+}
 
-  // Llamada para realizar un depósito
-  async function depositKyoKusanagi() {
-    const depositAmount = document.getElementById('depositAmount').value;
-    if (depositAmount) {
-      const accounts = await web3.eth.getAccounts();
-      try {
-        await contract.methods.kyoKusanagiDeposit(depositAmount).send({ from: accounts[0] });
-        document.getElementById('depositStatus').innerHTML = 'Deposit successful!';
-        document.getElementById('depositStatus').classList.add('success');
-      } catch (error) {
-        document.getElementById('depositStatus').innerHTML = 'Error during deposit.';
-        document.getElementById('depositStatus').classList.add('error');
-      }
-    } else {
-      document.getElementById('depositStatus').innerHTML = 'Please provide a deposit amount.';
-      document.getElementById('depositStatus').classList.add('error');
-    }
+async function toggleGlobalWithdrawals() {
+  const enabled = document.getElementById("globalWithdrawals").value === "true";
+
+  try {
+    await contract.methods.toggleAllBotWithdrawals(enabled).send({ from: userAccount });
+    alert("Estado de retiros actualizado.");
+  } catch (error) {
+    console.error(error);
+    alert("Error al actualizar retiros.");
   }
+}
 
-  // Llamada para realizar un retiro
-  async function withdrawBotBalance() {
-    const botId = document.getElementById('withdrawBotId').value;
-    const withdrawAmount = document.getElementById('withdrawAmount').value;
-    if (botId && withdrawAmount) {
-      const accounts = await web3.eth.getAccounts();
-      try {
-        await contract.methods.withdrawBotBalance(botId, withdrawAmount).send({ from: accounts[0] });
-        document.getElementById('withdrawStatus').innerHTML = 'Withdrawal successful!';
-        document.getElementById('withdrawStatus').classList.add('success');
-      } catch (error) {
-        document.getElementById('withdrawStatus').innerHTML = 'Error during withdrawal.';
-        document.getElementById('withdrawStatus').classList.add('error');
-      }
-    } else {
-      document.getElementById('withdrawStatus').innerHTML = 'Please provide both Bot ID and Amount.';
-      document.getElementById('withdrawStatus').classList.add('error');
-    }
+async function setReward() {
+  const user = document.getElementById("userAddress").value;
+  const amount = web3.utils.toWei(document.getElementById("rewardAmount").value, 'mwei');
+  const botId = parseInt(document.getElementById("botIdReward").value);
+
+  try {
+    await contract.methods.setRewardForUser(user, amount, botId).send({ from: userAccount });
+    alert("Recompensa asignada.");
+  } catch (error) {
+    console.error(error);
+    alert("Error al asignar recompensa.");
   }
+}
 
-  // Conectar cuando se cargue la página
-  window.onload = connectToMetaMask;
-</script>
+async function withdrawUSDT() {
+  const amount = web3.utils.toWei(document.getElementById("withdrawAmount").value, 'mwei');
 
-</body>
-</html>
+  try {
+    await contract.methods.withdrawUSDT(amount).send({ from: userAccount });
+    alert("USDT retirado.");
+  } catch (error) {
+    console.error(error);
+    alert("Error al retirar USDT.");
+  }
+}
+
+async function useFees() {
+  const amount = web3.utils.toWei(document.getElementById("feeAmount").value, 'mwei');
+
+  try {
+    await contract.methods.useAccumulatedFees(amount).send({ from: userAccount });
+    alert("Fees utilizados.");
+  } catch (error) {
+    console.error(error);
+    alert("Error al usar fees.");
+  }
+}
