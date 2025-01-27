@@ -908,31 +908,38 @@ async function updateAllBots() {
       console.warn("Web3 no está listo. Esperando...");
       return; // Salir si Web3 no está listo
     }
-    
 
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
-
+    // Iterar sobre todos los bots (IDs del 0 al 6)
     for (let botId = 0; botId <= 6; botId++) {
-      await updateBotInfo(botId);
+      // Obtener datos del contrato relacionados con el bot y el usuario
+      const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
+      const pendingRewards = BigInt(await lythosBotContract.methods.userRewards(userAddress, botId).call());
+      const botDetails = await lythosBotContract.methods.bots(botId).call();
+      const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
+      const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
+      const currentTime = BigInt(Math.floor(Date.now() / 1000));
 
+      // Calcular la tarifa de retiro y tiempo hasta el próximo reclamo
+      const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
+      const timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
 
-      const userBalance = (botDetails.userBalance / 1e6).toFixed(2);
-      const pendingRewards = (botDetails.pendingRewards / 1e6).toFixed(2);
-      const withdrawalFee = (botDetails.withdrawalFee / 1e6).toFixed(2);
-      const timeUntilNextClaim = Math.ceil(botDetails.timeUntilNextClaim / 3600);
-      const rewardsAvailable = botDetails.rewardsAvailable;
-      const userTotalBalance = (botDetails.userTotalBalance / 1e6).toFixed(2);
+      // Seleccionar la tarjeta del bot específica en el DOM
+      const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
+      if (!botInfo) {
+        console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
+        continue; // Pasar al siguiente bot si no se encuentra la tarjeta
+      }
 
-      document.getElementById(`userBalance${botId}`).textContent = userBalance;
-      document.getElementById(`pendingRewards${botId}`).textContent = pendingRewards;
-      document.getElementById(`withdrawalFee${botId}`).textContent = `${withdrawalFee}%`;
-      document.getElementById(`timeUntilClaim${botId}`).textContent =
-        timeUntilNextClaim > 0 ? `${timeUntilNextClaim} horas` : "Disponible";
-      document.getElementById(`claimNotice${botId}`).textContent = rewardsAvailable
-        ? "¡Recompensa disponible!"
-        : "No disponible";
-      document.getElementById(`userTotalBalance${botId}`).textContent = userTotalBalance;
+      // Actualizar los datos en la interfaz de usuario
+      botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
+      botInfo.querySelector(`#pendingRewards${botId}`).textContent = (Number(pendingRewards) / 1e6).toFixed(2);
+      botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)} USDT`;
+      botInfo.querySelector(`#timeUntilClaim${botId}`).textContent =
+        Number(timeUntilNextClaim) > 0 ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible";
+      botInfo.querySelector(`#claimNotice${botId}`).textContent =
+        pendingRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible";
+      botInfo.querySelector(`#userTotalBalance${botId}`).textContent = 
+        ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
 
       console.log(`Bot ${botId}: Datos actualizados correctamente.`);
     }
