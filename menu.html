@@ -842,6 +842,8 @@ async function updateBotInfo(botId) {
     const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
+    const botStatus = botInfo.querySelector(`#botStatus${botId}`);
+
 
     // Calcular la tarifa de retiro y tiempo hasta el próximo reclamo
     const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
@@ -874,7 +876,6 @@ async function updateBotInfo(botId) {
       ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
 
     // Actualizar el estado del bot y la luz
-    const botStatus = botInfo.querySelector(`#botStatus${botId}`);
     const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
     if (userBalance > 0n) {
       botStatus.textContent = "Bot activo";
