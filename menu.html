@@ -118,24 +118,28 @@
   0%, 90% { box-shadow: none; }
   91%, 100% { box-shadow: 0 0 15px green; }
 }
-  .status {
-  display: flex;
-  align-items: center;
-  margin: 10px auto; /* Centra el elemento horizontalmente */
-  justify-content: center;
-  border: 1px solid #22edfc; /* Borde decorativo */
-  padding: 5px;
-  border-radius: 5px;
-  width: 30%; /* Ancho más angosto, ajusta este valor según lo que necesites */
-  max-width: 300px; /* Limita el ancho máximo */
-  box-sizing: border-box; /* Asegura que el padding no aumente el ancho total */
+ .status-light {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: 8px;
 }
 
+.status-light.red {
+  background-color: red;
+}
 
-.status-label {
-  font-size: 1em;
-  color: #db0e15;
-  margin-right: 10px;
+.status-light.green {
+  background-color: green;
+}
+
+.bot-active {
+  color: green;
+}
+
+.bot-inactive {
+  color: red;
 }
 
 .status-indicator {
