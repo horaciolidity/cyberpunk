@@ -854,7 +854,6 @@ async function updateBotInfo(botId) {
       return;
     }
         // Seleccionar elementos del DOM
-    const botStatus = botInfo.querySelector(`#botStatus${botId}`);
     const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
 
     if (!botStatus || !botStatusLight) {
