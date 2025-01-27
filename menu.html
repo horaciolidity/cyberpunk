@@ -124,41 +124,41 @@
   margin: 10px 0;
 }
 
-.status p {
-  margin: 0;
-  padding-right: 10px;
-}
- .status-light {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-left: 8px;
+/* Estilo para el estado del bot */
+.bot-status {
+  font-weight: bold;
+  font-size: 14px;
 }
 
-.status-light.red {
-  background-color: red;
-}
-
-.status-light.green {
-  background-color: green;
-}
-
-.bot-active {
-  color: green;
-}
-
+/* Estado inactivo */
 .bot-inactive {
   color: red;
 }
 
-.status-indicator {
+/* Estado activo */
+.bot-active {
+  color: green;
+}
+
+/* Luz de estado */
+.status-light {
   width: 10px;
   height: 10px;
-  background-color: red;
   border-radius: 50%;
-  box-shadow: 0 0 10px red;
+  display: inline-block;
+  margin-left: 5px;
 }
+
+/* Luz roja (inactivo) */
+.red {
+  background-color: red;
+}
+
+/* Luz verde (activo) */
+.green {
+  background-color: green;
+}
+
 /* Linternas */
 .lantern {
   position: absolute;
