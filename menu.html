@@ -853,6 +853,15 @@ async function updateBotInfo(botId) {
       console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
       return;
     }
+        // Seleccionar elementos del DOM
+    const botStatus = botInfo.querySelector(`#botStatus${botId}`);
+    const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
+
+    if (!botStatus || !botStatusLight) {
+      console.warn(`Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
+      return;
+    }
+
 
     // Actualizar los datos en la interfaz de usuario
     botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
