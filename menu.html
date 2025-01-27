@@ -843,6 +843,8 @@ async function updateBotInfo(botId) {
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
     const botStatus = botInfo.querySelector(`#botStatus${botId}`);
+    const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
+
 
 
     // Calcular la tarifa de retiro y tiempo hasta el próximo reclamo
@@ -855,8 +857,7 @@ async function updateBotInfo(botId) {
       console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
       return;
     }
-        // Seleccionar elementos del DOM
-    const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
+        
 
     if (!botStatus || !botStatusLight) {
       console.warn(`Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
