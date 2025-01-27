@@ -294,8 +294,8 @@
 <div class="bot-card" data-bot-id="0">
       <h3>Bot 1 - BTC/USDT</h3>
       <div class="status">
-  <span class="status-label">Bot inactivo</span>
-  <span class="status-indicator"></span>
+ <p><strong>Estado:</strong> <span id="botStatus0" class="bot-status bot-inactive">Bot inactivo</span></p>
+  <span id="botStatusLight0" class="status-light red"></span>
 </div>
 
       <p>Profit: 3% diario | Congelamiento: 30 días | Fee de Retiro: 7%</p>
@@ -348,8 +348,8 @@
 <div class="bot-card" data-bot-id="1">
       <h3>Bot 2 - BTC/ETH</h3>
       <div class="status">
-  <span class="status-label">Bot inactivo</span>
-  <span class="status-indicator"></span>
+ <p><strong>Estado:</strong> <span id="botStatus1" class="bot-status bot-inactive">Bot inactivo</span></p>
+  <span id="botStatusLight1" class="status-light red"></span>
 </div>
 
       <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
@@ -402,8 +402,8 @@
 <div class="bot-card" data-bot-id="2">
       <h3>Bot 3 - BCH/USDT</h3>
       <div class="status">
-  <span class="status-label">Bot inactivo</span>
-  <span class="status-indicator"></span>
+ <p><strong>Estado:</strong> <span id="botStatus2" class="bot-status bot-inactive">Bot inactivo</span></p>
+  <span id="botStatusLight2" class="status-light red"></span>
 </div>
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
@@ -454,8 +454,8 @@
 <div class="bot-card" data-bot-id="3">
       <h3>Bot 4 - WLD/USDT</h3>
       <div class="status">
-  <span class="status-label">Bot inactivo</span>
-  <span class="status-indicator"></span>
+ <p><strong>Estado:</strong> <span id="botStatus3" class="bot-status bot-inactive">Bot inactivo</span></p>
+  <span id="botStatusLight3" class="status-light red"></span>
 </div>
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
@@ -504,8 +504,8 @@
 <div class="bot-card" data-bot-id="4">
       <h3>Bot 5 - DOGE/USDT</h3>
       <div class="status">
-  <span class="status-label">Bot inactivo</span>
-  <span class="status-indicator"></span>
+ <p><strong>Estado:</strong> <span id="botStatus4" class="bot-status bot-inactive">Bot inactivo</span></p>
+  <span id="botStatusLight4" class="status-light red"></span>
 </div>
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
@@ -554,8 +554,8 @@
 <div class="bot-card" data-bot-id="5">
       <h3>Bot 6 - ENA/USDT</h3>
       <div class="status">
-  <span class="status-label">Bot inactivo</span>
-  <span class="status-indicator"></span>
+ <p><strong>Estado:</strong> <span id="botStatus5" class="bot-status bot-inactive">Bot inactivo</span></p>
+  <span id="botStatusLight5" class="status-light red"></span>
 </div>
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
@@ -602,8 +602,8 @@
 <div class="bot-card" data-bot-id="6">
       <h3>Bot 7 - COW/USDT</h3>
       <div class="status">
-  <span class="status-label">Bot inactivo</span>
-  <span class="status-indicator"></span>
+<p><strong>Estado:</strong> <span id="botStatus6" class="bot-status bot-inactive">Bot inactivo</span></p>
+  <span id="botStatusLight6" class="status-light red"></span>
 </div>
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
@@ -863,6 +863,26 @@ async function updateBotInfo(botId) {
       pendingRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible";
     botInfo.querySelector(`#userTotalBalance${botId}`).textContent = 
       ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
+
+    // Actualizar el estado del bot y la luz
+    const botStatus = botInfo.querySelector(`#botStatus${botId}`);
+    const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
+    if (userBalance > 0n) {
+      botStatus.textContent = "Bot activo";
+      botStatus.classList.remove("bot-inactive");
+      botStatus.classList.add("bot-active");
+
+      botStatusLight.classList.remove("red");
+      botStatusLight.classList.add("green");
+    } else {
+      botStatus.textContent = "Bot inactivo";
+      botStatus.classList.remove("bot-active");
+      botStatus.classList.add("bot-inactive");
+
+      botStatusLight.classList.remove("green");
+      botStatusLight.classList.add("red");
+    }
+
 
     console.log(`Bot ${botId}: Información actualizada correctamente.`);
   } catch (error) {
