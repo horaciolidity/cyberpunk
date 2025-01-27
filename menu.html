@@ -830,24 +830,21 @@ async function purchaseBot(event) {
 
 async function updateBotInfo(botId) {
   try {
-    // Verificar si Web3 está listo
     if (!web3Ready) {
       console.warn("Web3 no está listo. Esperando...");
       return;
     }
 
-    // Obtener los datos del contrato relacionados con el bot y el usuario
+    // Obtener datos del contrato relacionados con el bot y el usuario
     const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
     const pendingRewards = BigInt(await lythosBotContract.methods.userRewards(userAddress, botId).call());
     const botDetails = await lythosBotContract.methods.bots(botId).call();
     const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
-    const currentTime = BigInt(Math.floor(Date.now() / 1000)); // Tiempo actual en segundos
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
+    const currentTime = BigInt(Math.floor(Date.now() / 1000));
 
-    // Calcular la tarifa de retiro (manual)
+    // Calcular la tarifa de retiro y tiempo hasta el próximo reclamo
     const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
-
-    // Calcular el tiempo hasta el próximo reclamo
     const timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
 
     // Seleccionar la tarjeta del bot específica en el DOM
@@ -857,7 +854,7 @@ async function updateBotInfo(botId) {
       return;
     }
 
-    // Actualizar los datos en la interfaz de usuario (DOM)
+    // Actualizar los datos en la interfaz de usuario
     botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
     botInfo.querySelector(`#pendingRewards${botId}`).textContent = (Number(pendingRewards) / 1e6).toFixed(2);
     botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)} USDT`;
@@ -887,17 +884,13 @@ async function updateBotInfo(botId) {
       botStatusLight.classList.add("red");
     }
 
-
     console.log(`Bot ${botId}: Información actualizada correctamente.`);
   } catch (error) {
     console.error(`Error al actualizar el bot ${botId}:`, error);
-
-    // Notificar al usuario si hay un error crítico
     alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
   }
 }
 
-    
 function simulateGuides() {
   const widgets = document.querySelectorAll('.tradingview-widget');
   widgets.forEach((widget, index) => {
