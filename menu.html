@@ -883,7 +883,7 @@ async function updateBotInfo(botId) {
     botInfo.querySelector(`#userTotalBalance${botId}`).textContent = 
       ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
 
-    // Actualizar el estado del bot y la luz
+    // Verificar el saldo del usuario y actualizar el estado del bot
     if (userBalance > 0n) {
       // Si el saldo es mayor a 0, marcar el bot como activo
       botStatus.textContent = "Bot activo";
@@ -908,7 +908,6 @@ async function updateBotInfo(botId) {
     alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
   }
 }
-
 
 
 function simulateGuides() {
