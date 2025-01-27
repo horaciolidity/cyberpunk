@@ -861,7 +861,7 @@ async function updateBotInfo(botId) {
     }
 
     const botStatus = botInfo.querySelector(`#botStatus${botId}`);
-    const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`); // Declarado aquí
+    const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
 
     if (!botStatus || !botStatusLight) {
       console.warn(`Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
@@ -885,6 +885,7 @@ async function updateBotInfo(botId) {
 
     // Actualizar el estado del bot y la luz
     if (userBalance > 0n) {
+      // Si el saldo es mayor a 0, marcar el bot como activo
       botStatus.textContent = "Bot activo";
       botStatus.classList.remove("bot-inactive");
       botStatus.classList.add("bot-active");
@@ -892,6 +893,7 @@ async function updateBotInfo(botId) {
       botStatusLight.classList.remove("red");
       botStatusLight.classList.add("green");
     } else {
+      // Si no tiene saldo, marcar el bot como inactivo
       botStatus.textContent = "Bot inactivo";
       botStatus.classList.remove("bot-active");
       botStatus.classList.add("bot-inactive");
@@ -906,6 +908,7 @@ async function updateBotInfo(botId) {
     alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
   }
 }
+
 
 
 function simulateGuides() {
