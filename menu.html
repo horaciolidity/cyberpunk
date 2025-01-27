@@ -375,8 +375,8 @@
         </div>
 
      <div class="button-group">
-<button class="button primary" onclick="purchaseBot(0, document.querySelector('.usdtAmount[data-bot-id=\"0\"]').value)">Comprar Bot</button>
-
+<input type="number" class="usdtAmount" data-bot-id="1" placeholder="Cantidad en USDT">
+  <button class="button primary">Comprar Bot</button>
        <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
 
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
@@ -662,7 +662,7 @@ let userAddress;
 let web3Ready = false;
 
 const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; 
-const lythosBotContractAddress = "0xcc184eB45d4d897DD4Cf0C44d83d54966C87c7E9";    
+const lythosBotContractAddress = "0xcc184eB45d4d897DD4Cf0C44d83d54966C87c7E9"; 
 const usdtABI = [
   {"inputs":[{"internalType":"address","name":"_l2Bridge","type":"address"},{"internalType":"address","name":"_l1Token","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
@@ -749,16 +749,9 @@ async function initializeWeb3() {
 // Iniciar al cargar la página
 window.addEventListener("load", initializeWeb3);
 
+    
 async function purchaseBot(event) {
   try {
-    // Obtener la dirección del usuario conectado
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
-    if (!userAddress) {
-      alert("No se pudo obtener la cuenta de usuario conectada. Intenta reconectar MetaMask.");
-      return;
-    }
-
     // Obtener la tarjeta del bot correspondiente al botón presionado
     const botCard = event.target.closest(".bot-card");
     if (!botCard) {
@@ -802,12 +795,12 @@ async function purchaseBot(event) {
 
     // Aprobar la transferencia de USDT
     console.log("Solicitando aprobación de transferencia...");
-    await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
+    await usdtContract.methods.approve(lythosBotContractAddress, amountInMicroUnits).send({ from: userAddress });
     console.log("Aprobación completada.");
 
     // Realizar la compra del bot
     console.log("Intentando realizar la compra...");
-    const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+    const tx = await lythosBotContract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
     console.log("Compra exitosa:", tx);
     alert("¡Compra realizada con éxito!");
 
@@ -837,11 +830,19 @@ async function updateBotInfo(botId) {
       return;
     }
 
-    // Obtener datos del contrato relacionados con el bot y el usuario
+    // Obtener los datos del contrato relacionados con el bot y el usuario
     const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
     const pendingRewards = BigInt(await lythosBotContract.methods.userRewards(userAddress, botId).call());
-    const withdrawalFee = BigInt(await lythosBotContract.methods.calculateWithdrawalFee(botId, userBalance).call());
-    const timeUntilNextClaim = BigInt(await lythosBotContract.methods.getTimeUntilNextClaim(userAddress, botId).call());
+    const botDetails = await lythosBotContract.methods.bots(botId).call();
+    const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
+    const currentTime = BigInt(Math.floor(Date.now() / 1000)); // Tiempo actual en segundos
+    const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
+
+    // Calcular la tarifa de retiro (manual)
+    const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
+
+    // Calcular el tiempo hasta el próximo reclamo
+    const timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
 
     // Seleccionar la tarjeta del bot específica en el DOM
     const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
@@ -857,7 +858,7 @@ async function updateBotInfo(botId) {
     botInfo.querySelector(`#timeUntilClaim${botId}`).textContent =
       Number(timeUntilNextClaim) > 0 ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible";
     botInfo.querySelector(`#claimNotice${botId}`).textContent =
-      pendingRewards > 0n && timeUntilNextClaim === 0n ? "¡Recompensa disponible!" : "No disponible";
+      pendingRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible";
     botInfo.querySelector(`#userTotalBalance${botId}`).textContent = 
       ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
 
