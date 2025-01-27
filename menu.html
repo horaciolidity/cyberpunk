@@ -843,7 +843,6 @@ async function updateBotInfo(botId) {
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
     const botStatus = botInfo.querySelector(`#botStatus${botId}`);
-    const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
 
 
 
