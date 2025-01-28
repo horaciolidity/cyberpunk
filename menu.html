@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kairos Bots</title>
+  <title>Lythos Bots</title>
   <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.umd.min.js"></script>
@@ -269,7 +269,7 @@
   </style>
 </head>
 <body class="dark-theme">
-  <div class="header">Selecciona el bot de trading que ma se ajuste a ti</div>
+  <div class="header">7 Bots disponibles Lythos</div>
 
   <div class="container">
     <h1>Retiros habilitados 24hs solo por red Optimism </h1>
@@ -288,21 +288,8 @@
       <h3>Saldo en USDT:</h3>
       <p id="balanceUsdt">Cargando...</p>
     </div>
-      <button class="button" onclick="transfer()">Transferir</button>
     </div>
-  <!-- Referal Stats Section -->
-    <div class="referal-stats">
-      <div class="referal-box">
-        <h4>Contador de Referidos</h4>
-        <p>Referidos: 10</p>
-      </div>
-      <div class="referal-box">
-        <h4>Saldo de Referido</h4>
-        <p>$50</p>
-        <button class="referal-button" onclick="claimReferralRewards()">Cobrar Referidos</button>
-      </div>
-    </div>
-<button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
+ 
 
     <!-- Bot 1 -->
 <div class="bot-card" data-bot-id="0">
@@ -346,13 +333,9 @@
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
        
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
-  <button class="button primary" onclick="customizeBot(1)">⚙️ Configuración Personalizada</button>
-  <button class="button secondary" onclick="enableNotifications(1)">🔔 Activar Notificaciones</button>
   <button class="button info" onclick="viewHistory(1)">📜 Historial de Transacciones</button>
   <button class="button info" onclick="compareBots()">📊 Comparar Bots</button>
-  <button class="button danger" onclick="switchBot(1)">🔄 Cambiar de Bot</button>
   <button class="button support" onclick="getTips()">💡 Consejos de Trading</button>
-  <button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
   <button class="button secondary" onclick="exportReport(1)">📤 Exportar Reporte</button>
 </div>
 
@@ -400,13 +383,9 @@
   
   <button class="button info" onclick="showDetails(1)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
-  <button class="button primary" onclick="customizeBot(1)">⚙️ Configuración Personalizada</button>
-  <button class="button secondary" onclick="enableNotifications(1)">🔔 Activar Notificaciones</button>
   <button class="button info" onclick="viewHistory(1)">📜 Historial de Transacciones</button>
   <button class="button info" onclick="compareBots()">📊 Comparar Bots</button>
-  <button class="button danger" onclick="switchBot(1)">🔄 Cambiar de Bot</button>
   <button class="button support" onclick="getTips()">💡 Consejos de Trading</button>
-  <button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
   <button class="button secondary" onclick="exportReport(1)">📤 Exportar Reporte</button>
 </div>
     </div>
@@ -452,13 +431,9 @@
   
   <button class="button info" onclick="showDetails(2)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(2)">📈 Analizar Rendimiento</button>
-  <button class="button primary" onclick="customizeBot(2)">⚙️ Configuración Personalizada</button>
-  <button class="button secondary" onclick="enableNotifications(2)">🔔 Activar Notificaciones</button>
   <button class="button info" onclick="viewHistory(2)">📜 Historial de Transacciones</button>
   <button class="button info" onclick="compareBots()">📊 Comparar Bots</button>
-  <button class="button danger" onclick="switchBot(2)">🔄 Cambiar de Bot</button>
   <button class="button support" onclick="getTips()">💡 Consejos de Trading</button>
-  <button class="button success" onclick="claimRewards(2)">🎁 Recompensas</button>
   <button class="button secondary" onclick="exportReport(2)">📤 Exportar Reporte</button>
 </div>
 
@@ -502,13 +477,9 @@
   
   <button class="button info" onclick="showDetails(3)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(3)">📈 Analizar Rendimiento</button>
-  <button class="button primary" onclick="customizeBot(3)">⚙️ Configuración Personalizada</button>
-  <button class="button secondary" onclick="enableNotifications(3)">🔔 Activar Notificaciones</button>
   <button class="button info" onclick="viewHistory(3)">📜 Historial de Transacciones</button>
   <button class="button info" onclick="compareBots()">📊 Comparar Bots</button>
-  <button class="button danger" onclick="switchBot(1)">🔄 Cambiar de Bot</button>
   <button class="button support" onclick="getTips()">💡 Consejos de Trading</button>
-  <button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
   <button class="button secondary" onclick="exportReport(1)">📤 Exportar Reporte</button>
 </div>
 
@@ -552,13 +523,10 @@
 
   <button class="button info" onclick="showDetails(4)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
-  <button class="button primary" onclick="customizeBot(1)">⚙️ Configuración Personalizada</button>
-  <button class="button secondary" onclick="enableNotifications(1)">🔔 Activar Notificaciones</button>
   <button class="button info" onclick="viewHistory(1)">📜 Historial de Transacciones</button>
   <button class="button info" onclick="compareBots()">📊 Comparar Bots</button>
   <button class="button danger" onclick="switchBot(1)">🔄 Cambiar de Bot</button>
   <button class="button support" onclick="getTips()">💡 Consejos de Trading</button>
-  <button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
   <button class="button secondary" onclick="exportReport(1)">📤 Exportar Reporte</button>
 </div>
     </div>
@@ -601,13 +569,9 @@
 
   <button class="button info" onclick="showDetails(5)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
-  <button class="button primary" onclick="customizeBot(1)">⚙️ Configuración Personalizada</button>
-  <button class="button secondary" onclick="enableNotifications(1)">🔔 Activar Notificaciones</button>
   <button class="button info" onclick="viewHistory(1)">📜 Historial de Transacciones</button>
   <button class="button info" onclick="compareBots()">📊 Comparar Bots</button>
-  <button class="button danger" onclick="switchBot(1)">🔄 Cambiar de Bot</button>
   <button class="button support" onclick="getTips()">💡 Consejos de Trading</button>
-  <button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
   <button class="button secondary" onclick="exportReport(1)">📤 Exportar Reporte</button>
 </div>
     </div>
@@ -650,12 +614,9 @@
   <button class="button info" onclick="showDetails(6)">📝 Detalles del Bot</button>
   <button class="button info" onclick="analyzePerformance(1)">📈 Analizar Rendimiento</button>
   <button class="button primary" onclick="customizeBot(1)">⚙️ Configuración Personalizada</button>
-  <button class="button secondary" onclick="enableNotifications(1)">🔔 Activar Notificaciones</button>
   <button class="button info" onclick="viewHistory(1)">📜 Historial de Transacciones</button>
   <button class="button info" onclick="compareBots()">📊 Comparar Bots</button>
-  <button class="button danger" onclick="switchBot(1)">🔄 Cambiar de Bot</button>
   <button class="button support" onclick="getTips()">💡 Consejos de Trading</button>
-  <button class="button success" onclick="claimRewards()">🎁 Recompensas</button>
   <button class="button secondary" onclick="exportReport(1)">📤 Exportar Reporte</button>
 </div>
     </div>
