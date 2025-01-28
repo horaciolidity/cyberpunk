@@ -307,10 +307,11 @@
     <!-- Bot 1 -->
 <div class="bot-card" data-bot-id="0">
       <h3>Bot 1 - BTC/USDT</h3>
-      <div class="status">
- <p><strong>Estado:</strong> <span id="botStatus0" class="bot-status bot-inactive">Bot inactivo</span></p>
+   <div class="status">
+  <p><strong>Estado:</strong> <span id="botStatus0" class="bot-status bot-inactive">Bot inactivo</span></p>
   <span id="botStatusLight0" class="status-light red"></span>
 </div>
+
 
       <p>Profit: 3% diario | Congelamiento: 30 días | Fee de Retiro: 7%</p>
       <p>1. Quantum Spectre: 50 USDT </p>
@@ -361,8 +362,8 @@
     <!-- Bot 2 -->
 <div class="bot-card" data-bot-id="1">
       <h3>Bot 2 - BTC/ETH</h3>
-      <div class="status">
- <p><strong>Estado:</strong> <span id="botStatus1" class="bot-status bot-inactive">Bot inactivo</span></p>
+     <div class="status">
+  <p><strong>Estado:</strong> <span id="botStatus1" class="bot-status bot-inactive">Bot inactivo</span></p>
   <span id="botStatusLight1" class="status-light red"></span>
 </div>
 
@@ -416,9 +417,10 @@
 <div class="bot-card" data-bot-id="2">
       <h3>Bot 3 - BCH/USDT</h3>
       <div class="status">
- <p><strong>Estado:</strong> <span id="botStatus2" class="bot-status bot-inactive">Bot inactivo</span></p>
+  <p><strong>Estado:</strong> <span id="botStatus2" class="bot-status bot-inactive">Bot inactivo</span></p>
   <span id="botStatusLight2" class="status-light red"></span>
 </div>
+
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
@@ -467,10 +469,11 @@
           <!-- Bot 3 -->
 <div class="bot-card" data-bot-id="3">
       <h3>Bot 4 - WLD/USDT</h3>
-      <div class="status">
- <p><strong>Estado:</strong> <span id="botStatus3" class="bot-status bot-inactive">Bot inactivo</span></p>
+    <div class="status">
+  <p><strong>Estado:</strong> <span id="botStatus3" class="bot-status bot-inactive">Bot inactivo</span></p>
   <span id="botStatusLight3" class="status-light red"></span>
 </div>
+
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
@@ -517,8 +520,8 @@
           <!-- Bot 3 -->
 <div class="bot-card" data-bot-id="4">
       <h3>Bot 5 - DOGE/USDT</h3>
-      <div class="status">
- <p><strong>Estado:</strong> <span id="botStatus4" class="bot-status bot-inactive">Bot inactivo</span></p>
+    <div class="status">
+  <p><strong>Estado:</strong> <span id="botStatus4" class="bot-status bot-inactive">Bot inactivo</span></p>
   <span id="botStatusLight4" class="status-light red"></span>
 </div>
 
@@ -567,10 +570,11 @@
           <!-- Bot 3 -->
 <div class="bot-card" data-bot-id="5">
       <h3>Bot 6 - ENA/USDT</h3>
-      <div class="status">
- <p><strong>Estado:</strong> <span id="botStatus5" class="bot-status bot-inactive">Bot inactivo</span></p>
+    <div class="status">
+  <p><strong>Estado:</strong> <span id="botStatus5" class="bot-status bot-inactive">Bot inactivo</span></p>
   <span id="botStatusLight5" class="status-light red"></span>
 </div>
+
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $800</p>
@@ -615,10 +619,11 @@
           <!-- Bot 3 -->
 <div class="bot-card" data-bot-id="6">
       <h3>Bot 7 - COW/USDT</h3>
-      <div class="status">
-<p><strong>Estado:</strong> <span id="botStatus6" class="bot-status bot-inactive">Bot inactivo</span></p>
+   <div class="status">
+  <p><strong>Estado:</strong> <span id="botStatus6" class="bot-status bot-inactive">Bot inactivo</span></p>
   <span id="botStatusLight6" class="status-light red"></span>
 </div>
+
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $1600</p>
@@ -940,16 +945,13 @@ async function updateAllBots() {
   try {
     if (!web3Ready) {
       console.warn("Web3 no está listo. Esperando...");
-      return; // Salir si Web3 no está listo
+      return;
     }
 
-    // Array para almacenar las promesas de cada bot
     const promises = [];
 
-    // Iterar sobre todos los bots (IDs del 0 al 6)
     for (let botId = 0; botId <= 6; botId++) {
       promises.push((async () => {
-        // Obtener datos del contrato relacionados con el bot y el usuario
         const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
         const pendingRewards = BigInt(await lythosBotContract.methods.userRewards(userAddress, botId).call());
         const botDetails = await lythosBotContract.methods.bots(botId).call();
@@ -957,18 +959,24 @@ async function updateAllBots() {
         const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
         const currentTime = BigInt(Math.floor(Date.now() / 1000));
 
-        // Calcular la tarifa de retiro y tiempo hasta el próximo reclamo
         const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
         const timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
 
-        // Seleccionar la tarjeta del bot específica en el DOM
         const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
         if (!botInfo) {
-          console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
-          return; // Pasar al siguiente bot si no se encuentra la tarjeta
+          console.warn(`No se encontró la tarjeta del bot con ID ${botId}`);
+          return;
         }
 
-        // Actualizar los datos en la interfaz de usuario
+        const botStatus = botInfo.querySelector(`#botStatus${botId}`);
+        const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
+
+        if (!botStatus || !botStatusLight) {
+          console.warn(`Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
+          return;
+        }
+
+        // Actualizar la interfaz
         botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
         botInfo.querySelector(`#pendingRewards${botId}`).textContent = (Number(pendingRewards) / 1e6).toFixed(2);
         botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)} USDT`;
@@ -979,10 +987,7 @@ async function updateAllBots() {
         botInfo.querySelector(`#userTotalBalance${botId}`).textContent =
           ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
 
-        // Actualizar estado del bot (activo/inactivo)
-        const botStatus = botInfo.querySelector(`#botStatus${botId}`);
-        const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
-
+        // Cambiar estado
         if (userBalance > 0n) {
           botStatus.textContent = "Bot activo";
           botStatus.classList.remove("bot-inactive");
@@ -1003,7 +1008,6 @@ async function updateAllBots() {
       })());
     }
 
-    // Esperar a que todas las promesas de los bots se resuelvan
     await Promise.all(promises);
     console.log("Todos los bots han sido actualizados.");
   } catch (error) {
