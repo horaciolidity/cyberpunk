@@ -972,14 +972,13 @@ async function updateAllBots() {
   }
 }
 
-
-  async function claimRewards(botId) {
+async function claimRewards(botId) {
   try {
     const accounts = await web3.eth.getAccounts();
     const userAddress = accounts[0];
     
     alert(`Reclamando recompensas del Bot ${botId}...`);
-    const tx = await lythosBotContract.methods.claimRewards(botId).send({ from: userAddress });
+    const tx = await lythosBotContract.methods.claimRewards(botId).send({ from: userAddress }); // Corregido
     alert("¡Recompensas reclamadas exitosamente!");
     console.log("Detalles de la transacción:", tx);
     
@@ -989,8 +988,6 @@ async function updateAllBots() {
     alert("Error al reclamar recompensas. Intenta nuevamente.");
   }
 }
-
-
 
 document.querySelectorAll(".button.primary").forEach(button => {
     button.addEventListener("click", async (event) => {
