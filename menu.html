@@ -118,47 +118,33 @@
   0%, 90% { box-shadow: none; }
   91%, 100% { box-shadow: 0 0 15px green; }
 }
-    .status {
+  .status {
   display: flex;
   align-items: center;
-  margin: 10px 0;
+  margin: 10px auto; /* Centra el elemento horizontalmente */
+  justify-content: center;
+  border: 1px solid #22edfc; /* Borde decorativo */
+  padding: 5px;
+  border-radius: 5px;
+  width: 30%; /* Ancho más angosto, ajusta este valor según lo que necesites */
+  max-width: 300px; /* Limita el ancho máximo */
+  box-sizing: border-box; /* Asegura que el padding no aumente el ancho total */
 }
 
-/* Estilo para el estado del bot */
-.bot-status {
-  font-weight: bold;
-  font-size: 14px;
+
+.status-label {
+  font-size: 1em;
+  color: #db0e15;
+  margin-right: 10px;
 }
 
-/* Estado inactivo */
-.bot-inactive {
-  color: red;
-}
-
-/* Estado activo */
-.bot-active {
-  color: green;
-}
-
-/* Luz de estado */
-.status-light {
+.status-indicator {
   width: 10px;
   height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-left: 5px;
-}
-
-/* Luz roja (inactivo) */
-.red {
   background-color: red;
+  border-radius: 50%;
+  box-shadow: 0 0 10px red;
 }
-
-/* Luz verde (activo) */
-.green {
-  background-color: green;
-}
-
 /* Linternas */
 .lantern {
   position: absolute;
@@ -307,13 +293,12 @@
     <!-- Bot 1 -->
 <div class="bot-card" data-bot-id="0">
       <h3>Bot 1 - BTC/USDT</h3>
-   <div class="status">
-  <p><strong>Estado:</strong> <span id="botStatus0" class="bot-status bot-inactive">Bot inactivo</span></p>
-  <span id="botStatusLight0" class="status-light red"></span>
+      <div class="status">
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
 </div>
 
-
-      <p>Profit: 3% diario | Congelamiento: 30 días | Fee de Retiro: 7%</p>
+      <p>Profit: 2% diario | Congelamiento: 30 días | Fee de Retiro: 5,7%</p>
       <p>1. Quantum Spectre: 50 USDT </p>
 
       <div class="bot-info" data-bot-id="0">
@@ -335,10 +320,9 @@
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
      <div class="button-group">
- <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="0" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
-   <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
+       <button class="button success" onclick="claimRewards(botId)">🎁 Reclamar Recompensas</button>
 
   <button class="button danger" onclick="withdraw(0)">Retirar</button>
   <button class="button info" onclick="showUserDetails(0)">📝 Ver Detalles</button>
@@ -362,23 +346,22 @@
     <!-- Bot 2 -->
 <div class="bot-card" data-bot-id="1">
       <h3>Bot 2 - BTC/ETH</h3>
-     <div class="status">
-  <p><strong>Estado:</strong> <span id="botStatus1" class="bot-status bot-inactive">Bot inactivo</span></p>
-  <span id="botStatusLight1" class="status-light red"></span>
+      <div class="status">
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
 </div>
 
       <p>Profit: 4% diario | Congelamiento: 15 días | Fee de Retiro: 11,6%</p>
       <p>Máximo para alquilar: $200</p>
 
 <div class="bot-info" data-bot-id="1">
-   <p><strong>Saldo:</strong> <span id="userBalance1">Cargando...</span> USDT</p>
+  <p><strong>Saldo:</strong> <span id="userBalance1">Cargando...</span> USDT</p>
   <p><strong>Recompensas Pendientes:</strong> <span id="pendingRewards1">Cargando...</span> USDT</p>
   <p><strong>Fee de Retiro:</strong> <span id="withdrawalFee1">Cargando...</span>%</p>
   <p><strong>Tiempo para Reclamar:</strong> <span id="timeUntilClaim1">Cargando...</span></p>
   <p><strong>Aviso:</strong> <span id="claimNotice1">Cargando...</span></p>
   <p><strong>Saldo Total:</strong> <span id="userTotalBalance1">Cargando...</span> USDT</p>
 </div>
-
 
       
       <div class="tradingview-widget">
@@ -417,23 +400,21 @@
 <div class="bot-card" data-bot-id="2">
       <h3>Bot 3 - BCH/USDT</h3>
       <div class="status">
-  <p><strong>Estado:</strong> <span id="botStatus2" class="bot-status bot-inactive">Bot inactivo</span></p>
-  <span id="botStatusLight2" class="status-light red"></span>
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
 </div>
-
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
 
       <div class="bot-info" data-bot-id="2">
-   <p><strong>Saldo:</strong> <span id="userBalance2">Cargando...</span> USDT</p>
+  <p><strong>Saldo:</strong> <span id="userBalance2">Cargando...</span> USDT</p>
   <p><strong>Recompensas Pendientes:</strong> <span id="pendingRewards2">Cargando...</span> USDT</p>
   <p><strong>Fee de Retiro:</strong> <span id="withdrawalFee2">Cargando...</span>%</p>
   <p><strong>Tiempo para Reclamar:</strong> <span id="timeUntilClaim2">Cargando...</span></p>
   <p><strong>Aviso:</strong> <span id="claimNotice2">Cargando...</span></p>
   <p><strong>Saldo Total:</strong> <span id="userTotalBalance2">Cargando...</span> USDT</p>
 </div>
-
 
       <div class="tradingview-widget">
          <div class="lantern red"></div>
@@ -469,11 +450,10 @@
           <!-- Bot 3 -->
 <div class="bot-card" data-bot-id="3">
       <h3>Bot 4 - WLD/USDT</h3>
-    <div class="status">
-  <p><strong>Estado:</strong> <span id="botStatus3" class="bot-status bot-inactive">Bot inactivo</span></p>
-  <span id="botStatusLight3" class="status-light red"></span>
+      <div class="status">
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
 </div>
-
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
       <p>Mínimo para alquilar: $3000</p>
@@ -520,9 +500,9 @@
           <!-- Bot 3 -->
 <div class="bot-card" data-bot-id="4">
       <h3>Bot 5 - DOGE/USDT</h3>
-    <div class="status">
-  <p><strong>Estado:</strong> <span id="botStatus4" class="bot-status bot-inactive">Bot inactivo</span></p>
-  <span id="botStatusLight4" class="status-light red"></span>
+      <div class="status">
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
 </div>
 
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
@@ -570,14 +550,13 @@
           <!-- Bot 3 -->
 <div class="bot-card" data-bot-id="5">
       <h3>Bot 6 - ENA/USDT</h3>
-    <div class="status">
-  <p><strong>Estado:</strong> <span id="botStatus5" class="bot-status bot-inactive">Bot inactivo</span></p>
-  <span id="botStatusLight5" class="status-light red"></span>
+      <div class="status">
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
 </div>
 
-
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
-      <p>Mínimo para alquilar: $800</p>
+      <p>Mínimo para alquilar: $3000</p>
      <div class="bot-info" data-bot-id="5">
   <p><strong>Saldo:</strong> <span id="userBalance5">Cargando...</span> USDT</p>
   <p><strong>Recompensas Pendientes:</strong> <span id="pendingRewards5">Cargando...</span> USDT</p>
@@ -619,16 +598,15 @@
           <!-- Bot 3 -->
 <div class="bot-card" data-bot-id="6">
       <h3>Bot 7 - COW/USDT</h3>
-   <div class="status">
-  <p><strong>Estado:</strong> <span id="botStatus6" class="bot-status bot-inactive">Bot inactivo</span></p>
-  <span id="botStatusLight6" class="status-light red"></span>
+      <div class="status">
+  <span class="status-label">Bot inactivo</span>
+  <span class="status-indicator"></span>
 </div>
 
-
       <p>Profit: 12% diario | Congelamiento: 10 días | Fee de Retiro: 8,3%</p>
-      <p>Mínimo para alquilar: $1600</p>
+      <p>Mínimo para alquilar: $3000</p>
       <div class="bot-info" data-bot-id="6">
-  <p><strong>Saldo:</strong> <span id="userBalance6">Cargando...</span> USDT</p>
+  <p><strong>Saldo:</strong> <span id="userBalance0">Cargando...</span> USDT</p>
   <p><strong>Recompensas Pendientes:</strong> <span id="pendingRewards6">Cargando...</span> USDT</p>
   <p><strong>Fee de Retiro:</strong> <span id="withdrawalFee6">Cargando...</span>%</p>
   <p><strong>Tiempo para Reclamar:</strong> <span id="timeUntilClaim6">Cargando...</span></p>
@@ -678,12 +656,13 @@
   <script>
 let web3;
 let usdtContract;
-let lythosBotContract;
+let contract;
 let userAddress;
-let web3Ready = false;
+let web3Ready = false; 
 
 const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; 
-const lythosBotContractAddress = "0xcc184eB45d4d897DD4Cf0C44d83d54966C87c7E9"; 
+const contractAddress = "0x03FA055e3879a4bF1f4ca31F8A3a9012e8CcC79F";
+    
 const usdtABI = [
   {"inputs":[{"internalType":"address","name":"_l2Bridge","type":"address"},{"internalType":"address","name":"_l1Token","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
@@ -703,7 +682,7 @@ const usdtABI = [
   }
 ];
 
-const lythosBotABI = [{"inputs":[{"internalType":"address","name":"_usdt","type":"address"},{"internalType":"address","name":"initialOwner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"BotInterestUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"BotPriceUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"newBalance","type":"uint256"}],"name":"BotPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"FeeUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"FundsWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RestauracionDeCuenta","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"RewardIntervalUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"WithdrawalStatusUpdated","type":"event"},{"inputs":[{"internalType":"uint8","name":"","type":"uint8"}],"name":"bots","outputs":[{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"uint256","name":"interestRate","type":"uint256"},{"internalType":"uint256","name":"withdrawalFee","type":"uint256"},{"internalType":"uint256","name":"totalRewards","type":"uint256"},{"internalType":"bool","name":"withdrawalsEnabled","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"lastRewardClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"medicine","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"purchaseBot","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"restauracionDeCuenta","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"rewardInterval","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"setRewardInterval","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleWithdrawals","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"updateBotInterest","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateBotPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"updateWithdrawalFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"userBotBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"userRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]; 
+const contractABI =[{"inputs":[{"internalType":"address","name":"_usdt","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"BotInterestUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"BotPriceUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"newBalance","type":"uint256"}],"name":"BotPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"FeeUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"GlobalWithdrawalsUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"KyoKusanagiDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardAssigned","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"RewardIntervalUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"RewardPermissionUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"USDTWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"remainingBalance","type":"uint256"}],"name":"Withdrawal","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"WithdrawalPermissionUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint8","name":"botId","type":"uint8"},{"indexed":false,"internalType":"bool","name":"enabled","type":"bool"}],"name":"WithdrawalStatusUpdated","type":"event"},{"inputs":[{"internalType":"uint8","name":"","type":"uint8"}],"name":"bots","outputs":[{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"uint256","name":"interestRate","type":"uint256"},{"internalType":"uint256","name":"withdrawalFee","type":"uint256"},{"internalType":"uint256","name":"totalRewards","type":"uint256"},{"internalType":"bool","name":"withdrawalsEnabled","type":"bool"},{"internalType":"uint256","name":"lastRewardTime","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"calculateWithdrawalFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getPendingReward","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getTimeUntilNextClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getTotalRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"getUserBotBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"kyoKusanagiDeposit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"lastRewardClaim","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"purchaseBot","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"rewardInterval","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"rewardsAllowed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint8","name":"botId","type":"uint8"}],"name":"setRewardForUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newInterval","type":"uint256"}],"name":"setRewardInterval","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleAllBotWithdrawals","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleUserRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleUserWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"bool","name":"enabled","type":"bool"}],"name":"toggleWithdrawalStatus","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"totalFeesAccumulated","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newInterestRate","type":"uint256"}],"name":"updateBotInterest","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateBotPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"updateWithdrawalFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"useAccumulatedFees","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"userBotBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint8","name":"","type":"uint8"}],"name":"userRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"botId","type":"uint8"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawBotBalance","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"withdrawalsAllowed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
 
 
 async function initializeWeb3() {
@@ -715,7 +694,7 @@ async function initializeWeb3() {
       // Cambiar a la red Optimism
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0xa" }], // Chain ID para Optimism
+        params: [{ chainId: "0xa" }] // Chain ID para Optimism
       });
 
       // Solicitar cuentas a MetaMask
@@ -743,18 +722,24 @@ async function initializeWeb3() {
       const usdtBalanceFormatted = (Number(usdtBalance) / 1e6).toFixed(2); // USDT tiene 6 decimales
       document.getElementById("balanceUsdt").textContent = `${usdtBalanceFormatted} USDT`;
 
-      // Inicializar el contrato principal (LythosBot)
-      lythosBotContract = new web3.eth.Contract(lythosBotABI, lythosBotContractAddress);
+      // Inicializar el contrato principal
+      contract = new web3.eth.Contract(contractABI, contractAddress);
       web3Ready = true;
 
-      // Actualizar información de los bots
-      await updateAllBots();
+
+      for (let botId = 0; botId <= 6; botId++) {
+      await updateBotInfo(botId, userAddress);
+    }
+
 
       // Confirmar conexión en la consola
       console.log("Conexión establecida correctamente:");
       console.log("Cuenta conectada:", userAddress);
       console.log("Saldo en ETH:", web3.utils.fromWei(ethBalance, "ether"), "ETH");
       console.log("Saldo en USDT:", usdtBalanceFormatted, "USDT");
+      
+      updateAllBots();
+
 
       // Notificar éxito al usuario
       alert("Conexión exitosa a MetaMask y la red Optimism.");
@@ -770,9 +755,17 @@ async function initializeWeb3() {
 // Iniciar al cargar la página
 window.addEventListener("load", initializeWeb3);
 
-    
+
 async function purchaseBot(event) {
   try {
+    // Obtener la dirección del usuario conectado
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+    if (!userAddress) {
+      alert("No se pudo obtener la cuenta de usuario conectada. Intenta reconectar MetaMask.");
+      return;
+    }
+
     // Obtener la tarjeta del bot correspondiente al botón presionado
     const botCard = event.target.closest(".bot-card");
     if (!botCard) {
@@ -795,7 +788,7 @@ async function purchaseBot(event) {
       return;
     }
 
-    // Convertir el monto a micro-unidades (1 USDT = 10^6 micro-unidades)
+    // Convertir el monto a micro-unidades
     const amountInMicroUnits = BigInt(Math.floor(amountInUsdt * 10 ** 6));
 
     console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
@@ -816,17 +809,17 @@ async function purchaseBot(event) {
 
     // Aprobar la transferencia de USDT
     console.log("Solicitando aprobación de transferencia...");
-    await usdtContract.methods.approve(lythosBotContractAddress, amountInMicroUnits).send({ from: userAddress });
+    await usdtContract.methods.approve(contractAddress, amountInMicroUnits).send({ from: userAddress });
     console.log("Aprobación completada.");
 
     // Realizar la compra del bot
     console.log("Intentando realizar la compra...");
-    const tx = await lythosBotContract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+    const tx = await contract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
     console.log("Compra exitosa:", tx);
     alert("¡Compra realizada con éxito!");
 
     // Actualizar la información del bot después de la compra
-    await updateBotInfo(botId);
+    await updateBotInfo(botId, userAddress);
   } catch (error) {
     console.error("Error al comprar el bot:", error);
 
@@ -850,69 +843,34 @@ async function updateBotInfo(botId) {
       return;
     }
 
-    // Obtener datos del contrato relacionados con el bot y el usuario
-    const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
-    const pendingRewards = BigInt(await lythosBotContract.methods.userRewards(userAddress, botId).call());
-    const botDetails = await lythosBotContract.methods.bots(botId).call();
-    const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
-    const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
-    const currentTime = BigInt(Math.floor(Date.now() / 1000));
+    // Obtener datos del contrato
+    const userBalance = BigInt(await contract.methods.getUserBotBalance(userAddress, botId).call());
+    const pendingRewards = BigInt(await contract.methods.getPendingReward(userAddress, botId).call());
+    const withdrawalFee = BigInt(await contract.methods.calculateWithdrawalFee(botId, userBalance).call());
+    const timeUntilNextClaim = BigInt(await contract.methods.getTimeUntilNextClaim(userAddress, botId).call());
 
-    // Seleccionar la tarjeta del bot específica en el DOM
+    // Seleccionar la tarjeta del bot
     const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
     if (!botInfo) {
       console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
       return;
     }
 
-    const botStatus = botInfo.querySelector(`#botStatus${botId}`);
-    const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
-
-    if (!botStatus || !botStatusLight) {
-      console.warn(`Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
-      return;
-    }
-
-    // Actualizar el estado del bot según el saldo del usuario
-    if (userBalance > 0n) {
-      botStatus.textContent = "Bot activo";
-      botStatus.classList.remove("bot-inactive");
-      botStatus.classList.add("bot-active");
-
-      botStatusLight.classList.remove("red");
-      botStatusLight.classList.add("green");
-    } else {
-      botStatus.textContent = "Bot inactivo";
-      botStatus.classList.remove("bot-active");
-      botStatus.classList.add("bot-inactive");
-
-      botStatusLight.classList.remove("green");
-      botStatusLight.classList.add("red");
-    }
-
-    // Calcular la tarifa de retiro y el tiempo hasta el próximo reclamo
-    const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
-    const timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
-
-    // Actualizar los datos en la interfaz de usuario
+    // Actualizar los datos en el DOM
     botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
     botInfo.querySelector(`#pendingRewards${botId}`).textContent = (Number(pendingRewards) / 1e6).toFixed(2);
-    botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)} USDT`;
+    botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)}%`;
     botInfo.querySelector(`#timeUntilClaim${botId}`).textContent =
       Number(timeUntilNextClaim) > 0 ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible";
     botInfo.querySelector(`#claimNotice${botId}`).textContent =
-      pendingRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible";
-    botInfo.querySelector(`#userTotalBalance${botId}`).textContent = 
-      ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
-
-    console.log(`Bot ${botId}: Información actualizada correctamente. Saldo: ${(Number(userBalance) / 1e6).toFixed(2)} USDT`);
+      pendingRewards > 0n && timeUntilNextClaim === 0n ? "¡Recompensa disponible!" : "No disponible";
+    botInfo.querySelector(`#userTotalBalance${botId}`).textContent = ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
   } catch (error) {
     console.error(`Error al actualizar el bot ${botId}:`, error);
-    alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
   }
 }
 
-
+    
 function simulateGuides() {
   const widgets = document.querySelectorAll('.tradingview-widget');
   widgets.forEach((widget, index) => {
@@ -945,73 +903,38 @@ async function updateAllBots() {
   try {
     if (!web3Ready) {
       console.warn("Web3 no está listo. Esperando...");
-      return;
+      return; // Salir si Web3 no está listo
     }
+    
 
-    const promises = [];
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
 
     for (let botId = 0; botId <= 6; botId++) {
-      promises.push((async () => {
-        const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
-        const pendingRewards = BigInt(await lythosBotContract.methods.userRewards(userAddress, botId).call());
-        const botDetails = await lythosBotContract.methods.bots(botId).call();
-        const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
-        const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
-        const currentTime = BigInt(Math.floor(Date.now() / 1000));
+      await updateBotInfo(botId);
 
-        const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
-        const timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
 
-        const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
-        if (!botInfo) {
-          console.warn(`No se encontró la tarjeta del bot con ID ${botId}`);
-          return;
-        }
+      const userBalance = (botDetails.userBalance / 1e6).toFixed(2);
+      const pendingRewards = (botDetails.pendingRewards / 1e6).toFixed(2);
+      const withdrawalFee = (botDetails.withdrawalFee / 1e6).toFixed(2);
+      const timeUntilNextClaim = Math.ceil(botDetails.timeUntilNextClaim / 3600);
+      const rewardsAvailable = botDetails.rewardsAvailable;
+      const userTotalBalance = (botDetails.userTotalBalance / 1e6).toFixed(2);
 
-        const botStatus = botInfo.querySelector(`#botStatus${botId}`);
-        const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
+      document.getElementById(`userBalance${botId}`).textContent = userBalance;
+      document.getElementById(`pendingRewards${botId}`).textContent = pendingRewards;
+      document.getElementById(`withdrawalFee${botId}`).textContent = `${withdrawalFee}%`;
+      document.getElementById(`timeUntilClaim${botId}`).textContent =
+        timeUntilNextClaim > 0 ? `${timeUntilNextClaim} horas` : "Disponible";
+      document.getElementById(`claimNotice${botId}`).textContent = rewardsAvailable
+        ? "¡Recompensa disponible!"
+        : "No disponible";
+      document.getElementById(`userTotalBalance${botId}`).textContent = userTotalBalance;
 
-        if (!botStatus || !botStatusLight) {
-          console.warn(`Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
-          return;
-        }
-
-        // Actualizar la interfaz
-        botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
-        botInfo.querySelector(`#pendingRewards${botId}`).textContent = (Number(pendingRewards) / 1e6).toFixed(2);
-        botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)} USDT`;
-        botInfo.querySelector(`#timeUntilClaim${botId}`).textContent =
-          Number(timeUntilNextClaim) > 0 ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible";
-        botInfo.querySelector(`#claimNotice${botId}`).textContent =
-          pendingRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible";
-        botInfo.querySelector(`#userTotalBalance${botId}`).textContent =
-          ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
-
-        // Cambiar estado
-        if (userBalance > 0n) {
-          botStatus.textContent = "Bot activo";
-          botStatus.classList.remove("bot-inactive");
-          botStatus.classList.add("bot-active");
-
-          botStatusLight.classList.remove("red");
-          botStatusLight.classList.add("green");
-        } else {
-          botStatus.textContent = "Bot inactivo";
-          botStatus.classList.remove("bot-active");
-          botStatus.classList.add("bot-inactive");
-
-          botStatusLight.classList.remove("green");
-          botStatusLight.classList.add("red");
-        }
-
-        console.log(`Bot ${botId}: Datos y estado actualizados correctamente.`);
-      })());
+      console.log(`Bot ${botId}: Datos actualizados correctamente.`);
     }
-
-    await Promise.all(promises);
-    console.log("Todos los bots han sido actualizados.");
   } catch (error) {
-    console.error("Error al actualizar los datos de los bots:", error.message);
+    console.error("Error al actualizar los datos de los bots:", error);
     alert("Hubo un error al obtener los datos de los bots. Revisa la consola para más detalles.");
   }
 }
