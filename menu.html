@@ -324,8 +324,7 @@
  <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="0" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
-<button class="button success" onclick="claimRewards(0)">🎁 Reclamar Recompensas</button>
-
+<button class="button success claim-btn" data-bot-id="0">🎁 Reclamar Recompensas</button>
   <button class="button danger" onclick="withdraw(0)">Retirar</button>
 
   
@@ -374,8 +373,7 @@
      <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="1" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
-<button class="button success" onclick="claimRewards(1)">🎁 Reclamar Recompensas</button>
-
+<button class="button success claim-btn" data-bot-id="1">🎁 Reclamar Recompensas</button>
   <button class="button danger" onclick="withdraw(1)">Retirar</button>
 
   
@@ -421,8 +419,7 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="2" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
-<button class="button success" onclick="claimRewards(2)">🎁 Reclamar Recompensas</button>
-
+<button class="button success claim-btn" data-bot-id="2">🎁 Reclamar Recompensas</button>
   <button class="button danger" onclick="withdraw(2)">Retirar</button>
 
   
@@ -466,8 +463,7 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="3" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
-<button class="button success" onclick="claimRewards(3)">🎁 Reclamar Recompensas</button>
-
+<button class="button success claim-btn" data-bot-id="3">🎁 Reclamar Recompensas</button>
   <button class="button danger" onclick="withdraw(3)">Retirar</button>
 
   
@@ -512,8 +508,7 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="4" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
-<button class="button success" onclick="claimRewards(4)">🎁 Reclamar Recompensas</button>
-
+<button class="button success claim-btn" data-bot-id="4">🎁 Reclamar Recompensas</button>
   <button class="button danger" onclick="withdraw(4)">Retirar</button>
 
   <button class="button info" onclick="showDetails(4)">📝 Detalles del Bot</button>
@@ -556,8 +551,7 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="5" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
-<button class="button success" onclick="claimRewards(5)">🎁 Reclamar Recompensas</button>
-
+<button class="button success claim-btn" data-bot-id="5">🎁 Reclamar Recompensas</button>
      <button class="button danger" onclick="withdraw(5)">Retirar</button>
 
   <button class="button info" onclick="showDetails(5)">📝 Detalles del Bot</button>
@@ -599,8 +593,7 @@
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="6" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
-<button class="button success" onclick="claimRewards(0)">🎁 Reclamar Recompensas</button>
-
+<button class="button success claim-btn" data-bot-id="5">🎁 Reclamar Recompensas</button>
      <button class="button danger" onclick="withdraw(6)">Retirar</button>
 
   <button class="button info" onclick="showDetails(6)">📝 Detalles del Bot</button>
@@ -974,56 +967,89 @@ async function updateAllBots() {
 
 async function claimRewards(botId) {
   try {
-    if (!web3Ready) {
-      alert("Web3 no está listo. Conecta primero tu wallet.");
+    if (!web3Ready || !lythosBotContract) {
+      alert("Conecta tu wallet primero.");
       return;
     }
 
-    // Verificar si el bot está activo y tiene recompensas
+    // 1. Verificar intervalo de recompensa
     const lastClaim = await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call();
-    const currentTime = Math.floor(Date.now() / 1000);
     const rewardInterval = await lythosBotContract.methods.rewardInterval().call();
-
+    const currentTime = Math.floor(Date.now() / 1000);
+    
     if (currentTime < Number(lastClaim) + Number(rewardInterval)) {
-      alert("El intervalo de recompensa no se ha cumplido.");
+      const hoursLeft = Math.ceil((Number(lastClaim) + Number(rewardInterval) - currentTime) / 3600);
+      alert(`Debes esperar ${hoursLeft} horas antes de reclamar nuevamente`);
       return;
     }
 
-    // Obtener recompensas pendientes
+    // 2. Verificar si hay recompensas
     const pendingRewards = await lythosBotContract.methods.userRewards(userAddress, botId).call();
     if (Number(pendingRewards) === 0) {
-      alert("No hay recompensas disponibles para este bot.");
+      alert("No hay recompensas disponibles para este bot");
       return;
     }
 
-    // Confirmar con el usuario
-    const confirmacion = confirm(`¿Reclamar ${Number(pendingRewards) / 1e6} USDT en recompensas?`);
+    // 3. Verificar estado de retiros
+    const botInfo = await lythosBotContract.methods.bots(botId).call();
+    if (!botInfo.withdrawalsEnabled) {
+      alert("Los retiros están deshabilitados para este bot");
+      return;
+    }
+
+    // 4. Mostrar confirmación con detalles
+    const rewardAmount = (Number(pendingRewards) / 1e6).toFixed(2);
+    const feePercentage = Number(botInfo.withdrawalFee) / 100;
+    const feeAmount = (rewardAmount * feePercentage).toFixed(2);
+    const netAmount = (rewardAmount - feeAmount).toFixed(2);
+    
+    const confirmacion = confirm(
+      `Reclamar ${rewardAmount} USDT?\n` +
+      `Tarifa de retiro (${feePercentage}%): ${feeAmount} USDT\n` +
+      `Recibirás: ${netAmount} USDT`
+    );
+    
     if (!confirmacion) return;
 
-    // Ejecutar la transacción
+    // 5. Ejecutar transacción
     const tx = await lythosBotContract.methods.claimRewards(botId)
       .send({ from: userAddress });
     
     console.log("Transacción exitosa:", tx);
-    alert("¡Recompensas reclamadas con éxito!");
-    
-    // Actualizar la interfaz
+    alert(`¡Éxito! ${netAmount} USDT han sido transferidos a tu wallet`);
+
+    // 6. Actualizar UI
     await updateBotInfo(botId);
-    
+    await updateUSDTBalance();
+
   } catch (error) {
     console.error("Error al reclamar:", error);
     
-    // Manejar errores específicos
     if (error.code === 4001) {
-      alert("Transacción cancelada por el usuario.");
+      alert("Transacción cancelada por el usuario");
     } else if (error.message.includes("revert")) {
-      const reason = error.message.match(/revert (.*)/)?.[1] || "Error desconocido";
-      alert(`El contrato rechazó la operación: ${reason}`);
+      const reason = error.message.match(/reverted with reason string '(.*)'/)?.[1] || "Error en el contrato";
+      alert(`Error: ${reason}`);
     } else {
-      alert("Error inesperado. Verifica la consola.");
+      alert("Error al procesar la transacción. Verifica la consola para más detalles");
     }
   }
 }
+
+// Función adicional para actualizar saldo USDT
+async function updateUSDTBalance() {
+  const usdtBalance = await usdtContract.methods.balanceOf(userAddress).call();
+  const formattedBalance = (Number(usdtBalance) / 1e6).toFixed(2);
+  document.getElementById("balanceUsdt").textContent = `${formattedBalance} USDT`;
+}
+
+    // Manejador para todos los botones de reclamar
+document.querySelectorAll('.claim-btn').forEach(button => {
+  button.addEventListener('click', async (e) => {
+    const botId = parseInt(e.target.closest('.bot-card').dataset.botId);
+    if (!isNaN(botId)) await claimRewards(botId);
+  });
+});
 
 document.querySelectorAll(".button.primary").forEach(button => {
     button.addEventListener("click", async (event) => {
