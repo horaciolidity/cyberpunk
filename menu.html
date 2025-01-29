@@ -1272,21 +1272,7 @@ async function analyzePerformance(botId) {
 }
 
 
-async function claimRewards() {
-  try {
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
 
-    alert("Reclamando recompensas...");
-    const tx = await contract.methods.claimRewards().send({ from: userAddress });
-
-    alert("¡Recompensas reclamadas exitosamente!");
-    console.log("Detalles de la transacción:", tx);
-  } catch (error) {
-    console.error("Error al reclamar recompensas:", error);
-    alert("No se pudieron reclamar las recompensas. Intenta nuevamente.");
-  }
-}
     document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".button.primary").forEach(button => {
     button.addEventListener("click", purchaseBot);
