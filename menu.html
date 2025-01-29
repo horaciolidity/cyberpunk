@@ -974,63 +974,56 @@ async function updateAllBots() {
 
 async function claimRewards(botId) {
   try {
-    // Asegúrate de que MetaMask esté conectado y obtén las cuentas disponibles
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
-
-    if (!userAddress) {
-      alert("No se detectó ninguna cuenta conectada. Asegúrate de estar conectado a MetaMask.");
+    if (!web3Ready) {
+      alert("Web3 no está listo. Conecta primero tu wallet.");
       return;
     }
 
-    // Notificar al usuario que se está procesando la transacción
-    alert(`Iniciando la reclamación de recompensas para el Bot ${botId}...`);
+    // Verificar si el bot está activo y tiene recompensas
+    const lastClaim = await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call();
+    const currentTime = Math.floor(Date.now() / 1000);
+    const rewardInterval = await lythosBotContract.methods.rewardInterval().call();
 
-    // Verificar si el usuario tiene recompensas disponibles antes de intentar reclamarlas
+    if (currentTime < Number(lastClaim) + Number(rewardInterval)) {
+      alert("El intervalo de recompensa no se ha cumplido.");
+      return;
+    }
+
+    // Obtener recompensas pendientes
     const pendingRewards = await lythosBotContract.methods.userRewards(userAddress, botId).call();
-    if (BigInt(pendingRewards) === 0n) {
-      alert("No tienes recompensas pendientes para reclamar en este bot.");
+    if (Number(pendingRewards) === 0) {
+      alert("No hay recompensas disponibles para este bot.");
       return;
     }
 
-    // Confirmar con el usuario antes de proceder
-    const confirmClaim = confirm(
-      `Tienes ${(Number(pendingRewards) / 1e6).toFixed(2)} USDT en recompensas pendientes. ¿Deseas reclamar estas recompensas?`
-    );
-    if (!confirmClaim) {
-      alert("Reclamación cancelada.");
-      return;
-    }
+    // Confirmar con el usuario
+    const confirmacion = confirm(`¿Reclamar ${Number(pendingRewards) / 1e6} USDT en recompensas?`);
+    if (!confirmacion) return;
 
-    // Llamar al contrato para reclamar las recompensas
-    const tx = await lythosBotContract.methods.claimRewards(botId).send({ from: userAddress });
-
-    // Mostrar una notificación de éxito al usuario
-    alert("¡Recompensas reclamadas exitosamente!");
-    console.log("Detalles de la transacción:", tx);
-
-    // Actualizar la información del bot en la interfaz
+    // Ejecutar la transacción
+    const tx = await lythosBotContract.methods.claimRewards(botId)
+      .send({ from: userAddress });
+    
+    console.log("Transacción exitosa:", tx);
+    alert("¡Recompensas reclamadas con éxito!");
+    
+    // Actualizar la interfaz
     await updateBotInfo(botId);
-
-    // Opcional: Regresar detalles de la transacción en caso de necesitar mostrarlos
-    return tx;
+    
   } catch (error) {
-    console.error("Error al reclamar recompensas:", error);
-
+    console.error("Error al reclamar:", error);
+    
     // Manejar errores específicos
     if (error.code === 4001) {
-      alert("Transacción rechazada por el usuario.");
+      alert("Transacción cancelada por el usuario.");
     } else if (error.message.includes("revert")) {
-      alert("El contrato rechazó la transacción. Revisa las condiciones para reclamar recompensas.");
-    } else if (error.message.includes("insufficient funds")) {
-      alert("No tienes fondos suficientes para pagar las comisiones de la red.");
+      const reason = error.message.match(/revert (.*)/)?.[1] || "Error desconocido";
+      alert(`El contrato rechazó la operación: ${reason}`);
     } else {
-      alert("Error inesperado al reclamar recompensas. Revisa la consola para más detalles.");
+      alert("Error inesperado. Verifica la consola.");
     }
   }
 }
-
-
 
 document.querySelectorAll(".button.primary").forEach(button => {
     button.addEventListener("click", async (event) => {
