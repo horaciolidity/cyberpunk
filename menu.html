@@ -976,18 +976,24 @@ async function claimRewards(botId) {
   try {
     const accounts = await web3.eth.getAccounts();
     const userAddress = accounts[0];
-    
+
     alert(`Reclamando recompensas del Bot ${botId}...`);
-    const tx = await lythosBotContract.methods.claimRewards(botId).send({ from: userAddress }); // Corregido
+    const tx = await lythosBotContract.methods.claimRewards(botId).send({ from: userAddress }); // Corrección aquí
     alert("¡Recompensas reclamadas exitosamente!");
     console.log("Detalles de la transacción:", tx);
-    
-    await updateBotInfo(botId);
+
+    await updateBotInfo(botId); // Actualizar información después de reclamar
   } catch (error) {
     console.error("Error al reclamar recompensas:", error);
-    alert("Error al reclamar recompensas. Intenta nuevamente.");
+
+    if (error.code === 4001) {
+      alert("Transacción rechazada por el usuario.");
+    } else {
+      alert("Error al reclamar recompensas. Revisa la consola para más detalles.");
+    }
   }
 }
+
 
 document.querySelectorAll(".button.primary").forEach(button => {
     button.addEventListener("click", async (event) => {
