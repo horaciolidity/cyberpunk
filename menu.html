@@ -974,25 +974,62 @@ async function updateAllBots() {
 
 async function claimRewards(botId) {
   try {
+    // Asegúrate de que MetaMask esté conectado y obtén las cuentas disponibles
     const accounts = await web3.eth.getAccounts();
     const userAddress = accounts[0];
 
-    alert(`Reclamando recompensas del Bot ${botId}...`);
-    const tx = await lythosBotContract.methods.claimRewards(botId).send({ from: userAddress }); // Corrección aquí
+    if (!userAddress) {
+      alert("No se detectó ninguna cuenta conectada. Asegúrate de estar conectado a MetaMask.");
+      return;
+    }
+
+    // Notificar al usuario que se está procesando la transacción
+    alert(`Iniciando la reclamación de recompensas para el Bot ${botId}...`);
+
+    // Verificar si el usuario tiene recompensas disponibles antes de intentar reclamarlas
+    const pendingRewards = await lythosBotContract.methods.userRewards(userAddress, botId).call();
+    if (BigInt(pendingRewards) === 0n) {
+      alert("No tienes recompensas pendientes para reclamar en este bot.");
+      return;
+    }
+
+    // Confirmar con el usuario antes de proceder
+    const confirmClaim = confirm(
+      `Tienes ${(Number(pendingRewards) / 1e6).toFixed(2)} USDT en recompensas pendientes. ¿Deseas reclamar estas recompensas?`
+    );
+    if (!confirmClaim) {
+      alert("Reclamación cancelada.");
+      return;
+    }
+
+    // Llamar al contrato para reclamar las recompensas
+    const tx = await lythosBotContract.methods.claimRewards(botId).send({ from: userAddress });
+
+    // Mostrar una notificación de éxito al usuario
     alert("¡Recompensas reclamadas exitosamente!");
     console.log("Detalles de la transacción:", tx);
 
-    await updateBotInfo(botId); // Actualizar información después de reclamar
+    // Actualizar la información del bot en la interfaz
+    await updateBotInfo(botId);
+
+    // Opcional: Regresar detalles de la transacción en caso de necesitar mostrarlos
+    return tx;
   } catch (error) {
     console.error("Error al reclamar recompensas:", error);
 
+    // Manejar errores específicos
     if (error.code === 4001) {
       alert("Transacción rechazada por el usuario.");
+    } else if (error.message.includes("revert")) {
+      alert("El contrato rechazó la transacción. Revisa las condiciones para reclamar recompensas.");
+    } else if (error.message.includes("insufficient funds")) {
+      alert("No tienes fondos suficientes para pagar las comisiones de la red.");
     } else {
-      alert("Error al reclamar recompensas. Revisa la consola para más detalles.");
+      alert("Error inesperado al reclamar recompensas. Revisa la consola para más detalles.");
     }
   }
 }
+
 
 
 document.querySelectorAll(".button.primary").forEach(button => {
