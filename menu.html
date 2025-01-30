@@ -118,9 +118,10 @@
   0%, 90% { box-shadow: none; }
   91%, 100% { box-shadow: 0 0 15px green; }
 }
-    .status {
+   .status {
   display: flex;
-  align-items: center;
+  align-items: center; /* Alineación vertical */
+  justify-content: center; /* Alineación horizontal */
   margin: 10px 0;
 }
 
@@ -128,6 +129,7 @@
 .bot-status {
   font-weight: bold;
   font-size: 14px;
+  text-align: center; /* Asegura que el texto también esté centrado */
 }
 
 /* Estado inactivo */
