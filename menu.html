@@ -795,6 +795,10 @@ h3 {
  
   <!-- Agrega más bots según sea necesario -->
 </select>
+      <div id="cookie-banner" style="position: fixed; bottom: 0; background: #333; color: white; width: 100%; padding: 10px; text-align: center;">
+    Este sitio web utiliza cookies. <a href="/cookies-policy" style="color: #ffcc00;">Más información</a>.
+    <button id="accept-cookies" style="background: #ffcc00; padding: 5px 10px; color: black;">Aceptar</button>
+</div>
 
   <script>
 let web3;
@@ -1457,6 +1461,11 @@ async function analyzePerformance(botId) {
     alert("Hubo un problema al intentar obtener el historial de transacciones.");
   }
 }
+
+  document.getElementById('accept-cookies').addEventListener('click', function() {
+    document.getElementById('cookie-banner').style.display = 'none';
+    document.cookie = "cookieConsent=true; max-age=" + 60 * 60 * 24 * 365; // 1 año
+});
 
 
 
