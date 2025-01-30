@@ -46,7 +46,6 @@
 
 .header span {
     display: inline-block;
-    animation: slide-in 3s ease-out forwards, scroll 7s linear infinite;
     position: relative;
     color: #ffcc00;
     text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ff6600;
@@ -61,14 +60,6 @@
     }
 }
 
-@keyframes scroll {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(-100%);
-    }
-}
 
 /* Efecto de luces LED */
 .header::before,
@@ -496,8 +487,7 @@ h3 {
       <div class="tradingview-widget">
          <div class="lantern red"></div>
   <div class="lantern green"></div>
-           <div id="red-guide-1" class="guide red"><span></span></div>
-
+<div id="red-guide-${botId}" class="guide red"></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       </div>
@@ -545,8 +535,7 @@ h3 {
       <div class="tradingview-widget">
         <div class="lantern red"></div>
   <div class="lantern green"></div>
-          <div id="red-guide-1" class="guide red"><span></span></div>
-
+<div id="red-guide-${botId}" class="guide red"></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ETHUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
@@ -592,7 +581,7 @@ h3 {
       <div class="tradingview-widget">
          <div class="lantern red"></div>
   <div class="lantern green"></div>
-    <div id="red-guide-1" class="guide red"><span></span></div>
+<div id="red-guide-${botId}" class="guide red"></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BCHUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
@@ -636,7 +625,7 @@ h3 {
       <div class="tradingview-widget">
        <div class="lantern red"></div>
   <div class="lantern green"></div>
-    <div id="red-guide-1" class="guide red"><span></span></div>
+<div id="red-guide-${botId}" class="guide red"></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:WLDUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
@@ -681,7 +670,7 @@ h3 {
       <div class="tradingview-widget">
         <div class="lantern red"></div>
   <div class="lantern green"></div>
-    <div id="red-guide-1" class="guide red"><span></span></div>
+    <div id="red-guide-${botId}" class="guide red"></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:DOGEUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
@@ -724,7 +713,7 @@ h3 {
       <div class="tradingview-widget">
         <div class="lantern red"></div>
   <div class="lantern green"></div>
-    <div id="red-guide-1" class="guide red"><span></span></div>
+<div id="red-guide-${botId}" class="guide red"></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ENAUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
@@ -766,7 +755,7 @@ h3 {
       <div class="tradingview-widget">
          <div class="lantern red"></div>
   <div class="lantern green"></div>
-    <div id="red-guide-1" class="guide red"><span></span></div>
+<div id="red-guide-${botId}" class="guide red"></div>
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:COWUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
@@ -774,7 +763,7 @@ h3 {
    <div class="button-group">
 <input type="number" class="usdtAmount" data-bot-id="6" placeholder="Cantidad en USDT">
   <button class="button primary">Comprar Bot</button>
-<button class="button success claim-btn" data-bot-id="5">🎁 Reclamar Recompensas</button>
+<button class="button success claim-btn" data-bot-id="6">🎁 Reclamar Recompensas</button>
      <button class="button danger" onclick="withdraw(6)">Retirar</button>
 
   <button class="button info" onclick="showDetails(6)">📝 Detalles del Bot</button>
@@ -884,6 +873,7 @@ async function initializeWeb3() {
   }
 } else {
   alert("MetaMask no está instalado. Por favor, instálalo para continuar.");
+}
 }
 
 window.addEventListener("load", initializeWeb3);
