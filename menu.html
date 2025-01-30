@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lythos Bots</title>
   <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
 
 
   <style>
@@ -582,7 +582,7 @@ h3 {
          <div class="lantern red"></div>
   <div class="lantern green"></div>
 <div id="red-guide-${botId}" class="guide red"></div>
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BCHUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
+        <iframe loading="lazy" src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BCHUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
 
@@ -626,7 +626,7 @@ h3 {
        <div class="lantern red"></div>
   <div class="lantern green"></div>
 <div id="red-guide-${botId}" class="guide red"></div>
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:WLDUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
+        <iframe loading="lazy" src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:WLDUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
 
@@ -671,7 +671,7 @@ h3 {
         <div class="lantern red"></div>
   <div class="lantern green"></div>
     <div id="red-guide-${botId}" class="guide red"></div>
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:DOGEUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
+        <iframe loading="lazy" src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:DOGEUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
 
@@ -714,7 +714,7 @@ h3 {
         <div class="lantern red"></div>
   <div class="lantern green"></div>
 <div id="red-guide-${botId}" class="guide red"></div>
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ENAUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
+        <iframe loading="lazy"  src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:ENAUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
 
@@ -756,7 +756,7 @@ h3 {
          <div class="lantern red"></div>
   <div class="lantern green"></div>
 <div id="red-guide-${botId}" class="guide red"></div>
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:COWUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
+        <iframe loading="lazy" src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:COWUSDT&interval=5&theme=dark&style=1&locale=es&toolbar_bg=%23f1f3f6&hide_top_toolbar=true&hide_legend=true" 
                 width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
         </div>
 
@@ -1273,9 +1273,9 @@ async function showUserDetails(botId) {
     }
 
     // Obtener datos del usuario y bot desde el contrato
-    const userBalance = await contract.methods.getUserBotBalance(userAddress, botId).call();
-    const pendingRewards = await contract.methods.getPendingReward(userAddress, botId).call();
-    const botDetails = await contract.methods.bots(botId).call();
+    const userBalance = await lythosBotContract.methods.getUserBotBalance(userAddress, botId).call();
+    const pendingRewards = await lythosBotContract.methods.getPendingReward(userAddress, botId).call();
+  const botDetails = await lythosBotContract.methods.bots(botId).call();
 
     // Calcular el porcentaje de ganancia
     const balance = parseFloat(userBalance) / 1e6;
@@ -1370,10 +1370,10 @@ async function analyzePerformance(botId) {
     }
 
     // Obtener detalles del bot desde el contrato
-    const botBalance = BigInt(await contract.methods.getUserBotBalance(userAddress, botId).call());
-    const pendingRewards = BigInt(await contract.methods.getPendingReward(userAddress).call());
-    const lastClaim = BigInt(await contract.methods.lastRewardClaim(userAddress).call());
-    const bot = await contract.methods.bots(botId).call();
+const botBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());   
+    const pendingRewards = BigInt(await lythosBotContract.methods.getPendingReward(userAddress).call());
+    const lastClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress).call());
+    const bot = await lythosBotContract.methods.bots(botId).call();
 
     // Convertir valores BigInt a Number para su manejo
     const balanceFormatted = Number(botBalance) / 1e6;
@@ -1400,6 +1400,20 @@ async function analyzePerformance(botId) {
     }
   }
 }
+    // 💡 Consejos de Trading
+function getTips() {
+  alert("Consejos de Trading:\n1. Diversifica tus inversiones\n2. Monitorea el mercado diariamente\n3. Usa stops de pérdida");
+}
+
+// 📊 Comparar Bots
+function compareBots() {
+  let comparacion = "Comparativa de Bots:\n";
+  for (let i = 0; i <= 6; i++) {
+    const bot = document.querySelector(`.bot-card[data-bot-id="${i}"] h3`).textContent;
+    comparacion += `- ${bot}\n`;
+  }
+  alert(comparacion);
+}
 
      function openTab(index) {
         let tabs = document.querySelectorAll('.tab');
@@ -1417,7 +1431,7 @@ async function analyzePerformance(botId) {
     const userAddress = accounts[0];
 
     // Obtener eventos del contrato relacionados con el usuario
-    const pastEvents = await contract.getPastEvents("allEvents", {
+    const pastEvents = await lythosBotContract.getPastEvents("allEvents", { 
       filter: { user: userAddress },
       fromBlock: 0, // Cambiar por el bloque de despliegue del contrato para optimizar
       toBlock: "latest"
