@@ -1462,16 +1462,16 @@ async function analyzePerformance(botId) {
   }
 }
 
-  document.getElementById('accept-cookies').addEventListener('click', function() {
-    document.getElementById('cookie-banner').style.display = 'none';
-    document.cookie = "cookieConsent=true; max-age=" + 60 * 60 * 24 * 365; // 1 año
-});
+
 
 
 
     document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".button.primary").forEach(button => {
     button.addEventListener("click", purchaseBot);
+      document.getElementById('accept-cookies').addEventListener('click', function() {
+    document.getElementById('cookie-banner').style.display = 'none';
+    document.cookie = "cookieConsent=true; max-age=" + 60 * 60 * 24 * 365; // 1 año
   });
 });
 
