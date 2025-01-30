@@ -25,6 +25,79 @@
       background: url(https://image.ibb.co/h2hLAJ/bg.png) #000;
     }
 
+.header {
+    font-size: 24px;
+    font-weight: bold;
+    background: rgba(0, 255, 204, 0.2);
+    border: 1px solid rgba(0, 255, 204, 0.5);
+    padding: 15px;
+    width: 300px;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 255, 204, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header span {
+    display: inline-block;
+    animation: slide-in 3s ease-out forwards, scroll 7s linear infinite;
+    position: relative;
+    color: #ffcc00;
+    text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ff6600;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes scroll {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/* Efecto de luces LED */
+.header::before,
+.header::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: red;
+    box-shadow: 0 0 8px red;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: blink 1s infinite alternate;
+}
+
+.header::before {
+    left: 5px;
+}
+
+.header::after {
+    right: 5px;
+    animation-delay: 0.5s;
+}
+
+@keyframes blink {
+    0% { background: red; box-shadow: 0 0 8px red; }
+    100% { background: yellow; box-shadow: 0 0 12px yellow; }
+}
    
     .container {
       position: relative;
