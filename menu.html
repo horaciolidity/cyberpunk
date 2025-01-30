@@ -287,6 +287,71 @@ h3 {
     text-shadow: 0 0 10px #FFF700, 0 0 20px #FFD700, 0 0 30px #FFAA00, 0 0 50px #FF4500;
   }
 }
+     .tabs-container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 2px solid #444;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            position: relative;
+            transition: 0.3s;
+            color: #ccc;
+        }
+
+        .tab:hover, .tab.active {
+            color: #00ffcc;
+        }
+
+        .tab::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #00ffcc;
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+
+        .tab.active::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            box-shadow: 0px 0px 10px rgba(0, 255, 204, 0.4);
+            margin-top: 10px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
   </style>
 </head>
@@ -294,20 +359,34 @@ h3 {
   <div class="header">7 Bots disponibles Lythos</div>
 
   <div class="container">
-   <h1>🤖 Retiros Habilitados Cada 24 Horas en Optimism</h1>
-<p>Nuestros bots operan sobre <strong>Optimism Layer 2</strong>, utilizando la arquitectura de <strong>Rollups Optimistas</strong> para procesar transacciones de forma eficiente y con costos reducidos. Gracias a la <strong>agregación de transacciones en lotes</strong>, los retiros pueden ejecutarse sin congestión, garantizando tiempos de confirmación mínimos.</p>
+ <div class="tabs-container">
+    <div class="tabs">
+        <div class="tab active" onclick="openTab(0)">🤖 Retiros</div>
+        <div class="tab" onclick="openTab(1)">🔐 Seguridad</div>
+        <div class="tab" onclick="openTab(2)">🚀 Tecnología</div>
+        <div class="tab" onclick="openTab(3)">🔄 USDT</div>
+    </div>
 
-<h1>🔐 Transacciones 100% Seguras y Verificadas</h1>
-<p>El contrato inteligente está desarrollado en <strong>Solidity 0.8.20</strong> y optimizado con <strong>gas-efficient patterns</strong>, reduciendo el consumo innecesario de gas en cada operación. Además, implementa medidas de seguridad como <strong>Reentrancy Guards</strong> y <strong>SafeMath</strong> para evitar vulnerabilidades comunes en los protocolos DeFi.</p>
+    <div class="tab-content active">
+        <h2>🤖 Retiros Habilitados Cada 24 Horas en Optimism</h2>
+        <p>Nuestros bots operan sobre <strong>Optimism Layer 2</strong>, utilizando la arquitectura de <strong>Rollups Optimistas</strong> para procesar transacciones de forma eficiente y con costos reducidos. Gracias a la <strong>agregación de transacciones en lotes</strong>, los retiros pueden ejecutarse sin congestión, garantizando tiempos de confirmación mínimos.</p>
+    </div>
 
-<h1>🚀 Tecnología de Última Generación en Optimism</h1>
-<p>Los bots utilizan un modelo de <strong>interés compuesto dinámico</strong>, calculado en base a la participación del usuario y gestionado a través de <strong>mapping structures en EVM</strong>, optimizando la lectura y escritura en la blockchain. El protocolo también incorpora la API de <strong>TradingView</strong> para obtener cotizaciones en tiempo real, asegurando precios actualizados al momento de realizar transacciones.</p>
+    <div class="tab-content">
+        <h2>🔐 Transacciones 100% Seguras y Verificadas</h2>
+        <p>El contrato inteligente está desarrollado en <strong>Solidity 0.8.20</strong> y optimizado con <strong>gas-efficient patterns</strong>, reduciendo el consumo innecesario de gas en cada operación. Además, implementa medidas de seguridad como <strong>Reentrancy Guards</strong> y <strong>SafeMath</strong> para evitar vulnerabilidades comunes en los protocolos DeFi.</p>
+    </div>
 
-<h1>🔄 Integración con USDT en Optimism</h1>
-<p>El sistema funciona con <strong>USDT en la red Optimism</strong>, aprovechando el estándar <strong>ERC-20</strong> y el manejo de permisos mediante la función <code>approve()</code> y <code>transferFrom()</code>. Esto permite que los usuarios interactúen directamente con el contrato sin intervención de terceros, manteniendo la descentralización y seguridad de los fondos.</p>
+    <div class="tab-content">
+        <h2>🚀 Tecnología de Última Generación en Optimism</h2>
+        <p>Los bots utilizan un modelo de <strong>interés compuesto dinámico</strong>, calculado en base a la participación del usuario y gestionado a través de <strong>mapping structures en EVM</strong>, optimizando la lectura y escritura en la blockchain. El protocolo también incorpora la API de <strong>TradingView</strong> para obtener cotizaciones en tiempo real, asegurando precios actualizados al momento de realizar transacciones.</p>
+    </div>
 
-
-
+    <div class="tab-content">
+        <h2>🔄 Integración con USDT en Optimism</h2>
+        <p>El sistema funciona con <strong>USDT en la red Optimism</strong>, aprovechando el estándar <strong>ERC-20</strong> y el manejo de permisos mediante la función <code>approve()</code> y <code>transferFrom()</code>. Esto permite que los usuarios interactúen directamente con el contrato sin intervención de terceros, manteniendo la descentralización y seguridad de los fondos.</p>
+    </div>
+</div>
    
   <div class="container">
     <div class="info-box">
@@ -1266,6 +1345,16 @@ async function analyzePerformance(botId) {
     }
   }
 }
+
+     function openTab(index) {
+        let tabs = document.querySelectorAll('.tab');
+        let contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach((tab, i) => {
+            tab.classList.toggle('active', i === index);
+            contents[i].classList.toggle('active', i === index);
+        });
+    }
 
     async function viewHistory(botId) {
   try {
