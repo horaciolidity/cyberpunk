@@ -1,1 +1,442 @@
 
+ @import url(https://fonts.googleapis.com/css?family=Share+Tech+Mono);
+
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow-y: scroll;
+      font-family: 'Share Tech Mono', monospace;
+      color: #db0e15;
+      font-size: 14px; /* Reducida */
+     
+      background: url(https://image.ibb.co/h2hLAJ/bg.png) #000;
+    }
+
+.header {
+    font-size: 14px;
+    font-weight: bold;
+    background: rgba(0, 255, 204, 0.2);
+    border: 1px solid rgba(0, 255, 204, 0.5);
+    padding: 15px;
+    width: 200px;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 255, 204, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header span {
+    display: inline-block;
+    position: relative;
+    color: #ffcc00;
+    text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ff6600;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+
+/* Efecto de luces LED */
+.header::before,
+.header::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: red;
+    box-shadow: 0 0 8px red;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: blink 1s infinite alternate;
+}
+
+.header::before {
+    left: 5px;
+}
+
+.header::after {
+    right: 5px;
+    animation-delay: 0.5s;
+}
+
+@keyframes blink {
+    0% { background: red; box-shadow: 0 0 8px red; }
+    100% { background: yellow; box-shadow: 0 0 12px yellow; }
+}
+   
+    .container {
+      position: relative;
+      margin: 0 auto;
+      width: 90%;
+      max-width: 1080px;
+      text-align: center;
+    }
+
+    .bot-card {
+      background-color: #222;
+      margin-bottom: 20px; /* Reducido */
+      padding: 10px; /* Reducido */
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      color: #40E0D0; /* Color turquesa */
+
+    }
+
+    .bot-card h3 {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    .bot-card p {
+      margin: 5px 0;
+    }
+
+    .tradingview-widget {
+      margin: 5px 0; /* Reducido */
+      width: 100%;
+      height: 200px; /* Reducido */
+      border: 2px solid #22edfc;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .button {
+      margin: 5px; /* Reducido */
+      padding: 5px 10px; /* Reducido */
+      background: #db0e15;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9em; /* Reducido */
+      border-radius: 5px;
+    }
+
+    .button:hover {
+      background: #b20812;
+    }
+
+    .theme-button {
+      margin-top: 10px; /* Reducido */
+      padding: 5px 10px; /* Reducido */
+      background: #22edfc;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9em; /* Reducido */
+      border-radius: 5px;
+    }
+
+    .theme-button:hover {
+      background: #1cc0d3;
+    }
+
+     .guide {
+  position: absolute;
+  width: 40px; /* Reducir el ancho */
+  height: 2px;
+  right: 0; /* Mover al borde derecho */
+  background-color: transparent;
+  z-index: 10;
+  animation: blink 1s infinite;
+}
+
+   .guide.red {
+  background-color: red;
+  animation: blinkRed 1s infinite, flashGreen 5s infinite;
+}
+
+@keyframes flashGreen {
+  0%, 90% { box-shadow: none; }
+  91%, 100% { box-shadow: 0 0 15px green; }
+}
+   .status {
+  display: flex;
+  align-items: center; /* Alineación vertical */
+  justify-content: center; /* Alineación horizontal */
+  margin: 10px 0;
+}
+
+/* Estilo para el estado del bot */
+.bot-status {
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center; /* Asegura que el texto también esté centrado */
+}
+
+/* Estado inactivo */
+.bot-inactive {
+  color: red;
+}
+
+/* Estado activo */
+.bot-active {
+  color: green;
+}
+
+/* Luz de estado */
+.status-light {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+/* Luz roja (inactivo) */
+.red {
+  background-color: red;
+}
+
+/* Luz verde (activo) */
+.green {
+  background-color: green;
+}
+
+/* Linternas */
+.lantern {
+  position: absolute;
+  top: 10px;
+  width: 10px; /* Reducido a la mitad */
+  height: 10px; /* Reducido a la mitad */
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Ajustado para el nuevo tamaño */
+}
+
+.lantern.red {
+  background-color: darkred;
+  right: 50px;
+}
+
+.lantern.green {
+  background-color: darkgreen;
+  right: 20px;
+}
+
+/* Animaciones */
+.active.red {
+  animation: blink-red 1s infinite;
+}
+
+.active.green {
+  animation: blink-green 1s infinite;
+}
+
+@keyframes blink-red {
+  0%, 50% {
+    background-color: red;
+    box-shadow: 0 0 7.5px red; /* Ajustado para el tamaño reducido */
+  }
+  51%, 100% {
+    background-color: darkred;
+    box-shadow: none;
+  }
+}
+
+@keyframes blink-green {
+  0%, 50% {
+    background-color: green;
+    box-shadow: 0 0 7.5px green; /* Ajustado para el tamaño reducido */
+  }
+  51%, 100% {
+    background-color: darkgreen;
+    box-shadow: none;
+  }
+}
+    /* New section for the header and referal stats */
+    .referal-stats {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around;
+      color: #22edfc;
+    }
+
+    .referal-box {
+      background-color: #333;
+      padding: 10px;
+      border-radius: 5px;
+      width: 25%;
+    }
+
+    .referal-box h4 {
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+
+    .referal-box p {
+      font-size: 0.9em;
+    }
+
+    .referal-button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background: #22edfc;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9em;
+      border-radius: 5px;
+    }
+
+    .referal-button:hover {
+      background: #1cc0d3;
+    }
+.container {
+      margin-top: 20px;
+    }
+    .info-box {
+      background-color: #1e1e1e;
+      padding: 20px;
+      margin: 10px auto;
+      border-radius: 10px;
+      max-width: 500px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      color: #40E0D0; /* Color turquesa */
+
+    }
+    .info-box h3 {
+      margin: 0 0 10px;
+    }
+    .info-box p {
+      margin: 5px 0;
+    }
+    .bot-info span {
+   color: yellow;
+}
+h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #FFD700; /* Amarillo dorado */
+  text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 20px #FFAA00, 0 0 40px #FF8000;
+  animation: glow 1.5s infinite alternate;
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 20px #FFAA00, 0 0 40px #FF8000;
+  }
+  100% {
+    text-shadow: 0 0 10px #FFF700, 0 0 20px #FFD700, 0 0 30px #FFAA00, 0 0 50px #FF4500;
+  }
+}
+     .tabs-container {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 2px solid #444;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            position: relative;
+            transition: 0.3s;
+            color: #ccc;
+        }
+
+        .tab:hover, .tab.active {
+            color: #00ffcc;
+        }
+
+        .tab::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #00ffcc;
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+
+        .tab.active::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            box-shadow: 0px 0px 10px rgba(0, 255, 204, 0.4);
+            margin-top: 10px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+   .ufo-button {
+            position: relative;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #00eaff;
+            background: linear-gradient(45deg, #002244, #003366);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #00eaff, 0 0 30px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+        }
+
+        .ufo-button::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(0, 238, 255, 0.6) 10%, transparent 60%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease-out;
+        }
+
+        .ufo-button:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .ufo-button:hover {
+            background: linear-gradient(45deg, #003366, #004488);
+            box-shadow: 0 0 20px #00eaff, 0 0 40px rgba(0, 255, 255, 0.5);
+        }
+
+        .ufo-button span {
+            position: relative;
+            z-index: 2;
+        }
