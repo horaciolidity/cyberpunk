@@ -410,13 +410,56 @@ h3 {
                 transform: translateY(0);
             }
         }
+   .ufo-button {
+            position: relative;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #00eaff;
+            background: linear-gradient(45deg, #002244, #003366);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #00eaff, 0 0 30px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+        }
 
+        .ufo-button::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(0, 238, 255, 0.6) 10%, transparent 60%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease-out;
+        }
+
+        .ufo-button:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .ufo-button:hover {
+            background: linear-gradient(45deg, #003366, #004488);
+            box-shadow: 0 0 20px #00eaff, 0 0 40px rgba(0, 255, 255, 0.5);
+        }
+
+        .ufo-button span {
+            position: relative;
+            z-index: 2;
+        }
   </style>
 </head>
 <body class="dark-theme">
     <div class="container">
 
  <div class="header">7 Bots disponibles Lythos</div>
+       <button class="ufo-button">
+        <span>🔥 Gana Lythos - Próximo Lanzamiento 🚀</span>
+    </button>
 
  <div class="tabs-container">
     <div class="tabs">
