@@ -11,11 +11,21 @@
             background-color: #111;
             color: #fff;
             font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
         }
         h1 {
             color: #00c9ff;
-            font-size: 3rem;
-            font-weight: bold;
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-shadow: 0 0 10px rgba(0, 201, 255, 0.8);
+        }
+        .btn-primary, .btn-danger, .btn-success, .btn-warning, .btn-info {
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
         }
         .btn-primary {
             background-color: #00c9ff;
@@ -25,92 +35,158 @@
             background-color: #0099cc;
             border-color: #0099cc;
         }
+        .btn-danger {
+            background-color: #ff4040;
+            border-color: #ff4040;
+        }
+        .btn-danger:hover {
+            background-color: #e80000;
+            border-color: #e80000;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+        .btn-warning {
+            background-color: #ff9900;
+            border-color: #ff9900;
+        }
+        .btn-warning:hover {
+            background-color: #e68900;
+            border-color: #e68900;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+        .btn-info:hover {
+            background-color: #138496;
+            border-color: #138496;
+        }
         .container {
-            max-width: 800px;
+            max-width: 900px;
+            margin-top: 60px;
         }
         .alert {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 201, 255, 0.5);
         }
         .section-title {
             font-size: 2rem;
             color: #00c9ff;
-            margin-top: 40px;
+            text-transform: uppercase;
+            margin-top: 50px;
+            font-weight: 800;
+            text-align: center;
+            letter-spacing: 1px;
         }
         .countdown {
-            font-size: 1.5rem;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
         }
         .section-content {
-            margin-top: 20px;
-            font-size: 1.1rem;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #bbb;
+        }
+        .section-content ul {
+            padding-left: 20px;
+        }
+        .section-content ul li {
+            margin-bottom: 10px;
         }
         .link-btn {
             background-color: #ff9900;
             color: #fff;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 10px 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
         .link-btn:hover {
             background-color: #ff6600;
+        }
+        .form-control {
+            border-radius: 20px;
+            background-color: #333;
+            color: #fff;
+            font-size: 1rem;
+            border: 2px solid #444;
+        }
+        .form-control:focus {
+            border-color: #00c9ff;
+            background-color: #222;
+        }
+        .wallet-info {
+            font-size: 1.1rem;
+            color: #00c9ff;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container text-center">
         <h1>LYTHOS Fairlaunch</h1>
-        <button id="connectWallet" class="btn btn-primary mt-3">Conectar con MetaMask</button>
-        <p id="walletAddress" class="mt-3"></p>
+        
+        <button id="connectWallet" class="btn btn-primary mt-4">Conectar con MetaMask</button>
+        <p id="walletAddress" class="wallet-info mt-3"></p>
 
         <!-- Contador de tiempo -->
         <div class="alert alert-info mt-4">
-            <h4>El Fairlaunch termina en:</h4>
-            <p id="countdown" class="fs-3 countdown"></p>
+            <h4 class="section-title">El Fairlaunch termina en:</h4>
+            <p id="countdown" class="countdown"></p>
         </div>
 
-        <!-- Instrucciones -->
-        <div class="alert alert-warning mt-4" role="alert">
-            <h4 class="alert-heading">¿Cómo obtener tokens?</h4>
-            <p>Para obtener tokens LYTHOS tienes dos opciones:</p>
-            <ul class="text-start">
-                <li>Comprando un bot en <strong>LYTHOS BOT</strong>. Según el bot que compres, recibirás tokens equivalentes y tu referidor recibirá la misma cantidad.</li>
-                <li>Adquiriendo tokens directamente en la DApp.</li>
-            </ul>
-            <p>El lanzamiento se realizará a través de <strong>Uniswap</strong> y se podrá comprar a través de diversas plataformas. Cuanto más saldo tengas en los bots, más tokens recibirás tú y tu referidor.</p>
-            <a href="https://tupagina.com/lythosbot" target="_blank" class="btn btn-success mt-3">Ir a LYTHOS BOT</a>
+        <!-- Información importante -->
+        <div class="alert alert-warning mt-4">
+            <h4 class="section-title">¿Cómo obtener tokens?</h4>
+            <div class="section-content">
+                <ul>
+                    <li>Comprando un bot en <strong>LYTHOS BOT</strong>, recibirás tokens equivalentes y tu referidor también ganará tokens.</li>
+                    <li>Adquiriendo tokens directamente en la DApp.</li>
+                </ul>
+                <p>Cuanto más saldo tengas en los bots, más tokens recibirás tú y tu referidor.</p>
+                <a href="https://tupagina.com/lythosbot" target="_blank" class="link-btn">Ir a LYTHOS BOT</a>
+            </div>
         </div>
 
-        <!-- Aportar Liquidez -->
-        <div class="section-title">Aporta Liquidez y Gana Más Recompensas</div>
-        <div class="section-content">
-            <p>Si deseas obtener más recompensas en tokens LYTHOS, puedes aportar liquidez a Uniswap y participar en el intercambio de estos tokens en exchanges populares que usan Web3, exceptuando Binance y Bybit.</p>
-            <p>Visita <a href="https://app.uniswap.org" target="_blank" class="link-btn">Uniswap</a> para agregar liquidez y ganar mayores recompensas.</p>
-        </div>
-
-        <!-- Configurar Referido -->
+        <!-- Configuración de referido -->
         <div class="mt-4">
-            <h4>Configurar Referido</h4>
+            <h4 class="section-title">Configurar Referido</h4>
             <input type="text" id="referrer" class="form-control" placeholder="Dirección del referidor">
             <button id="setReferrer" class="btn btn-success mt-2">Establecer Referido</button>
         </div>
 
-        <!-- Reclamar Tokens -->
+        <!-- Reclamar tokens -->
         <div class="mt-4">
-            <h4>Reclamar Tokens de Referido</h4>
+            <h4 class="section-title">Reclamar Tokens de Referido</h4>
             <button id="claimReferral" class="btn btn-warning mt-2">Claim Tokens</button>
         </div>
 
-        <!-- Balance de Tokens -->
+        <!-- Balance de tokens -->
         <div class="mt-4">
-            <h4>Balance de Tokens</h4>
-            <p id="tokenBalance">Balance: 0 LYTH</p>
+            <h4 class="section-title">Balance de Tokens</h4>
+            <p id="tokenBalance" class="section-content">Balance: 0 LYTH</p>
             <button id="refreshBalance" class="btn btn-info">Actualizar Balance</button>
         </div>
 
         <!-- Comprar Tokens -->
         <div class="mt-4">
-            <h4>Comprar Tokens</h4>
+            <h4 class="section-title">Comprar Tokens</h4>
             <input type="number" id="ethAmount" class="form-control" placeholder="Cantidad en ETH">
             <button id="buyTokens" class="btn btn-danger mt-2">Comprar Tokens</button>
         </div>
     </div>
+
 
     <script>
         const contractAddress = "0xFD55fBBC978943Fe8AcA74f94670E17384E55CB6";
