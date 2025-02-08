@@ -1,72 +1,74 @@
-import { useEffect, useState } from "react";
-import { ethers } from "ethers";
-
-const CONTRACT_ADDRESS = "TU_CONTRATO_AQUI";
-const ABI = [ /* ABI DEL CONTRATO */ ];
-
-export default function LythosDashboard() {
-  const [balance, setBalance] = useState("0");
-  const [totalSupply, setTotalSupply] = useState("0");
-  const [rewards, setRewards] = useState("0");
-  const [referrer, setReferrer] = useState("-");
-  const [account, setAccount] = useState(null);
-
-  useEffect(() => {
-    if (window.ethereum) {
-      connectWallet();
-    }
-  }, []);
-
-  async function connectWallet() {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.send("eth_requestAccounts", []);
-    setAccount(accounts[0]);
-    loadContractData(provider, accounts[0]);
-  }
-
-  async function loadContractData(provider, user) {
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-    const userBalance = await contract.balanceOf(user);
-    const supply = await contract.totalSupply();
-    const ref = await contract.referrer(user);
-    const rewardTokens = await contract.rewardedBots(user, 0); // Ajusta para obtener recompensas reales
-
-    setBalance(ethers.utils.formatEther(userBalance));
-    setTotalSupply(ethers.utils.formatEther(supply));
-    setReferrer(ref !== "0x0000000000000000000000000000000000000000" ? ref : "No referrer");
-    setRewards(ethers.utils.formatEther(rewardTokens));
-  }
-
-  async function claimRewards() {
-    if (!account) return;
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-    await contract.rewardTokens(account);
-    alert("Recompensas reclamadas!");
-    loadContractData(provider, account);
-  }
-
-  async function buyTokens() {
-    if (!account) return;
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-    await contract.buyTokens({ value: ethers.utils.parseEther("0.01") });
-    alert("Compra realizada!");
-    loadContractData(provider, account);
-  }
-
-  return (
-    <div className="p-4 bg-gray-900 text-white rounded-lg">
-      <h1 className="text-2xl font-bold">LYTHOS Dashboard</h1>
-      <p><strong>Tu dirección:</strong> {account || "No conectado"}</p>
-      <p><strong>Balance:</strong> {balance} LYTH</p>
-      <p><strong>Suministro total:</strong> {totalSupply} LYTH</p>
-      <p><strong>Recompensas acumuladas:</strong> {rewards} LYTH</p>
-      <p><strong>Referido por:</strong> {referrer}</p>
-      <button className="mt-2 p-2 bg-green-500 rounded" onClick={claimRewards}>Reclamar Recompensas</button>
-      <button className="mt-2 p-2 bg-blue-500 rounded ml-2" onClick={buyTokens}>Comprar Tokens</button>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LYTHOS Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #121212; color: white; }
+        .container { max-width: 500px; margin: auto; padding: 20px; background: #1e1e1e; border-radius: 10px; }
+        button { background: #ff9800; border: none; padding: 10px; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LYTHOS Dashboard</h1>
+        <p><strong>Balance:</strong> <span id="balance">0</span> LYTH</p>
+        <p><strong>Suministro Total:</strong> <span id="totalSupply">0</span> LYTH</p>
+        <p><strong>Recompensas:</strong> <span id="rewards">0</span> LYTH</p>
+        <button onclick="claimRewards()">Reclamar Recompensas</button>
+        <button onclick="buyTokens()">Comprar LYTH con ETH</button>
+        <p><strong>Referido:</strong> <span id="referrer">N/A</span></p>
     </div>
-  );
-}
+
+    <script>
+        const contractAddress = "TU_CONTRATO_AQUI";
+        const contractABI = [/* ABI DEL CONTRATO AQUÍ */];
+        let web3, contract, account;
+        
+        async function connectWallet() {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+                account = (await web3.eth.getAccounts())[0];
+                contract = new web3.eth.Contract(contractABI, contractAddress);
+                loadData();
+            } else {
+                alert("Por favor, instala MetaMask");
+            }
+        }
+        
+        async function loadData() {
+            const balance = await contract.methods.balanceOf(account).call();
+            document.getElementById("balance").innerText = web3.utils.fromWei(balance, "ether");
+            
+            const totalSupply = await contract.methods.totalSupply().call();
+            document.getElementById("totalSupply").innerText = web3.utils.fromWei(totalSupply, "ether");
+            
+            const rewards = await contract.methods.rewardedBots(account, 0).call();
+            document.getElementById("rewards").innerText = web3.utils.fromWei(rewards, "ether");
+            
+            const referrer = await contract.methods.referrer(account).call();
+            document.getElementById("referrer").innerText = referrer !== "0x0000000000000000000000000000000000000000" ? referrer : "N/A";
+        }
+        
+        async function claimRewards() {
+            await contract.methods.rewardTokens(account).send({ from: account });
+            alert("Recompensas reclamadas!");
+            loadData();
+        }
+        
+        async function buyTokens() {
+            const amount = prompt("Cantidad de ETH a gastar:");
+            if (amount) {
+                await contract.methods.buyTokens().send({ from: account, value: web3.utils.toWei(amount, "ether") });
+                alert("Compra realizada!");
+                loadData();
+            }
+        }
+        
+        window.onload = connectWallet;
+    </script>
+</body>
+</html>
