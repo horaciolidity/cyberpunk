@@ -4,71 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LYTHOS Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.1/web3.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #121212; color: white; }
-        .container { max-width: 500px; margin: auto; padding: 20px; background: #1e1e1e; border-radius: 10px; }
-        button { background: #ff9800; border: none; padding: 10px; color: white; cursor: pointer; }
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; }
+        button { margin: 10px; padding: 10px; cursor: pointer; }
+        input { width: 100%; padding: 8px; margin: 5px 0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>LYTHOS Dashboard</h1>
-        <p><strong>Balance:</strong> <span id="balance">0</span> LYTH</p>
-        <p><strong>Suministro Total:</strong> <span id="totalSupply">0</span> LYTH</p>
-        <p><strong>Recompensas:</strong> <span id="rewards">0</span> LYTH</p>
-        <button onclick="claimRewards()">Reclamar Recompensas</button>
-        <button onclick="buyTokens()">Comprar LYTH con ETH</button>
-        <p><strong>Referido:</strong> <span id="referrer">N/A</span></p>
+        <h2>LYTHOS Dashboard</h2>
+        <button onclick="connectWallet()">Conectar Wallet</button>
+        <p><strong>Cuenta:</strong> <span id="account">No conectado</span></p>
+        <p><strong>Balance LYTH:</strong> <span id="balance">0</span></p>
+        <p><strong>Referido:</strong> <span id="referrer">No asignado</span></p>
+        
+        <input type="text" id="referralAddress" placeholder="Dirección del referidor">
+        <button onclick="setReferrer()">Asignar Referidor</button>
+        
+        <p><strong>Enlace de referido:</strong></p>
+        <input type="text" id="referralLink" readonly>
+        <button onclick="copyReferralLink()">Copiar Enlace</button>
+        
+        <button onclick="claimRewards()">Claim Rewards</button>
+        <button onclick="buyTokens()">Comprar Tokens</button>
     </div>
 
     <script>
+        let web3;
+        let account;
         const contractAddress = "TU_CONTRATO_AQUI";
         const contractABI = [/* ABI DEL CONTRATO AQUÍ */];
-        let web3, contract, account;
-        
+        let contract;
+
         async function connectWallet() {
             if (window.ethereum) {
                 web3 = new Web3(window.ethereum);
                 await window.ethereum.request({ method: "eth_requestAccounts" });
-                account = (await web3.eth.getAccounts())[0];
+                const accounts = await web3.eth.getAccounts();
+                account = accounts[0];
+                document.getElementById("account").innerText = account;
                 contract = new web3.eth.Contract(contractABI, contractAddress);
-                loadData();
+                updateDashboard();
             } else {
-                alert("Por favor, instala MetaMask");
+                alert("MetaMask no está instalado");
             }
         }
-        
-        async function loadData() {
-            const balance = await contract.methods.balanceOf(account).call();
+
+        async function updateDashboard() {
+            if (!contract || !account) return;
+            let balance = await contract.methods.balanceOf(account).call();
+            let referrer = await contract.methods.referrer(account).call();
             document.getElementById("balance").innerText = web3.utils.fromWei(balance, "ether");
-            
-            const totalSupply = await contract.methods.totalSupply().call();
-            document.getElementById("totalSupply").innerText = web3.utils.fromWei(totalSupply, "ether");
-            
-            const rewards = await contract.methods.rewardedBots(account, 0).call();
-            document.getElementById("rewards").innerText = web3.utils.fromWei(rewards, "ether");
-            
-            const referrer = await contract.methods.referrer(account).call();
-            document.getElementById("referrer").innerText = referrer !== "0x0000000000000000000000000000000000000000" ? referrer : "N/A";
+            document.getElementById("referrer").innerText = referrer === "0x0000000000000000000000000000000000000000" ? "No asignado" : referrer;
+            generateReferralLink();
         }
-        
+
         async function claimRewards() {
             await contract.methods.rewardTokens(account).send({ from: account });
-            alert("Recompensas reclamadas!");
-            loadData();
+            updateDashboard();
         }
-        
+
         async function buyTokens() {
-            const amount = prompt("Cantidad de ETH a gastar:");
-            if (amount) {
-                await contract.methods.buyTokens().send({ from: account, value: web3.utils.toWei(amount, "ether") });
-                alert("Compra realizada!");
-                loadData();
-            }
+            const ethAmount = prompt("Ingrese cantidad de ETH a gastar:");
+            if (!ethAmount || isNaN(ethAmount)) return alert("Cantidad inválida");
+            await contract.methods.buyTokens().send({ from: account, value: web3.utils.toWei(ethAmount, "ether") });
+            updateDashboard();
         }
-        
-        window.onload = connectWallet;
+
+        async function setReferrer() {
+            const refAddress = document.getElementById("referralAddress").value;
+            if (!web3.utils.isAddress(refAddress)) return alert("Dirección inválida");
+            await contract.methods.setReferrer(refAddress).send({ from: account });
+            updateDashboard();
+        }
+
+        function generateReferralLink() {
+            const link = `${window.location.origin}?ref=${account}`;
+            document.getElementById("referralLink").value = link;
+        }
+
+        function copyReferralLink() {
+            const linkInput = document.getElementById("referralLink");
+            linkInput.select();
+            document.execCommand("copy");
+            alert("Enlace copiado");
+        }
     </script>
 </body>
 </html>
