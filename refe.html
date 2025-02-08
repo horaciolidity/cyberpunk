@@ -6,10 +6,93 @@
     <title>LYTHOS Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.1/web3.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; }
-        button { margin: 10px; padding: 10px; cursor: pointer; }
-        input { width: 100%; padding: 8px; margin: 5px 0; }
+       body {
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: #00eaff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ff00ff;
+    border-radius: 15px;
+    box-shadow: 0px 0px 20px rgba(255, 0, 255, 0.6);
+    text-align: center;
+    animation: glow 1.5s infinite alternate;
+}
+
+@keyframes glow {
+    from { box-shadow: 0px 0px 10px rgba(255, 0, 255, 0.4); }
+    to { box-shadow: 0px 0px 20px rgba(255, 0, 255, 0.8); }
+}
+
+button {
+    margin: 10px;
+    padding: 12px 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #ff00ff, #00eaff);
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0px 0px 10px rgba(255, 0, 255, 0.6);
+}
+
+button:hover {
+    background: linear-gradient(90deg, #00eaff, #ff00ff);
+    box-shadow: 0px 0px 20px rgba(0, 255, 255, 0.8);
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #00eaff;
+    border-radius: 5px;
+    background: #111;
+    color: #00eaff;
+    font-size: 16px;
+    text-align: center;
+}
+
+input:focus {
+    outline: none;
+    border-color: #ff00ff;
+    box-shadow: 0px 0px 10px rgba(255, 0, 255, 0.6);
+}
+
+h1 {
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #ff00ff;
+    text-shadow: 0px 0px 10px rgba(255, 0, 255, 0.8);
+}
+
+a {
+    color: #00eaff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #ff00ff;
+    text-shadow: 0px 0px 10px rgba(255, 0, 255, 0.6);
+}
+
     </style>
 </head>
 <body>
