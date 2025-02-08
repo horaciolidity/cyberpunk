@@ -1,258 +1,176 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LYTHOS DApp - Fairlaunch</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-    <style>
-        body {
-            background-color: #0e0e0e;
-            color: #fff;
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            font-size: 1rem;
-        }
-        h1 {
-            color: #00c9ff;
-            font-size: 3.5rem;
-            font-weight: 900;
-            text-shadow: 0 0 20px rgba(0, 201, 255, 0.8);
-            margin-top: 50px;
-        }
-        h2, h3, h4 {
-            color: #00c9ff;
-        }
-        .btn-primary, .btn-danger, .btn-success, .btn-warning, .btn-info {
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 12px 30px;
-            transition: all 0.3s ease;
-        }
-        .btn-primary {
-            background-color: #00c9ff;
-            border-color: #00c9ff;
-        }
-        .btn-primary:hover {
-            background-color: #0099cc;
-            border-color: #0099cc;
-        }
-        .btn-danger {
-            background-color: #ff4040;
-            border-color: #ff4040;
-        }
-        .btn-danger:hover {
-            background-color: #e80000;
-            border-color: #e80000;
-        }
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-        .btn-success:hover {
-            background-color: #218838;
-            border-color: #218838;
-        }
-        .btn-warning {
-            background-color: #ff9900;
-            border-color: #ff9900;
-        }
-        .btn-warning:hover {
-            background-color: #e68900;
-            border-color: #e68900;
-        }
-        .btn-info {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
-        }
-        .btn-info:hover {
-            background-color: #138496;
-            border-color: #138496;
-        }
-        .container {
-            max-width: 900px;
-            margin-top: 80px;
-        }
-        .alert {
-            background-color: rgba(0, 0, 0, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 201, 255, 0.5);
-        }
-        .section-title {
-            font-size: 2.5rem;
-            color: #00c9ff;
-            text-transform: uppercase;
-            margin-top: 50px;
-            font-weight: 800;
-            text-align: center;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(0, 201, 255, 0.5);
-        }
-        .countdown {
-            font-size: 2rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-        .section-content {
-            margin-top: 30px;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            color: #bbb;
-        }
-        .section-content ul {
-            padding-left: 20px;
-        }
-        .section-content ul li {
-            margin-bottom: 10px;
-        }
-        .link-btn {
-            background-color: #ff9900;
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 50px;
-            padding: 10px 25px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        .link-btn:hover {
-            background-color: #ff6600;
-        }
-        .form-control {
-            border-radius: 20px;
-            background-color: #333;
-            color: #fff;
-            font-size: 1rem;
-            border: 2px solid #444;
-        }
-        .form-control:focus {
-            border-color: #00c9ff;
-            background-color: #222;
-        }
-        .wallet-info {
-            font-size: 1.1rem;
-            color: #00c9ff;
-            margin-top: 20px;
-        }
-        .section {
-            background-color: #111;
-            padding: 40px 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0, 201, 255, 0.3);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LYTHOS Token Launch</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJzXyE6uWq3W1XxD4w8zVtp6CHlhC3W0IHq4xQTxhZyPTCpJlG0Vt40eG6fi" crossorigin="anonymous">
+  <style>
+    body {
+      background-color: #212121;
+      color: #fff;
+    }
+    .container {
+      margin-top: 50px;
+    }
+    .card {
+      background-color: #333;
+      border: none;
+      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    }
+    .btn-custom {
+      background-color: #00c6ff;
+      border: none;
+    }
+    .btn-custom:hover {
+      background-color: #0089c6;
+    }
+    .countdown {
+      font-size: 2em;
+      color: #00ff00;
+    }
+    .card-header {
+      background-color: #444;
+      color: #fff;
+    }
+    .card-body {
+      background-color: #555;
+    }
+  </style>
 </head>
 <body>
-    <div class="container text-center">
-        <h1>LYTHOS Fairlaunch</h1>
-        
-        <!-- Conectar con MetaMask -->
-        <button id="connectWallet" class="btn btn-primary mt-4">Conectar con MetaMask</button>
-        <p id="walletAddress" class="wallet-info mt-3"></p>
 
-        <!-- Contador de tiempo -->
-        <div class="alert alert-info mt-4">
-            <h4 class="section-title">El Fairlaunch termina en:</h4>
-            <p id="countdown" class="countdown"></p>
-        </div>
-
-        <!-- Guía para conectar Optimism y agregar contrato -->
-        <div class="section mt-4">
-            <h2 class="section-title">Paso a paso: Conectar con Optimism y agregar el contrato LYTHOS</h2>
-            <div class="section-content">
-                <ol>
-                    <li>Abre MetaMask y cambia a la red de <strong>Optimism</strong>. Si no la tienes configurada, añade la red Optimism siguiendo estos pasos:</li>
-                    <ul>
-                        <li>Ve a la configuración de MetaMask y selecciona "Redes".</li>
-                        <li>Haz clic en "Añadir Red" y llena los siguientes datos:</li>
-                        <ul>
-                            <li><strong>Nombre de la Red:</strong> Optimism</li>
-                            <li><strong>RPC URL:</strong> https://mainnet.optimism.io</li>
-                            <li><strong>Chain ID:</strong> 10</li>
-                            <li><strong>Simbolo de la Moneda:</strong> ETH</li>
-                            <li><strong>URL del explorador:</strong> https://optimistic.etherscan.io</li>
-                        </ul>
-                    </ul>
-                    <li>Después de añadir la red, conecta tu MetaMask a la red Optimism.</li>
-                    <li>Para interactuar con el contrato LYTHOS Token, usa este contrato en la sección de "Contrato" de tu wallet.</li>
-                    <li>¡Listo! Ahora puedes visualizar el airdrop de LYTHOS en tu MetaMask y participar en el Fairlaunch.</li>
-                </ol>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8 col-sm-12">
+        <div class="card">
+          <div class="card-header text-center">
+            <h2>LYTHOS Token Launch</h2>
+            <p>Claim your LYTH tokens, refer others and earn rewards!</p>
+          </div>
+          <div class="card-body">
+            <!-- Display Claimed Tokens -->
+            <div class="mb-3">
+              <label for="tokenCount" class="form-label">Claimed Tokens</label>
+              <input type="text" class="form-control" id="tokenCount" readonly>
             </div>
-        </div>
 
-        <!-- Aportar liquidez -->
-        <div class="section mt-4">
-            <h2 class="section-title">Aporta Liquidez y Gana Más Recompensas</h2>
-            <div class="section-content">
-                <p>Si deseas obtener más recompensas en tokens, puedes aportar liquidez a nuestro pool en Uniswap. Los usuarios que aporten liquidez recibirán una mayor cantidad de tokens LYTHOS como recompensa.</p>
-                <p>Para hacerlo:</p>
-                <ol>
-                    <li>Ve a <a href="https://app.uniswap.org" target="_blank" class="link-btn">Uniswap</a> y conecta tu MetaMask a la red Optimism.</li>
-                    <li>En Uniswap, selecciona el par de tokens <strong>ETH/LYTHOS</strong> y agrega liquidez.</li>
-                    <li>Recibirás tokens de LP que puedes utilizar para ganar más recompensas en la DApp.</li>
-                </ol>
-                <p>Los LPs (provisionadores de liquidez) podrán ver sus recompensas y el rendimiento de su inversión en los principales exchanges Web3, excluyendo Binance y Bybit, que no usan Web3 en sus plataformas.</p>
+            <!-- Buy Tokens -->
+            <div class="mb-3">
+              <button id="buyTokensBtn" class="btn btn-custom btn-block">Buy LYTH Tokens</button>
             </div>
-        </div>
 
-        <!-- Comprar Tokens -->
-        <div class="section mt-4">
-            <h2 class="section-title">Comprar Tokens LYTHOS</h2>
-            <div class="section-content">
-                <p>Si deseas comprar tokens LYTHOS directamente, puedes hacerlo a través de nuestra DApp en la red de Optimism.</p>
-                <div class="form-group">
-                    <label for="ethAmount" class="form-label">Cantidad en ETH:</label>
-                    <input type="number" id="ethAmount" class="form-control" placeholder="Cantidad en ETH" min="0" required>
-                </div>
-                <button id="buyTokens" class="btn btn-danger mt-3">Comprar Tokens</button>
+            <!-- Create Referral Link -->
+            <div class="mb-3">
+              <button id="createReferralBtn" class="btn btn-custom btn-block">Create Referral Link</button>
             </div>
-        </div>
-
-        <!-- Balance de tokens -->
-        <div class="section mt-4">
-            <h2 class="section-title">Consulta tu Balance de Tokens</h2>
-            <p id="tokenBalance" class="section-content">Balance: 0 LYTH</p>
-            <button id="refreshBalance" class="btn btn-info mt-3">Actualizar Balance</button>
-        </div>
-
-        <!-- Configuración avanzada -->
-        <div class="section mt-4">
-            <h2 class="section-title">Configuración Avanzada</h2>
-            <div class="section-content">
-                <button id="advancedSettings" class="btn btn-warning mt-3">Abrir Configuración Avanzada</button>
-                <div id="advancedOptions" class="mt-3" style="display:none;">
-                    <p>Personaliza tu experiencia y participa de forma avanzada en el ecosistema LYTHOS.</p>
-                    <button id="saveSettings" class="btn btn-success">Guardar Configuración</button>
-                </div>
+            <div id="referralLink" class="mb-3" style="display: none;">
+              <label for="referralUrl" class="form-label">Your Referral Link:</label>
+              <input type="text" class="form-control" id="referralUrl" readonly>
             </div>
-        </div>
 
+            <!-- Countdown Timer -->
+            <div class="countdown text-center" id="countdown"></div>
+            
+            <!-- MetaMask Status -->
+            <div id="metamaskStatus" class="text-center mt-3"></div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // Funciones para interacción con MetaMask y Web3
-        document.getElementById('connectWallet').addEventListener('click', function () {
-            // Conectar MetaMask y mostrar dirección
-        });
-        
-        document.getElementById('buyTokens').addEventListener('click', function () {
-            // Lógica para comprar tokens LYTHOS
-        });
+  <!-- External Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@metamask/detect-provider"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.7.3/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-        document.getElementById('refreshBalance').addEventListener('click', function () {
-            // Lógica para actualizar el balance de tokens
-        });
+  <script>
+    let web3;
+    let contract;
+    let account;
 
-        document.getElementById('advancedSettings').addEventListener('click', function () {
-            document.getElementById('advancedOptions').style.display = 'block';
-        });
+    // MetaMask and Web3 initialization
+    async function initWeb3() {
+      const provider = await detectEthereumProvider();
+      if (provider) {
+        web3 = new Web3(provider);
+        await provider.request({ method: 'eth_requestAccounts' });
+        account = (await web3.eth.getAccounts())[0];
+        $('#metamaskStatus').text(`Connected to: ${account}`);
+        initContract();
+      } else {
+        $('#metamaskStatus').text('Please install MetaMask!');
+      }
+    }
 
-        document.getElementById('saveSettings').addEventListener('click', function () {
-            // Guardar configuraciones avanzadas
-        });
-    </script>
+    // Contract ABI and address
+    const contractAddress = 'YOUR_CONTRACT_ADDRESS';
+    const abi = [ /* ABI goes here */ ];
+
+    // Initialize the contract
+    async function initContract() {
+      contract = new web3.eth.Contract(abi, contractAddress);
+      updateClaimedTokens();
+    }
+
+    // Get the claimed tokens balance
+    async function updateClaimedTokens() {
+      const claimedTokens = await contract.methods.balanceOf(account).call();
+      $('#tokenCount').val(web3.utils.fromWei(claimedTokens, 'ether'));
+    }
+
+    // Countdown timer for the launch
+    function startCountdown() {
+      const countdownDate = new Date("Feb 15, 2025 00:00:00").getTime();
+      const x = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = countdownDate - now;
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+        if (distance < 0) {
+          clearInterval(x);
+          document.getElementById("countdown").innerHTML = "EXPIRED";
+        }
+      }, 1000);
+    }
+
+    // Buy LYTH Tokens
+    async function buyTokens() {
+      const amount = web3.utils.toWei('0.1', 'ether');  // Change this to the amount you want to buy
+      try {
+        await contract.methods.buyTokens().send({ from: account, value: amount });
+        alert('Tokens successfully bought!');
+        updateClaimedTokens();
+      } catch (err) {
+        alert('Transaction failed: ' + err.message);
+      }
+    }
+
+    // Create Referral Link
+    function createReferralLink() {
+      const referralLink = `https://yourdapp.com?ref=${account}`;  // Add your dynamic referral logic here
+      $('#referralUrl').val(referralLink);
+      $('#referralLink').show();
+    }
+
+    $(document).ready(function() {
+      initWeb3();
+      startCountdown();
+
+      $('#buyTokensBtn').click(function() {
+        buyTokens();
+      });
+
+      $('#createReferralBtn').click(function() {
+        createReferralLink();
+      });
+    });
+  </script>
 </body>
 </html>
