@@ -7,18 +7,23 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <style>
-        body {
-            background-color: #111;
+         body {
+            background-color: #0e0e0e;
             color: #fff;
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
+            font-size: 1rem;
         }
         h1 {
             color: #00c9ff;
             font-size: 3.5rem;
             font-weight: 900;
-            text-shadow: 0 0 10px rgba(0, 201, 255, 0.8);
+            text-shadow: 0 0 20px rgba(0, 201, 255, 0.8);
+            margin-top: 50px;
+        }
+        h2, h3, h4 {
+            color: #00c9ff;
         }
         .btn-primary, .btn-danger, .btn-success, .btn-warning, .btn-info {
             border-radius: 30px;
@@ -69,7 +74,7 @@
         }
         .container {
             max-width: 900px;
-            margin-top: 60px;
+            margin-top: 80px;
         }
         .alert {
             background-color: rgba(0, 0, 0, 0.9);
@@ -77,13 +82,14 @@
             box-shadow: 0 0 20px rgba(0, 201, 255, 0.5);
         }
         .section-title {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: #00c9ff;
             text-transform: uppercase;
             margin-top: 50px;
             font-weight: 800;
             text-align: center;
             letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 201, 255, 0.5);
         }
         .countdown {
             font-size: 2rem;
@@ -131,6 +137,12 @@
             color: #00c9ff;
             margin-top: 20px;
         }
+        .section {
+            background-color: #111;
+            padding: 40px 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 201, 255, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -146,46 +158,63 @@
             <p id="countdown" class="countdown"></p>
         </div>
 
-        <!-- Información importante -->
-        <div class="alert alert-warning mt-4">
-            <h4 class="section-title">¿Cómo obtener tokens?</h4>
+        <!-- Guía para conectar Optimism y agregar contrato -->
+        <div class="section mt-4">
+            <h2 class="section-title">Paso a paso: Conectar con Optimism y agregar el contrato LYTHOS</h2>
             <div class="section-content">
-                <ul>
-                    <li>Comprando un bot en <strong>LYTHOS BOT</strong>, recibirás tokens equivalentes y tu referidor también ganará tokens.</li>
-                    <li>Adquiriendo tokens directamente en la DApp.</li>
-                </ul>
-                <p>Cuanto más saldo tengas en los bots, más tokens recibirás tú y tu referidor.</p>
-                <a href="https://tupagina.com/lythosbot" target="_blank" class="link-btn">Ir a LYTHOS BOT</a>
+                <ol>
+                    <li>Abre MetaMask y cambia a la red de <strong>Optimism</strong>. Si no la tienes configurada, añade la red Optimism siguiendo estos pasos:</li>
+                    <ul>
+                        <li>Ve a la configuración de MetaMask y selecciona "Redes".</li>
+                        <li>Haz clic en "Añadir Red" y llena los siguientes datos:</li>
+                        <ul>
+                            <li><strong>Nombre de la Red:</strong> Optimism</li>
+                            <li><strong>RPC URL:</strong> https://mainnet.optimism.io</li>
+                            <li><strong>Chain ID:</strong> 10</li>
+                            <li><strong>Simbolo de la Moneda:</strong> ETH</li>
+                            <li><strong>URL del explorador:</strong> https://optimistic.etherscan.io</li>
+                        </ul>
+                    </ul>
+                    <li>Después de añadir la red, conecta tu MetaMask a la red Optimism.</li>
+                    <li>Para interactuar con el contrato LYTHOS Token, usa este contrato en la sección de "Contrato" de tu wallet.</li>
+                    <li>¡Listo! Ahora puedes visualizar el airdrop de LYTHOS en tu MetaMask y participar en el Fairlaunch.</li>
+                </ol>
             </div>
         </div>
 
-        <!-- Configuración de referido -->
-        <div class="mt-4">
-            <h4 class="section-title">Configurar Referido</h4>
-            <input type="text" id="referrer" class="form-control" placeholder="Dirección del referidor">
-            <button id="setReferrer" class="btn btn-success mt-2">Establecer Referido</button>
-        </div>
-
-        <!-- Reclamar tokens -->
-        <div class="mt-4">
-            <h4 class="section-title">Reclamar Tokens de Referido</h4>
-            <button id="claimReferral" class="btn btn-warning mt-2">Claim Tokens</button>
-        </div>
-
-        <!-- Balance de tokens -->
-        <div class="mt-4">
-            <h4 class="section-title">Balance de Tokens</h4>
-            <p id="tokenBalance" class="section-content">Balance: 0 LYTH</p>
-            <button id="refreshBalance" class="btn btn-info">Actualizar Balance</button>
+        <!-- Aportar liquidez -->
+        <div class="section mt-4">
+            <h2 class="section-title">Aporta Liquidez y Gana Más Recompensas</h2>
+            <div class="section-content">
+                <p>Si deseas obtener más recompensas en tokens, puedes aportar liquidez a nuestro pool en Uniswap. Los usuarios que aporten liquidez recibirán una mayor cantidad de tokens LYTHOS como recompensa.</p>
+                <p>Para hacerlo:</p>
+                <ol>
+                    <li>Ve a <a href="https://app.uniswap.org" target="_blank" class="link-btn">Uniswap</a> y conecta tu MetaMask a la red Optimism.</li>
+                    <li>En Uniswap, selecciona el par de tokens <strong>ETH/LYTHOS</strong> y agrega liquidez.</li>
+                    <li>Recibirás tokens de LP que puedes utilizar para ganar más recompensas en la DApp.</li>
+                </ol>
+                <p>Los LPs (provisionadores de liquidez) podrán ver sus recompensas y el rendimiento de su inversión en los principales exchanges Web3, excluyendo Binance y Bybit, que no usan Web3 en sus plataformas.</p>
+            </div>
         </div>
 
         <!-- Comprar Tokens -->
-        <div class="mt-4">
-            <h4 class="section-title">Comprar Tokens</h4>
-            <input type="number" id="ethAmount" class="form-control" placeholder="Cantidad en ETH">
-            <button id="buyTokens" class="btn btn-danger mt-2">Comprar Tokens</button>
+        <div class="section mt-4">
+            <h2 class="section-title">Comprar Tokens LYTHOS</h2>
+            <div class="section-content">
+                <p>Si deseas comprar tokens LYTHOS directamente, puedes hacerlo a través de nuestra DApp en la red de Optimism.</p>
+                <input type="number" id="ethAmount" class="form-control" placeholder="Cantidad en ETH">
+                <button id="buyTokens" class="btn btn-danger mt-2">Comprar Tokens</button>
+            </div>
+        </div>
+
+        <!-- Balance de tokens -->
+        <div class="section mt-4">
+            <h2 class="section-title">Consulta tu Balance de Tokens</h2>
+            <p id="tokenBalance" class="section-content">Balance: 0 LYTH</p>
+            <button id="refreshBalance" class="btn btn-info">Actualizar Balance</button>
         </div>
     </div>
+
 
 
     <script>
