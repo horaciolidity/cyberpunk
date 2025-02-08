@@ -13,16 +13,22 @@
         <button id="connectWallet" class="btn btn-primary mt-3">Conectar con MetaMask</button>
         <p id="walletAddress" class="mt-3"></p>
 
+        <!-- Contador de tiempo -->
+        <div class="alert alert-info mt-4">
+            <h4>El Fairlaunch termina en:</h4>
+            <p id="countdown" class="fs-3"></p>
+        </div>
+
         <!-- Aviso importante -->
         <div class="alert alert-warning mt-4" role="alert">
-            <h4 class="alert-heading">🔥 ¡Obtén tus Tokens LYTHOS! 🔥</h4>
-            <p>Tienes dos maneras de obtener tokens:</p>
+            <h4 class="alert-heading">¿Cómo obtener tokens?</h4>
+            <p>Para obtener tokens LYTHOS tienes dos opciones:</p>
             <ul class="text-start">
-                <li><strong>Comprando un bot en LYTHOS BOT:</strong> La cantidad de tokens que recibirás dependerá del bot que compres, y tu referidor obtendrá la misma cantidad.</li>
-                <li><strong>Comprándolos directamente aquí en la DApp.</strong></li>
+                <li>Comprando un bot en <strong>LYTHOS BOT</strong>. Según el bot que compres, recibirás tokens equivalentes y tu referidor recibirá la misma cantidad.</li>
+                <li>Adquiriendo tokens directamente en la DApp.</li>
             </ul>
-            <p>El lanzamiento será en <strong>Uniswap</strong>, y podrás adquirir tokens desde diversas plataformas.</p>
-            <p>💡 <strong>Mientras más saldo tengas en los bots, más tokens recibirás tú y tu referidor.</strong></p>
+            <p>El lanzamiento se realizará a través de <strong>Uniswap</strong> y se podrá comprar a través de diversas plataformas. Cuanto más saldo tengas en los bots, más tokens recibirás tú y tu referidor.</p>
+            <a href="https://tupagina.com/lythosbot" target="_blank" class="btn btn-success mt-3">Ir a LYTHOS BOT</a>
         </div>
 
         <div class="mt-4">
@@ -152,11 +158,24 @@
             }
         }
 
+        // Contador de tiempo
+        const countdownElement = document.getElementById("countdown");
+        const launchDate = new Date();
+        launchDate.setMonth(launchDate.getMonth() + 2);
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = launchDate - now;
+            const months = Math.floor(distance / (1000 * 60 * 60 * 24 * 30));
+            const days = Math.floor((distance % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            countdownElement.innerText = `${months}m ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+        setInterval(updateCountdown, 1000);
+
         document.getElementById("connectWallet").addEventListener("click", connectWallet);
-        document.getElementById("setReferrer").addEventListener("click", setReferrer);
-        document.getElementById("claimReferral").addEventListener("click", claimReferral);
-        document.getElementById("refreshBalance").addEventListener("click", refreshBalance);
-        document.getElementById("buyTokens").addEventListener("click", buyTokens);
     </script>
 </body>
 </html>
