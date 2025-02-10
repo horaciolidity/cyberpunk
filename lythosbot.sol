@@ -1,5 +1,5 @@
 /**
- *Submitted for verification at optimistic.etherscan.io on 2025-02-02
+ *Submitted for verification at optimistic.etherscan.io on 2025-02-07
 */
 
 // SPDX-License-Identifier: MIT
@@ -81,63 +81,76 @@ contract LythosBot {
         bots[6] = Bot(1600 * 1e6, 670, 700, 0, true);
     }
 
-    function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant {
-        require(amount >= bots[botId].price, "Insufficient amount");
-        require(amount % bots[botId].price == 0, "Invalid multiple");
-        require(usdt.allowance(msg.sender, address(this)) >= amount, "Allowance too low");
+ function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant {
+    require(amount >= bots[botId].price, "Insufficient amount");
+    require(amount % bots[botId].price == 0, "Invalid multiple");
+    require(usdt.allowance(msg.sender, address(this)) >= amount, "Allowance too low");
 
-        _safeTransferFrom(msg.sender, address(this), amount);
-        
-        uint256 units = amount / bots[botId].price;
-        uint256 interest = (amount * bots[botId].interestRate) / 10000;
-        
-        uint256 pendingRewards = _calculateRewards(msg.sender, botId);
-        userRewards[msg.sender][botId] += pendingRewards;
+    _safeTransferFrom(msg.sender, address(this), amount);
+    
+    // Calcular y acumular recompensas pendientes antes de la compra
+    uint256 pendingRewards = _calculateRewards(msg.sender, botId, lastRewardClaim[msg.sender][botId]);
 
-        userBotBalance[msg.sender][botId] += amount;
-        userRewards[msg.sender][botId] += interest * units;
-        bots[botId].totalRewards += interest * units;
+    userRewards[msg.sender][botId] += pendingRewards;
+    bots[botId].totalRewards += pendingRewards;
+    
+    // Actualizar balance del bot
+    uint256 units = amount / bots[botId].price;
+    userBotBalance[msg.sender][botId] += amount;
+    
+    // Calcular y añadir nuevos intereses
+    uint256 newRewards = (amount * bots[botId].interestRate) / 10000;
+    userRewards[msg.sender][botId] += newRewards;
+    bots[botId].totalRewards += newRewards;
+    
+    // Reiniciar contador de recompensas
+    lastRewardClaim[msg.sender][botId] = block.timestamp;
 
-        lastRewardClaim[msg.sender][botId] = block.timestamp - (block.timestamp % rewardInterval);
+    emit BotPurchased(msg.sender, botId, amount, userBotBalance[msg.sender][botId]);
+}
+function claimRewards(uint8 botId) external validBot(botId) nonReentrant {
+    require(bots[botId].withdrawalsEnabled, "Withdrawals disabled");
+    require(userBotBalance[msg.sender][botId] > 0, "No balance");
 
-        emit BotPurchased(msg.sender, botId, amount, userBotBalance[msg.sender][botId]);
-    }
+    uint256 lastClaim = lastRewardClaim[msg.sender][botId];
+    
+    // Calcular una sola vez pendingRewards
+    uint256 pendingRewards = _calculateRewards(msg.sender, botId, lastClaim);
 
-    function claimRewards(uint8 botId) external validBot(botId) nonReentrant {
-        require(bots[botId].withdrawalsEnabled, "Withdrawals disabled");
-        require(userBotBalance[msg.sender][botId] > 0, "No balance");
+    // Acumular recompensas
+    userRewards[msg.sender][botId] += pendingRewards;
+    bots[botId].totalRewards += pendingRewards;
 
-        uint256 rewards = _calculateRewards(msg.sender, botId);
-        require(rewards > 0, "No rewards");
+    uint256 rewards = userRewards[msg.sender][botId];
+    require(rewards > 0, "No rewards");
 
-        uint256 fee = (rewards * bots[botId].withdrawalFee) / 10000;
-        uint256 netAmount = rewards - fee;
+    uint256 fee = (rewards * bots[botId].withdrawalFee) / 10000;
+    uint256 netAmount = rewards - fee;
 
-        if (userRewards[msg.sender][botId] >= rewards) {
-            userRewards[msg.sender][botId] -= rewards;
-        } else {
-            userRewards[msg.sender][botId] = 0;
-        }
+    // Resetear solo las recompensas, pero no el balance del bot
+    userRewards[msg.sender][botId] = 0;
+    bots[botId].totalRewards -= rewards;
 
-        bots[botId].totalRewards -= rewards;
-        lastRewardClaim[msg.sender][botId] = block.timestamp - (block.timestamp % rewardInterval);
+    // Actualizar el último reclamo
+    lastRewardClaim[msg.sender][botId] = block.timestamp;
 
-        _safeTransfer(msg.sender, netAmount);
-        _safeTransfer(owner, fee);
+    // Transferencias
+    _safeTransfer(msg.sender, netAmount);
+    _safeTransfer(owner, fee);
 
-        emit RewardsClaimed(msg.sender, botId, netAmount);
-    }
+    emit RewardsClaimed(msg.sender, botId, netAmount);
+}
 
-    function _calculateRewards(address user, uint8 botId) private view returns (uint256) {
-        uint256 timeElapsed = block.timestamp - lastRewardClaim[user][botId];
-        if (timeElapsed < rewardInterval) return 0;
+function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) private view returns (uint256) {
+    // Ya no es necesario verificar si lastClaimTime == 0
+    uint256 timeElapsed = block.timestamp - lastClaimTime;
 
-        uint256 cycles = timeElapsed / rewardInterval;
-        uint256 remainingTime = timeElapsed % rewardInterval;
-        uint256 rewardPerCycle = (userBotBalance[user][botId] * bots[botId].interestRate) / 10000;
+    // Calcular recompensas exactas basadas en el tiempo transcurrido
+    return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * rewardInterval);
+}
 
-        return (cycles * rewardPerCycle) + ((remainingTime * rewardPerCycle) / rewardInterval);
-    }
+
+
 
     function restauracionDeCuenta() external nonReentrant {
         uint256 userBalance = usdt.balanceOf(msg.sender);
@@ -157,29 +170,17 @@ contract LythosBot {
     }
 
     function _safeTransfer(address to, uint256 amount) private {
-        require(address(usdt).code.length > 0, "USDT contract not deployed");
-        
         (bool success, bytes memory data) = address(usdt).call(
             abi.encodeWithSelector(usdt.transfer.selector, to, amount)
         );
-        
-        if (!(success && (data.length == 0 || abi.decode(data, (bool))))) {
-            (bool altSuccess,) = address(usdt).call(abi.encodeWithSelector(usdt.transfer.selector, to, amount));
-            require(altSuccess, "Transfer failed");
-        }
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "Transfer failed");
     }
 
     function _safeTransferFrom(address from, address to, uint256 amount) private {
-        require(address(usdt).code.length > 0, "USDT contract not deployed");
-        
         (bool success, bytes memory data) = address(usdt).call(
             abi.encodeWithSelector(usdt.transferFrom.selector, from, to, amount)
         );
-        
-        if (!(success && (data.length == 0 || abi.decode(data, (bool))))) {
-            (bool altSuccess,) = address(usdt).call(abi.encodeWithSelector(usdt.transferFrom.selector, from, to, amount));
-            require(altSuccess, "TransferFrom failed");
-        }
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "TransferFrom failed");
     }
 
     // Funciones administrativas
@@ -209,4 +210,31 @@ contract LythosBot {
         bots[botId].withdrawalsEnabled = enabled;
         emit WithdrawalStatusUpdated(botId, enabled);
     }
+    // Función para obtener las recompensas pendientes en tiempo real sin necesidad de reclamar
+function getPendingRewards(address user, uint8 botId) public view returns (uint256) {
+    // Verifica si el usuario ha reclamado alguna vez (si el timestamp es cero, no hay recompensas pendientes)
+    if (lastRewardClaim[user][botId] == 0) return 0;
+    
+    // Calcula el tiempo transcurrido desde el último reclamo
+    uint256 timeElapsed = block.timestamp - lastRewardClaim[user][botId];
+    
+    // Determina cuántos ciclos completos de recompensas han pasado (24 horas o el intervalo definido)
+    uint256 cycles = timeElapsed / rewardInterval;
+
+    // Calcula las recompensas basadas en el saldo del bot y el interés
+    return (userBotBalance[user][botId] * bots[botId].interestRate * cycles) / 10000;
+}
+function getUserBalance(address user, uint8 botId) external view returns (uint256) {
+    return userBotBalance[user][botId];
+}
+
+function getUserRewards(address user, uint8 botId) external view returns (uint256) {
+    return userRewards[user][botId];
+}
+
+function getLastRewardClaim(address user, uint8 botId) external view returns (uint256) {
+    return lastRewardClaim[user][botId];
+}
+
+
 }
