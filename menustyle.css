@@ -187,6 +187,7 @@
 /* Estado activo */
 .bot-active {
   color: green;
+ font-weight: bold;
 }
 
 /* Luz de estado */
