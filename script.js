@@ -475,41 +475,6 @@ document.querySelectorAll(".button.primary").forEach(button => {
     });
 });
 
-async function showUserDetails(botId) {
-  try {
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
-
-    if (!userAddress) {
-      alert("No se pudo obtener la cuenta conectada. Asegúrate de estar conectado a MetaMask.");
-      return;
-    }
-
-    // Obtener datos del usuario y bot desde el contrato
-    const userBalance = await lythosBotContract.methods.getUserBotBalance(userAddress, botId).call();
-    const pendingRewards = await lythosBotContract.methods.getPendingReward(userAddress, botId).call();
-  const botDetails = await lythosBotContract.methods.bots(botId).call();
-
-    // Calcular el porcentaje de ganancia
-    const balance = parseFloat(userBalance) / 1e6;
-    const rewards = parseFloat(pendingRewards) / 1e6;
-    const profitPercentage = rewards > 0 ? ((rewards / balance) * 100).toFixed(2) : 0;
-
-    // Mostrar los detalles en un modal o alerta
-    alert(`
-      Detalles del Bot ${botId}:
-      - Saldo: ${balance.toFixed(2)} USDT
-      - Recompensas Pendientes: ${rewards.toFixed(2)} USDT
-      - Porcentaje de Ganancia: ${profitPercentage}%
-      - Interés Diario: ${(botDetails.interestRate / 100).toFixed(2)}%
-      - Retiros Habilitados: ${botDetails.withdrawalsEnabled ? "Sí" : "No"}
-    `);
-  } catch (error) {
-    console.error("Error al obtener detalles del bot:", error);
-    alert("No se pudieron obtener los detalles del bot. Intenta nuevamente.");
-  }
-}
-
 
 
 
@@ -639,43 +604,48 @@ function compareBots() {
     }
 
     async function viewHistory(botId) {
-  try {
-    const accounts = await web3.eth.getAccounts();
+    // Solicitar acceso a las cuentas
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
     const userAddress = accounts[0];
 
-    // Obtener eventos del contrato relacionados con el usuario
-    const pastEvents = await lythosBotContract.getPastEvents("allEvents", { 
+    // Buscar los eventos de compra de bot (BotPurchased) y retiro de recompensas (RewardsClaimed)
+    const botPurchasedEvents = await contract.getPastEvents('BotPurchased', {
       filter: { user: userAddress },
-      fromBlock: 0, // Cambiar por el bloque de despliegue del contrato para optimizar
-      toBlock: "latest"
+      fromBlock: 0,
+      toBlock: 'latest'
     });
 
-    // Filtrar eventos específicos relacionados con el botId
-    const botEvents = pastEvents.filter(event => {
-      return event.returnValues.botId == botId;
+    const rewardsClaimedEvents = await contract.getPastEvents('RewardsClaimed', {
+      filter: { user: userAddress },
+      fromBlock: 0,
+      toBlock: 'latest'
     });
 
-    if (botEvents.length === 0) {
-      alert(`No hay transacciones registradas para el Bot ${botId}.`);
-      return;
+    // Mostrar los resultados en la interfaz
+    let history = `<h3>Historial de Transacciones</h3>`;
+    
+    if (botPurchasedEvents.length > 0) {
+      history += `<h4>Compras de Bot:</h4><ul>`;
+      botPurchasedEvents.forEach(event => {
+        history += `<li>Bot ID: ${event.returnValues.botId}, Monto: ${web3.utils.fromWei(event.returnValues.amount, 'ether')} USDT, Nuevo Saldo: ${web3.utils.fromWei(event.returnValues.newBalance, 'ether')} USDT</li>`;
+      });
+      history += `</ul>`;
     }
 
-    // Formatear el historial
-    const history = botEvents.map(event => {
-      const eventType = event.event;
-      const amount = (event.returnValues.amount / 1e6).toFixed(2);
-      const timestamp = new Date(event.returnValues.timestamp * 1000).toLocaleString();
-      return `${timestamp} - ${eventType}: ${amount} USDT`;
-    }).join("\n");
+    if (rewardsClaimedEvents.length > 0) {
+      history += `<h4>Reclamos de Recompensas:</h4><ul>`;
+      rewardsClaimedEvents.forEach(event => {
+        history += `<li>Bot ID: ${event.returnValues.botId}, Monto Reclamo: ${web3.utils.fromWei(event.returnValues.amount, 'ether')} USDT</li>`;
+      });
+      history += `</ul>`;
+    }
 
-    // Mostrar el historial
-    alert(`Historial de Transacciones para el Bot ${botId}:\n\n${history}`);
-  } catch (error) {
-    console.error("Error al ver el historial:", error);
-    alert("Hubo un problema al intentar obtener el historial de transacciones.");
+    if (!botPurchasedEvents.length && !rewardsClaimedEvents.length) {
+      history += `<p>No se encontraron transacciones.</p>`;
+    }
+
+    document.getElementById("historyContainer").innerHTML = history;
   }
-}
-
 
 
 
