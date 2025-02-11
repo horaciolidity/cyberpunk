@@ -465,20 +465,5 @@ h3 {
     width: 280px; /* Ajusta el tamaño si es necesario */
 }
 
-.ufo-button {
-    display: inline-block;
-    text-decoration: none;
-    padding: 10px 20px;
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(45deg, #ff007a, #7a00ff);
-    border-radius: 8px;
-    transition: 0.3s;
-}
 
-.ufo-button:hover {
-    background: linear-gradient(45deg, #ff3399, #8a2be2);
-    transform: scale(1.05);
-}
 
