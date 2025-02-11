@@ -187,33 +187,36 @@ async function updateBotInfo(botId) {
       return;
     }
 
-    // Buscar los elementos de estado en el DOM
-    const botStatus = document.querySelector(`#botStatus${botId}`);
-    const botStatusLight = document.querySelector(`#botStatusLight${botId}`);
+   const botStatus = document.getElementById(`botStatus${botId}`);
+   const botStatusLight = document.getElementById(`botStatusLight${botId}`);
 
-    if (!botStatus || !botStatusLight) {
-      console.warn(`⚠️ Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
-      return;
-    }
+if (!botStatus || !botStatusLight) {
+  console.warn(`⚠️ Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
+  return;
+}
 
-    // Verificar si el saldo es mayor a 0 para marcar el bot como activo
-    if (userBalance > 0n) {
-      console.log(`✅ Bot ${botId} activado. Saldo:`, userBalance);
-      botStatus.textContent = "Bot activo";
-      botStatus.classList.remove("bot-inactive");
-      botStatus.classList.add("bot-active");
+   if (userBalance > 0n) {
+  console.log(`✅ Bot ${botId} activado con saldo: ${userBalance}`);
+  botStatus.textContent = "Bot activo";
+  botStatus.classList.remove("bot-inactive");
+  botStatus.classList.add("bot-active");
 
-      botStatusLight.classList.remove("red");
-      botStatusLight.classList.add("green");
-    } else {
-      console.log(`❌ Bot ${botId} sigue inactivo. Saldo:`, userBalance);
-      botStatus.textContent = "Bot inactivo";
-      botStatus.classList.remove("bot-active");
-      botStatus.classList.add("bot-inactive");
+  if (botStatusLight.classList.contains("red")) {
+    botStatusLight.classList.remove("red");
+  }
+  botStatusLight.classList.add("green");
+} else {
+  console.log(`❌ Bot ${botId} sigue inactivo. Saldo: ${userBalance}`);
+  botStatus.textContent = "Bot inactivo";
+  botStatus.classList.remove("bot-active");
+  botStatus.classList.add("bot-inactive");
 
-      botStatusLight.classList.remove("green");
-      botStatusLight.classList.add("red");
-    }
+  if (botStatusLight.classList.contains("green")) {
+    botStatusLight.classList.remove("green");
+  }
+  botStatusLight.classList.add("red");
+}
+
 
     // Calcular la tarifa de retiro y tiempo hasta el próximo reclamo
     const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
@@ -269,67 +272,55 @@ async function updateAllBots() {
   try {
     if (!web3Ready) {
       console.warn("Web3 no está listo. Esperando...");
-      return; // Salir si Web3 no está listo
+      return;
     }
 
-    // Array para almacenar las promesas de cada bot
-    const promises = [];
+    console.log("🔄 Actualizando todos los bots...");
 
-    
-
-    // Iterar sobre todos los bots (IDs del 0 al 6)
     for (let botId = 0; botId <= 6; botId++) {
-      promises.push((async () => {
-        // Obtener datos del contrato relacionados con el bot y el usuario
-        const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
-        const pendingRewards = BigInt(await lythosBotContract.methods.userRewards(userAddress, botId).call());
-        const botDetails = await lythosBotContract.methods.bots(botId).call();
-        const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
-        const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
-        const currentTime = BigInt(Math.floor(Date.now() / 1000));
+      // Obtener datos del contrato relacionados con el bot y el usuario
+      const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
+      const pendingRewards = BigInt(await lythosBotContract.methods.userRewards(userAddress, botId).call());
+      const botDetails = await lythosBotContract.methods.bots(botId).call();
+      const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
+      const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
+      const currentTime = BigInt(Math.floor(Date.now() / 1000));
 
-        // Calcular la tarifa de retiro y tiempo hasta el próximo reclamo
-        const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
-        const timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
+      // Calcular la tarifa de retiro y tiempo hasta el próximo reclamo
+      const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
+      const timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
 
-        // Seleccionar la tarjeta del bot específica en el DOM
-        const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
-        if (!botInfo) {
-          console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
-          return; // Pasar al siguiente bot si no se encuentra la tarjeta
-        }
-
-        // Actualizar los datos en la interfaz de usuario
-        botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
-        botInfo.querySelector(`#pendingRewards${botId}`).textContent = (Number(pendingRewards) / 1e6).toFixed(2);
-        botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)} `;
-        botInfo.querySelector(`#timeUntilClaim${botId}`).textContent =
-          Number(timeUntilNextClaim) > 0 ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible";
-        botInfo.querySelector(`#claimNotice${botId}`).textContent =
-          pendingRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible";
-        botInfo.querySelector(`#userTotalBalance${botId}`).textContent = 
-          ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
-
-        console.log(`Bot ${botId}: Datos actualizados correctamente.`);
-      })());
-    }
-
-    // Esperar a que todas las promesas de los bots se resuelvan
-    await Promise.all(promises);
-
-    // Después de que todos los bots hayan sido actualizados, verificar si están activos
-    for (let botId = 0; botId <= 6; botId++) {
+      // Seleccionar la tarjeta del bot en el DOM
       const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
-      if (!botInfo) continue; // Pasar si no se encuentra la tarjeta
+      if (!botInfo) {
+        console.warn(`⚠️ No se encontró la tarjeta del bot con ID ${botId}`);
+        continue;
+      }
 
-      const botStatus = botInfo.querySelector(`#botStatus${botId}`);
-      const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
+      // Actualizar los datos en la interfaz de usuario
+      botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
+      botInfo.querySelector(`#pendingRewards${botId}`).textContent = (Number(pendingRewards) / 1e6).toFixed(2);
+      botInfo.querySelector(`#withdrawalFee${botId}`).textContent = `${(Number(withdrawalFee) / 1e6).toFixed(2)} `;
+      botInfo.querySelector(`#timeUntilClaim${botId}`).textContent =
+        Number(timeUntilNextClaim) > 0 ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible";
+      botInfo.querySelector(`#claimNotice${botId}`).textContent =
+        pendingRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible";
+      botInfo.querySelector(`#userTotalBalance${botId}`).textContent = 
+        ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
 
-      if (!botStatus || !botStatusLight) continue;
+      // Buscar los elementos de estado en el DOM
+      const botStatus = document.getElementById(`botStatus${botId}`);
+      const botStatusLight = document.getElementById(`botStatusLight${botId}`);
+
+      if (!botStatus || !botStatusLight) {
+        console.warn(`⚠️ Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
+        continue;
+      }
 
       // Verificar si el saldo es mayor a 0 para marcar el bot como activo
-      const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
       if (userBalance > 0n) {
+        console.log(`✅ Bot ${botId} activado con saldo: ${userBalance}`);
+
         botStatus.textContent = "Bot activo";
         botStatus.classList.remove("bot-inactive");
         botStatus.classList.add("bot-active");
@@ -337,6 +328,8 @@ async function updateAllBots() {
         botStatusLight.classList.remove("red");
         botStatusLight.classList.add("green");
       } else {
+        console.log(`❌ Bot ${botId} sigue inactivo. Saldo: ${userBalance}`);
+
         botStatus.textContent = "Bot inactivo";
         botStatus.classList.remove("bot-active");
         botStatus.classList.add("bot-inactive");
@@ -346,9 +339,10 @@ async function updateAllBots() {
       }
     }
 
+    console.log("✅ Todos los bots han sido actualizados.");
   } catch (error) {
-    console.error("Error al actualizar los datos de los bots:", error);
-    alert("Hubo un error al obtener los datos de los bots. Revisa la consola para más detalles.");
+    console.error("❌ Error al actualizar los bots:", error);
+    alert("Hubo un error al actualizar los bots. Revisa la consola para más detalles.");
   }
 }
 
