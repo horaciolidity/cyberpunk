@@ -6,7 +6,9 @@
     <title>LYTHOS Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.1/web3.min.js"></script>
     <style>
-       body {
+      @import url('https://fonts.googleapis.com/css?family=Orbitron|Share+Tech+Mono');
+
+body {
     font-family: 'Orbitron', sans-serif;
     text-align: center;
     background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
@@ -17,9 +19,11 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow-y: scroll;
 }
 
 .container {
+    position: relative;
     max-width: 400px;
     margin: auto;
     padding: 20px;
@@ -27,8 +31,8 @@
     border: 2px solid #ff00ff;
     border-radius: 15px;
     box-shadow: 0px 0px 20px rgba(255, 0, 255, 0.6);
-    text-align: center;
     animation: glow 1.5s infinite alternate;
+    text-align: center;
 }
 
 @keyframes glow {
@@ -92,6 +96,69 @@ a:hover {
     color: #ff00ff;
     text-shadow: 0px 0px 10px rgba(255, 0, 255, 0.6);
 }
+
+.header {
+    font-size: 14px;
+    font-weight: bold;
+    background: rgba(0, 255, 204, 0.2);
+    border: 1px solid rgba(0, 255, 204, 0.5);
+    padding: 15px;
+    width: 200px;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 255, 204, 0.4);
+    white-space: nowrap;
+    position: relative;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header span {
+    display: inline-block;
+    position: relative;
+    color: #ffcc00;
+    text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ff6600;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.header::before,
+.header::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: red;
+    box-shadow: 0 0 8px red;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: blink 1s infinite alternate;
+}
+
+.header::before {
+    left: 5px;
+}
+
+.header::after {
+    right: 5px;
+    animation-delay: 0.5s;
+}
+
+@keyframes blink {
+    0% { background: red; box-shadow: 0 0 8px red; }
+    100% { background: yellow; box-shadow: 0 0 12px yellow; }
+}
+
 
     </style>
 </head>
