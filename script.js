@@ -166,7 +166,7 @@ async function purchaseBot(event) {
 async function updateBotInfo(botId) {
   try {
     if (!web3Ready) {
-      console.warn("Web3 no está listo. Esperando...");
+      console.warn("⏳ Web3 no está listo. Esperando...");
       return;
     }
 
@@ -178,23 +178,27 @@ async function updateBotInfo(botId) {
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
 
+    console.log(`🔄 Bot ${botId} - Saldo obtenido:`, userBalance); // Log para depuración
+
     // Seleccionar la tarjeta del bot específica en el DOM
     const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
     if (!botInfo) {
-      console.error(`No se encontró la tarjeta del bot con ID ${botId}`);
+      console.error(`❌ No se encontró la tarjeta del bot con ID ${botId}`);
       return;
     }
 
-    const botStatus = botInfo.querySelector(`#botStatus${botId}`);
-    const botStatusLight = botInfo.querySelector(`#botStatusLight${botId}`);
+    // Buscar los elementos de estado en el DOM
+    const botStatus = document.querySelector(`#botStatus${botId}`);
+    const botStatusLight = document.querySelector(`#botStatusLight${botId}`);
 
     if (!botStatus || !botStatusLight) {
-      console.warn(`Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
+      console.warn(`⚠️ Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
       return;
     }
 
     // Verificar si el saldo es mayor a 0 para marcar el bot como activo
     if (userBalance > 0n) {
+      console.log(`✅ Bot ${botId} activado. Saldo:`, userBalance);
       botStatus.textContent = "Bot activo";
       botStatus.classList.remove("bot-inactive");
       botStatus.classList.add("bot-active");
@@ -202,6 +206,7 @@ async function updateBotInfo(botId) {
       botStatusLight.classList.remove("red");
       botStatusLight.classList.add("green");
     } else {
+      console.log(`❌ Bot ${botId} sigue inactivo. Saldo:`, userBalance);
       botStatus.textContent = "Bot inactivo";
       botStatus.classList.remove("bot-active");
       botStatus.classList.add("bot-inactive");
@@ -225,9 +230,9 @@ async function updateBotInfo(botId) {
     botInfo.querySelector(`#userTotalBalance${botId}`).textContent = 
       ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2);
 
-    console.log(`Bot ${botId}: Información actualizada correctamente.`);
+    console.log(`✅ Bot ${botId}: Información actualizada correctamente.`);
   } catch (error) {
-    console.error(`Error al actualizar el bot ${botId}:`, error);
+    console.error(`❌ Error al actualizar el bot ${botId}:`, error);
     alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
   }
 }
@@ -269,6 +274,8 @@ async function updateAllBots() {
 
     // Array para almacenar las promesas de cada bot
     const promises = [];
+
+    
 
     // Iterar sobre todos los bots (IDs del 0 al 6)
     for (let botId = 0; botId <= 6; botId++) {
