@@ -448,14 +448,14 @@ h3 {
             position: relative;
             z-index: 2;
         }
-.card-container {
+.cards-container {
     display: flex;
     justify-content: center; /* Centra la card horizontalmente */
     align-items: center;
     margin: 50px 0; /* Espacio arriba y abajo */
 }
 
-.card {
+.cards {
     background: rgba(255, 255, 255, 0.1); /* Transparencia */
     padding: 20px;
     border-radius: 10px;
