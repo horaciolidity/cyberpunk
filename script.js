@@ -6,7 +6,7 @@ let userAddress;
 let web3Ready = false;
 
 const usdtContractAddress = "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"; 
-const lythosBotContractAddress = "0xF254B98135949ab5cE314fE626573dCE412526cE"; 
+const lythosBotContractAddress = "0xD68bB3AD5a109B9788E555B85ffa960c5B4656b5"; 
 const usdtABI = [
   {"inputs":[{"internalType":"address","name":"_l2Bridge","type":"address"},{"internalType":"address","name":"_l1Token","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
   {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
