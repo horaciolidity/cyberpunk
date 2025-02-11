@@ -179,25 +179,31 @@
   text-align: center; /* Asegura que el texto también esté centrado */
 }
 
-/* Estado inactivo */
-.bot-inactive {
-  color: red;
-}
-
-/* Estado activo */
 .bot-active {
   color: green;
- font-weight: bold;
+  font-weight: bold;
 }
 
-/* Luz de estado */
+.bot-inactive {
+  color: red;
+  font-weight: normal;
+}
+
 .status-light {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   display: inline-block;
-  margin-left: 5px;
 }
+
+.status-light.red {
+  background-color: red;
+}
+
+.status-light.green {
+  background-color: green;
+}
+
 
 /* Luz roja (inactivo) */
 .red {
