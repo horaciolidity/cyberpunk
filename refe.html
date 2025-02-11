@@ -167,6 +167,16 @@ h2 {
         
         <button onclick="claimRewards()">Claim Rewards</button>
         <button onclick="buyTokens()">Comprar Tokens</button>
+
+         <!-- Card para Recompensas Disponibles -->
+        <div class="card" id="rewardCard">
+            <p id="rewardStatus">Recompensa disponible: No</p>
+        </div>
+
+        <!-- Card para el Precio del Token -->
+        <div class="card">
+            <p class="token-price">Precio del Token: 1 ETH = 20,000 LYTH</p>
+        </div>
     </div>
 
     <script>
@@ -200,17 +210,21 @@ h2 {
         }
 
         async function claimRewards() {
-            await contract.methods.rewardTokens(account).send({ from: account });
-            updateDashboard();
+            const contract = new web3.eth.Contract(contractABI, contractAddress);
+            const reward = await contract.methods.getReward(account).call();
+            const rewardStatus = document.getElementById("rewardStatus");
+            if (reward > 0) {
+                rewardStatus.textContent = `Recompensa disponible: ${reward} LYTH`;
+            } else {
+                rewardStatus.textContent = `Recompensa disponible: No`;
+            }
         }
 
-        async function buyTokens() {
-            const ethAmount = prompt("Ingrese cantidad de ETH a gastar:");
-            if (!ethAmount || isNaN(ethAmount)) return alert("Cantidad inválida");
-            await contract.methods.buyTokens().send({ from: account, value: web3.utils.toWei(ethAmount, "ether") });
-            updateDashboard();
+       async function buyTokens() {
+            const contract = new web3.eth.Contract(contractABI, contractAddress);
+            const price = await contract.methods.ETH_PRICE_IN_LYTH().call();
+            alert(`1 ETH = ${price / 1e18} LYTH`);
         }
-
         async function setReferrer() {
             const refAddress = document.getElementById("referralAddress").value;
             if (!web3.utils.isAddress(refAddress)) return alert("Dirección inválida");
