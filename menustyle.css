@@ -407,63 +407,34 @@ h3 {
                 transform: translateY(0);
             }
         }
-   .ufo-button {
-            position: relative;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #00eaff;
-            background: linear-gradient(45deg, #002244, #003366);
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 0 15px #00eaff, 0 0 30px rgba(0, 255, 255, 0.3);
-            transition: all 0.3s ease-in-out;
-            overflow: hidden;
-        }
-
-        .ufo-button::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300%;
-            height: 300%;
-            background: radial-gradient(circle, rgba(0, 238, 255, 0.6) 10%, transparent 60%);
-            transform: translate(-50%, -50%) scale(0);
-            transition: transform 0.5s ease-out;
-        }
-
-        .ufo-button:hover::before {
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .ufo-button:hover {
-            background: linear-gradient(45deg, #003366, #004488);
-            box-shadow: 0 0 20px #00eaff, 0 0 40px rgba(0, 255, 255, 0.5);
-        }
-
-        .ufo-button span {
-            position: relative;
-            z-index: 2;
-        }
-.cards-container {
-    display: flex;
-    justify-content: center; /* Centra la card horizontalmente */
-    align-items: center;
-    margin: 50px 0; /* Espacio arriba y abajo */
-}
-
-.cards {
-    background: rgba(255, 255, 255, 0.1); /* Transparencia */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Sombra ligera */
-    backdrop-filter: blur(10px); /* Efecto vidrio */
+  .ufo-button {
+    position: relative;
+    display: inline-block;
+    padding: 12px 30px; /* Tamaño más discreto */
+    font-size: 16px; /* Un poco más pequeño */
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #00eaff;
+    background: rgba(0, 238, 255, 0.1); /* Transparente con leve brillo */
+    border: 2px solid rgba(0, 238, 255, 0.5); /* Borde suave */
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 238, 255, 0.2); /* Glow sutil */
+    transition: all 0.3s ease-in-out;
     text-align: center;
-    width: 280px; /* Ajusta el tamaño si es necesario */
 }
 
+.ufo-button:hover {
+    background: rgba(0, 238, 255, 0.2); /* Un poco más visible */
+    box-shadow: 0 0 15px rgba(0, 238, 255, 0.6); /* Glow más intenso */
+    transform: scale(1.05);
+}
+
+.ufo-button span {
+    background: linear-gradient(45deg, #00ffff, #ff00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
 
 
