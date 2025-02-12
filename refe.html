@@ -14,17 +14,22 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
    body {
-            background-color: #0d0d0d;
-            background-image: url('https://www.transparenttextures.com/patterns/wave-cut.png'); /* Añadir la imagen wave */
-            background-size: cover; /* Ajustar el tamaño de la imagen de fondo */
-            background-position: center; /* Centrar la imagen de fondo */
-            color: #ffffff;
-            font-family: 'Orbitron', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            position: relative; /* Posicionamiento para las imágenes de fondo */
-        }
+          * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0d0d0d;
+    background-image: url('https://www.transparenttextures.com/patterns/wave-cut.png');
+    background-size: cover;
+    background-position: center;
+    color: #ffffff;
+    font-family: 'Orbitron', Arial, sans-serif;
+    overflow-x: hidden;
+    position: relative;
+}
 
 nav {
     display: flex;
@@ -68,12 +73,10 @@ nav {
     margin: 20px auto;
     position: relative;
     z-index: 2;
-   
 }
 
-
 .header {
-    background-color: rgba(26, 26, 26, 0.6); /* Fondo oscuro y más claro */
+    background-color: rgba(26, 26, 26, 0.6);
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -86,7 +89,7 @@ nav {
     justify-content: center;
     align-items: center;
     position: relative;
-    z-index: 2; /* Asegura que el contenido principal esté por encima de las imágenes de fondo */
+    z-index: 2;
 }
 
 .left-side-image, .right-side-image {
@@ -94,7 +97,7 @@ nav {
     top: 0;
     bottom: 0;
     width: 50%;
-    opacity: 1; /* Opacidad ajustada */
+    opacity: 1;
     z-index: -2;
 }
 
@@ -110,15 +113,14 @@ nav {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: brightness(1.5); /* Brillo ajustado */
+    filter: brightness(1.5);
     position: absolute;
     top: 0;
     left: 0;
-
 }
 
 .exchange-box {
-    background-color: rgba(26, 26, 26, 0.6); /* Fondo oscuro y más claro */
+    background-color: rgba(26, 26, 26, 0.6);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
@@ -136,7 +138,7 @@ nav {
 }
 
 .exchange-options button {
-    background-color: rgba(51, 51, 51, 0.6); /* Fondo oscuro y más claro */
+    background-color: rgba(51, 51, 51, 0.6);
     border: none;
     color: #00ff99;
     padding: 10px 20px;
@@ -167,7 +169,7 @@ nav {
 .input-group select, .input-group input {
     padding: 10px;
     border: 1px solid #2c2c2c;
-    background-color: rgba(51, 51, 51, 0.6); /* Fondo oscuro y más claro */
+    background-color: rgba(51, 51, 51, 0.6);
     color: #ffffff;
     margin-right: 10px;
     flex: 1;
@@ -187,7 +189,7 @@ nav {
 }
 
 .swap-icon button {
-    background-color: rgba(51, 51, 51, 0.6); /* Fondo oscuro y más claro */
+    background-color: rgba(51, 51, 51, 0.6);
     border: none;
     color: #00ff99;
     font-size: 20px;
@@ -223,195 +225,189 @@ p {
     padding: 0;
 }
 
- .countdown-container {
-            text-align: center;
-            margin: 20px 0;
-            color: #ffffff;
-        }
+.countdown-container {
+    text-align: center;
+    margin: 20px 0;
+    color: #ffffff;
+}
 
-        .countdown {
-            font-size: 24px;
-            font-weight: bold;
-            background-color: rgba(51, 51, 51, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            display: inline-block;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
-        }
+.countdown {
+    font-size: 24px;
+    font-weight: bold;
+    background-color: rgba(51, 51, 51, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+}
 
-        .countdown span {
-            display: inline-block;
-            min-width: 40px;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin: 0 5px;
-        }
+.countdown span {
+    display: inline-block;
+    min-width: 40px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin: 0 5px;
+}
 
-        .countdown .updating {
-            color: #ff0000;
-        }
+.countdown .updating {
+    color: #ff0000;
+}
+
 #buy-button {
-  display: block;
-  margin: 0 auto; /* Centrará el botón horizontalmente */
-  padding: 10px 20px;
-  background-color: yellow;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  color: black;
-  cursor: pointer;
-  transition: transform 0.2s, background-color 0.2s;
+    display: block;
+    margin: 0 auto;
+    padding: 10px 20px;
+    background-color: yellow;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    color: black;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
 }
 
 #buy-button:active {
-  transform: scale(0.95); /* Reduce ligeramente el tamaño del botón */
-  background-color: gold; /* Cambia el color de fondo al hacer clic */
+    transform: scale(0.95);
+    background-color: gold;
 }
- @keyframes subtle-glow {
-        0% {
-            text-shadow: 0 0 3px rgba(255, 255, 255, 0.5),
-                         0 0 5px rgba(255, 255, 255, 0.3);
-        }
-        50% {
-            text-shadow: 0 0 6px rgba(255, 255, 255, 0.7),
-                         0 0 10px rgba(255, 255, 255, 0.5);
-        }
-        100% {
-            text-shadow: 0 0 3px rgba(255, 255, 255, 0.5),
-                         0 0 5px rgba(255, 255, 255, 0.3);
-        }
+
+@keyframes subtle-glow {
+    0% {
+        text-shadow: 0 0 3px rgba(255, 255, 255, 0.5),
+                     0 0 5px rgba(255, 255, 255, 0.3);
     }
-
-
- .container {
-            padding: 20px;
-            max-width: 800px;
-            margin: 20px auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .referral-container {
-            text-align: center;
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #333;
-            border-radius: 8px;
-            background-color: #1a1a2e;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            margin: 0 auto; /* Center the container */
-        }
-
-        .referral-container h2 {
-            margin-bottom: 10px;
-            color: #00d4ff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .referral-link {
-            display: block;
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #2e2e5d;
-            border: 1px solid #00d4ff;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #00d4ff;
-            word-wrap: break-word;
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        .referral-container button {
-            padding: 10px 20px;
-            background-color: #00d4ff;
-            color: #1a1a2e;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        .referral-container button:hover {
-            background-color: #0095b6;
-            transform: scale(1.05);
-        }
-
-      .transaction-container {
-        max-width: 800px;
-        margin: 50px auto;
-        padding: 20px;
-        border: 1px solid #333;
-        border-radius: 8px;
-        background-color: #1a1a2e;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        position: relative;
-        overflow: hidden;
-        height: 200px; /* Altura fija */
+    50% {
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.7),
+                     0 0 10px rgba(255, 255, 255, 0.5);
     }
-
-    .transaction-list {
-        position: absolute;
-        width: 100%;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        animation: scrollUp 15s linear infinite; /* Ajustar duración según sea necesario */
+    100% {
+        text-shadow: 0 0 3px rgba(255, 255, 255, 0.5),
+                     0 0 5px rgba(255, 255, 255, 0.3);
     }
+}
 
-    .transaction {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        margin-bottom: 5px;
-    }
+.referral-container {
+    text-align: center;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background-color: #1a1a2e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    margin: 0 auto;
+}
 
-    .transaction:nth-child(odd) {
-        background-color: rgba(51, 51, 51, 0.6);
-    }
+.referral-container h2 {
+    margin-bottom: 10px;
+    color: #00d4ff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    .transaction:nth-child(even) {
-        background-color: rgba(77, 77, 77, 0.6);
-    }
+.referral-link {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #2e2e5d;
+    border: 1px solid #00d4ff;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #00d4ff;
+    word-wrap: break-word;
+    font-family: 'Courier New', Courier, monospace;
+}
 
-    .transaction span {
-        flex: 1;
-        text-align: center;
-    }
+.referral-container button {
+    padding: 10px 20px;
+    background-color: #00d4ff;
+    color: #1a1a2e;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.3s;
+}
 
-    .address {
-        color: #00ff99;
-    }
+.referral-container button:hover {
+    background-color: #0095b6;
+    transform: scale(1.05);
+}
 
-    .eth {
-        color: #ff00ff;
-    }
+.transaction-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background-color: #1a1a2e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
 
-    .lyth {
-        color: #e3b341;
-    }
+.transaction-list {
+    position: absolute;
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    animation: scrollUp 15s linear infinite;
+}
 
-    .time {
-        color: #00d4ff;
-    }
+.transaction {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    margin-bottom: 5px;
+}
 
-    .hash {
-        color: #ff5733;
-    }
+.transaction:nth-child(odd) {
+    background-color: rgba(51, 51, 51, 0.6);
+}
 
-    @keyframes scrollUp {
-        0% {
-            transform: translateY(100%);
-        }
-        20%,
-        25% {
-            transform: translateY(0);
-        }
-        100% {
-            transform: translateY(-100%);
-        }
+.transaction:nth-child(even) {
+    background-color: rgba(77, 77, 77, 0.6);
+}
+
+.transaction span {
+    flex: 1;
+    text-align: center;
+}
+
+.address {
+    color: #00ff99;
+}
+
+.eth {
+    color: #ff00ff;
+}
+
+.lyth {
+    color: #e3b341;
+}
+
+.time {
+    color: #00d4ff;
+}
+
+.hash {
+    color: #ff5733;
+}
+
+@keyframes scrollUp {
+    0% {
+        transform: translateY(100%);
     }
+    20%,
+    25% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-100%);
+    }
+}
+
     </style>
 <body>
     <nav>
