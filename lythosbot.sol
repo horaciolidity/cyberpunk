@@ -1,3 +1,4 @@
+
 /**
  *Submitted for verification at optimistic.etherscan.io on 2025-02-07
 */
@@ -81,71 +82,43 @@ contract LythosBot {
         bots[6] = Bot(1600 * 1e6, 670, 700, 0, true);
     }
 
- function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant {
+function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant { 
     require(amount >= bots[botId].price, "Insufficient amount");
     require(amount % bots[botId].price == 0, "Invalid multiple");
     require(usdt.allowance(msg.sender, address(this)) >= amount, "Allowance too low");
 
     _safeTransferFrom(msg.sender, address(this), amount);
     
-    // Calcular y acumular recompensas pendientes antes de la compra
+    // Acumular recompensas antes de modificar el balance
     uint256 pendingRewards = _calculateRewards(msg.sender, botId, lastRewardClaim[msg.sender][botId]);
+    if (pendingRewards > 0) {
+        userRewards[msg.sender][botId] += pendingRewards;
+        bots[botId].totalRewards += pendingRewards;
+    }
 
-    userRewards[msg.sender][botId] += pendingRewards;
-    bots[botId].totalRewards += pendingRewards;
-    
     // Actualizar balance del bot
     uint256 units = amount / bots[botId].price;
     userBotBalance[msg.sender][botId] += amount;
     
-    // Calcular y añadir nuevos intereses
+    // Calcular y añadir nuevas recompensas
     uint256 newRewards = (amount * bots[botId].interestRate) / 10000;
     userRewards[msg.sender][botId] += newRewards;
     bots[botId].totalRewards += newRewards;
-    
-    // Reiniciar contador de recompensas
+
+    // **No reiniciamos la acumulación de recompensas**, solo actualizamos el tiempo
     lastRewardClaim[msg.sender][botId] = block.timestamp;
 
     emit BotPurchased(msg.sender, botId, amount, userBotBalance[msg.sender][botId]);
 }
-function claimRewards(uint8 botId) external validBot(botId) nonReentrant {
-    require(bots[botId].withdrawalsEnabled, "Withdrawals disabled");
-    require(userBotBalance[msg.sender][botId] > 0, "No balance");
 
-    uint256 lastClaim = lastRewardClaim[msg.sender][botId];
-    
-    // Calcular una sola vez pendingRewards
-    uint256 pendingRewards = _calculateRewards(msg.sender, botId, lastClaim);
 
-    // Acumular recompensas
-    userRewards[msg.sender][botId] += pendingRewards;
-    bots[botId].totalRewards += pendingRewards;
-
-    uint256 rewards = userRewards[msg.sender][botId];
-    require(rewards > 0, "No rewards");
-
-    uint256 fee = (rewards * bots[botId].withdrawalFee) / 10000;
-    uint256 netAmount = rewards - fee;
-
-    // Resetear solo las recompensas, pero no el balance del bot
-    userRewards[msg.sender][botId] = 0;
-    bots[botId].totalRewards -= rewards;
-
-    // Actualizar el último reclamo
-    lastRewardClaim[msg.sender][botId] = block.timestamp;
-
-    // Transferencias
-    _safeTransfer(msg.sender, netAmount);
-    _safeTransfer(owner, fee);
-
-    emit RewardsClaimed(msg.sender, botId, netAmount);
-}
 
 function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) private view returns (uint256) {
-    // Ya no es necesario verificar si lastClaimTime == 0
+    if (lastClaimTime == 0) return 0;
+
     uint256 timeElapsed = block.timestamp - lastClaimTime;
 
-    // Calcular recompensas exactas basadas en el tiempo transcurrido
+    // Acumulación infinita de recompensas sin importar si el usuario reclama o no
     return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * rewardInterval);
 }
 
