@@ -365,7 +365,7 @@ async function claimRewards(botId) {
     }
 
     // 2. Verificar si hay recompensas
-    const pendingRewards = await lythosBotContract.methods.userRewards(userAddress, botId).call();
+    const pendingRewards = await lythosBotContract.methods.userReward(userAddress, botId).call();
     if (Number(pendingRewards) === 0) {
       alert("No hay recompensas disponibles para este bot");
       return;
@@ -393,7 +393,7 @@ async function claimRewards(botId) {
     if (!confirmacion) return;
 
     // 5. Ejecutar transacción
-    const tx = await lythosBotContract.methods.claimRewards(botId)
+    const tx = await lythosBotContract.methods.claimReward(botId)
       .send({ from: userAddress });
     
     console.log("Transacción exitosa:", tx);
