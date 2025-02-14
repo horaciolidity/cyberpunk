@@ -428,7 +428,7 @@ async function updateUSDTBalance() {
 document.querySelectorAll('.claim-btn').forEach(button => {
   button.addEventListener('click', async (e) => {
     const botId = parseInt(e.target.closest('.bot-card').dataset.botId);
-    if (!isNaN(botId)) await claimRewards(botId);
+    if (!isNaN(botId)) await claimReward(botId);
   });
 });
 
