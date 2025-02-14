@@ -1,3 +1,10 @@
+/**
+ *Submitted for verification at optimistic.etherscan.io on 2025-02-14
+*/
+
+/**
+ *Submitted for verification at optimistic.etherscan.io on 2025-02-12
+*/
 
 /**
  *Submitted for verification at optimistic.etherscan.io on 2025-02-07
@@ -109,6 +116,38 @@ function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonRe
     lastRewardClaim[msg.sender][botId] = block.timestamp;
 
     emit BotPurchased(msg.sender, botId, amount, userBotBalance[msg.sender][botId]);
+}
+
+ function claimReward(uint8 botId) external validBot(botId) nonReentrant {
+    require(bots[botId].withdrawalsEnabled, "Withdrawals disabled");
+    require(userRewards[msg.sender][botId] > 0, "No rewards available");
+
+    // Calculamos las recompensas acumuladas hasta ahora
+    uint256 accumulatedRewards = _calculateRewards(msg.sender, botId, lastRewardClaim[msg.sender][botId]);
+    
+    // Sumamos las recompensas pendientes al balance del usuario
+    userRewards[msg.sender][botId] += accumulatedRewards;
+    
+    uint256 totalRewards = userRewards[msg.sender][botId];
+    uint256 fee = (totalRewards * bots[botId].withdrawalFee) / 10000;
+    uint256 finalAmount = totalRewards - fee;
+
+    require(finalAmount > 0, "Reward too small after fee");
+    require(usdt.balanceOf(address(this)) >= finalAmount, "Insufficient contract balance");
+
+    // **Mantenemos el ciclo de recompensas sin interrumpirlo**
+    uint256 timeElapsed = block.timestamp - lastRewardClaim[msg.sender][botId];
+    uint256 cycles = timeElapsed / rewardInterval;
+    lastRewardClaim[msg.sender][botId] += cycles * rewardInterval; // Se mantiene alineado al ciclo de recompensas
+
+    // Reiniciamos solo el monto reclamado, sin afectar la acumulación de recompensas futuras
+    userRewards[msg.sender][botId] = 0;
+
+    // Transferimos el dinero con la deducción del 7% de fee
+    require(usdt.transfer(msg.sender, finalAmount), "Transfer failed");
+    require(usdt.transfer(owner, fee), "Fee transfer failed");
+
+    emit RewardsClaimed(msg.sender, botId, finalAmount);
 }
 
 
