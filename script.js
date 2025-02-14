@@ -362,18 +362,18 @@ async function claimReward(botId) {
     }
 
     // 1. Verificar intervalo de recompensa
-    const lastClaim = await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call();
+    const lastClaim = await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call();
     const rewardInterval = await lythosBotContract.methods.rewardInterval().call();
     const currentTime = Math.floor(Date.now() / 1000);
-    
-    if (currentTime < Number(lastClaim) + Number(rewardInterval)) {
+
+    if (Number(lastClaim) > 0 && currentTime < Number(lastClaim) + Number(rewardInterval)) {
       const hoursLeft = Math.ceil((Number(lastClaim) + Number(rewardInterval) - currentTime) / 3600);
       alert(`Debes esperar ${hoursLeft} horas antes de reclamar nuevamente`);
       return;
     }
 
     // 2. Verificar si hay recompensas
-    const pendingRewards = await lythosBotContract.methods.userReward(userAddress, botId).call();
+    const pendingRewards = await lythosBotContract.methods.getPendingRewards(userAddress, botId).call();
     if (Number(pendingRewards) === 0) {
       alert("No hay recompensas disponibles para este bot");
       return;
@@ -388,28 +388,33 @@ async function claimReward(botId) {
 
     // 4. Mostrar confirmación con detalles
     const rewardAmount = (Number(pendingRewards) / 1e6).toFixed(2);
-    const feePercentage = Number(botInfo.withdrawalFee) / 100;
+    const feePercentage = Number(botInfo.withdrawalFee) / 10000; // Corregido
     const feeAmount = (rewardAmount * feePercentage).toFixed(2);
     const netAmount = (rewardAmount - feeAmount).toFixed(2);
-    
+
     const confirmacion = confirm(
       `Reclamar ${rewardAmount} USDT?\n` +
-      `Tarifa de retiro (${feePercentage}%): ${feeAmount} USDT\n` +
+      `Tarifa de retiro (${feePercentage * 100}%): ${feeAmount} USDT\n` +
       `Recibirás: ${netAmount} USDT`
     );
     
     if (!confirmacion) return;
 
-    // 5. Ejecutar transacción
-    const tx = await lythosBotContract.methods.claimReward(botId)
-      .send({ from: userAddress });
-    
-    console.log("Transacción exitosa:", tx);
-    alert(`¡Éxito! ${netAmount} USDT han sido transferidos a tu wallet`);
+    // 5. Ejecutar transacción con control de errores
+    try {
+      const tx = await lythosBotContract.methods.claimReward(botId)
+        .send({ from: userAddress, gas: 200000 });
+      
+      console.log("Transacción exitosa:", tx);
+      alert(`¡Éxito! ${netAmount} USDT han sido transferidos a tu wallet`);
 
-    // 6. Actualizar UI
-    await updateBotInfo(botId);
-    await updateUSDTBalance();
+      // 6. Actualizar UI
+      await updateBotInfo(botId);
+      await updateUSDTBalance();
+    } catch (txError) {
+      console.error("Error al ejecutar la transacción:", txError);
+      alert("Error al procesar la transacción. Verifica que haya suficiente gas y saldo en el contrato.");
+    }
 
   } catch (error) {
     console.error("Error al reclamar:", error);
@@ -420,7 +425,7 @@ async function claimReward(botId) {
       const reason = error.message.match(/reverted with reason string '(.*)'/)?.[1] || "Error en el contrato";
       alert(`Error: ${reason}`);
     } else {
-      alert("Error al procesar la transacción. Verifica la consola para más detalles");
+      alert("Error al procesar la transacción. Verifica la consola para más detalles.");
     }
   }
 }
