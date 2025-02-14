@@ -172,9 +172,9 @@ async function updateBotInfo(botId) {
 
     // Obtener datos del contrato relacionados con el bot y el usuario
     const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
-    const pendingRewards = BigInt(await lythosBotContract.methods.userRewards(userAddress, botId).call());
+    const pendingRewards = BigInt(await lythosBotContract.methods.getPendingRewards(userAddress, botId).call());
     const botDetails = await lythosBotContract.methods.bots(botId).call();
-    const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
+    const lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
 
