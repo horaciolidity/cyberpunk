@@ -346,7 +346,7 @@ async function updateAllBots() {
   }
 }
 
-async function claimRewards(botId) {
+async function claimReward(botId) {
   try {
     if (!web3Ready || !lythosBotContract) {
       alert("Conecta tu wallet primero.");
