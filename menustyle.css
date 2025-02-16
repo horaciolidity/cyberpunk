@@ -437,7 +437,7 @@ h3 {
     font-weight: bold;
 }
 
-      #mascota {
+  #mascota {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -445,7 +445,12 @@ h3 {
     height: 150px;
     background: url('mascota.gif') no-repeat center/contain;
     cursor: pointer;
+    transform: scale(0.5); 
+    transform-origin: bottom right; 
+       z-index: 9999; 
+
 }
+
 
         #mensaje {
             position: fixed;
