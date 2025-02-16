@@ -172,9 +172,9 @@ async function updateBotInfo(botId) {
 
     // Obtener datos del contrato relacionados con el bot y el usuario
     const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
-    let pendingRewards = BigInt(await lythosBotContract.methods.getPendingRewards(userAddress, botId).call());
+    const totalRewards = BigInt(await lythosBotContract.methods.getUserRewards(userAddress, botId).call()); // 🔥 Total acumulado
     const botDetails = await lythosBotContract.methods.bots(botId).call();
-    let lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
+    const lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
 
@@ -201,9 +201,7 @@ async function updateBotInfo(botId) {
       botStatus.classList.remove("bot-inactive");
       botStatus.classList.add("bot-active");
 
-      if (botStatusLight.classList.contains("red")) {
-        botStatusLight.classList.remove("red");
-      }
+      botStatusLight.classList.remove("red");
       botStatusLight.classList.add("green");
     } else {
       console.log(`❌ Bot ${botId} sigue inactivo. Saldo: ${userBalance}`);
@@ -211,9 +209,7 @@ async function updateBotInfo(botId) {
       botStatus.classList.remove("bot-active");
       botStatus.classList.add("bot-inactive");
 
-      if (botStatusLight.classList.contains("green")) {
-        botStatusLight.classList.remove("green");
-      }
+      botStatusLight.classList.remove("green");
       botStatusLight.classList.add("red");
     }
 
@@ -234,11 +230,11 @@ async function updateBotInfo(botId) {
     };
 
     updateText(`#userBalance${botId}`, (Number(userBalance) / 1e6).toFixed(2));
-    updateText(`#pendingRewards${botId}`, (Number(pendingRewards) / 1e6).toFixed(2));
+    updateText(`#pendingRewards${botId}`, (Number(totalRewards) / 1e6).toFixed(2)); // ✅ Ahora muestra el total acumulado
     updateText(`#withdrawalFee${botId}`, `${(Number(withdrawalFee) / 1e6).toFixed(2)} `);
     updateText(`#timeUntilClaim${botId}`, timeUntilNextClaim > 0n ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible");
-    updateText(`#claimNotice${botId}`, pendingRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible");
-    updateText(`#userTotalBalance${botId}`, ((Number(userBalance) + Number(pendingRewards)) / 1e6).toFixed(2));
+    updateText(`#claimNotice${botId}`, totalRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible");
+    updateText(`#userTotalBalance${botId}`, ((Number(userBalance) + Number(totalRewards)) / 1e6).toFixed(2));
 
     console.log(`✅ Bot ${botId}: Información actualizada correctamente.`);
   } catch (error) {
@@ -246,6 +242,7 @@ async function updateBotInfo(botId) {
     alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
   }
 }
+
 
 
 function simulateGuides() {
