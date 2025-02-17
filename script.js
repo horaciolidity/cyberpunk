@@ -235,6 +235,8 @@ async function updateBotInfo(botId) {
     updateText(`#timeUntilClaim${botId}`, timeUntilNextClaim > 0n ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible");
     updateText(`#claimNotice${botId}`, totalRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible");
     updateText(`#userTotalBalance${botId}`, ((Number(userBalance) + Number(totalRewards)) / 1e6).toFixed(2));
+    updateText(`#interestRate${botId}`, `${interestRate.toFixed(2)}%`); // ✅ Muestra el % de pago
+
 
     console.log(`✅ Bot ${botId}: Información actualizada correctamente.`);
   } catch (error) {
