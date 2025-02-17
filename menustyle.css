@@ -437,22 +437,7 @@ h3 {
     font-weight: bold;
 }
 
-  #mascota {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 150px;
-    height: 150px;
-    background: url('mascota.gif') no-repeat center/contain;
-    cursor: pointer;
-    transform: scale(0.5); 
-    transform-origin: bottom right; 
-       z-index: 9999; 
-
-}
-
-
-        #mensaje {
+#mensaje {
             position: fixed;
             bottom: 180px;
             right: 20px;
@@ -462,5 +447,16 @@ h3 {
             border-radius: 8px;
             display: none;
         }
+        #mascota {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            background: url('mascota.gif') no-repeat center/contain;
+            cursor: pointer;
+            transform: scale(0.5);
+            transform-origin: bottom right;
+            z-index: 9999;
+        }
 ml>
-
