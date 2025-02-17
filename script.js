@@ -176,8 +176,9 @@ async function updateBotInfo(botId) {
     const botDetails = await lythosBotContract.methods.bots(botId).call();
     const lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
-    const botDetails = await lythosBotContract.methods.bots(botId).call();
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
+    const interestRate = Number(botDetails.interestRate) / 100; // <-- Sin "const" aquí
+
     
 
     console.log(`🔄 Bot ${botId} - Saldo obtenido:`, userBalance);
@@ -294,6 +295,8 @@ async function updateAllBots() {
       const lastRewardClaim = BigInt(await lythosBotContract.methods.lastRewardClaim(userAddress, botId).call());
       const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
       const currentTime = BigInt(Math.floor(Date.now() / 1000));
+      const interestRate = Number(botDetails.interestRate) / 100; // <-- Sin "const" aquí
+
 
       // Calcular la tarifa de retiro y tiempo hasta el próximo reclamo
       const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
