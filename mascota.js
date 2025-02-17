@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
         mensaje.style.display = "block";
         setTimeout(() => {
             mensaje.style.display = "none";
-        }, 12000);
+        }, 16000);
     }, 1000);
 
     // Función para verificar la red en Web3 (requiere MetaMask)
