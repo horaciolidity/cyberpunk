@@ -177,7 +177,7 @@ async function updateBotInfo(botId) {
     const lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
-    const interestRate = Number(botDetails.interestRate) / 100; // <-- Sin "const" aquí
+    const interestRate = (Number(botDetails.interestRate) / 100).toFixed(2); // ✅ 300 → 3.00%
 
     
 
@@ -188,6 +188,12 @@ async function updateBotInfo(botId) {
     if (!botInfo) {
       console.error(`❌ No se encontró la tarjeta del bot con ID ${botId}`);
       return;
+    }
+    const interestElement = document.querySelector(`#interestRate${botId}`);
+    if (interestElement) {
+      interestElement.textContent = `${interestRate}%`; 
+    } else {
+      console.error(`Elemento #interestRate${botId} no encontrado`);
     }
 
     const botStatus = document.getElementById(`botStatus${botId}`);
@@ -308,6 +314,13 @@ async function updateAllBots() {
         console.warn(`⚠️ No se encontró la tarjeta del bot con ID ${botId}`);
         continue;
       }
+
+      // Actualizar el elemento de interés
+      const interestElement = document.querySelector(`#interestRate${botId}`);
+      if (interestElement) {
+        interestElement.textContent = `${interestRate}%`;
+      }
+
 
       // Actualizar los datos en la interfaz de usuario
       botInfo.querySelector(`#userBalance${botId}`).textContent = (Number(userBalance) / 1e6).toFixed(2);
