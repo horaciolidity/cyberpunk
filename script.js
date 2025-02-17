@@ -177,7 +177,6 @@ async function updateBotInfo(botId) {
     const lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
     const botDetails = await lythosBotContract.methods.bots(botId).call();
-    const interestRate = Number(botDetails.interestRate) / 100;
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
     
 
