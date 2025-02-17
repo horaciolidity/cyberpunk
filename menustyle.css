@@ -446,6 +446,8 @@ h3 {
             padding: 10px;
             border-radius: 8px;
             display: none;
+             z-index: 9999;
+
         }
         #mascota {
             position: fixed;
