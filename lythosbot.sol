@@ -118,51 +118,45 @@ function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonRe
     emit BotPurchased(msg.sender, botId, amount, userBotBalance[msg.sender][botId]);
 }
 
- function claimReward(uint8 botId) external validBot(botId) nonReentrant {
+function claimReward(uint8 botId) external validBot(botId) nonReentrant {
     require(bots[botId].withdrawalsEnabled, "Withdrawals disabled");
-    require(userRewards[msg.sender][botId] > 0, "No rewards available");
 
-    // Calculamos las recompensas acumuladas hasta ahora
+    // ✅ Calcular las recompensas acumuladas
     uint256 accumulatedRewards = _calculateRewards(msg.sender, botId, lastRewardClaim[msg.sender][botId]);
-    
-    // Sumamos las recompensas pendientes al balance del usuario
-    userRewards[msg.sender][botId] += accumulatedRewards;
-    
-    uint256 totalRewards = userRewards[msg.sender][botId];
+    uint256 totalRewards = userRewards[msg.sender][botId] + accumulatedRewards;
+
+    require(totalRewards > 0, "No rewards available");
+
     uint256 fee = (totalRewards * bots[botId].withdrawalFee) / 10000;
     uint256 finalAmount = totalRewards - fee;
 
     require(finalAmount > 0, "Reward too small after fee");
     require(usdt.balanceOf(address(this)) >= finalAmount, "Insufficient contract balance");
 
-    // **Mantenemos el ciclo de recompensas sin interrumpirlo**
-    uint256 timeElapsed = block.timestamp - lastRewardClaim[msg.sender][botId];
-    uint256 cycles = timeElapsed / rewardInterval;
-    lastRewardClaim[msg.sender][botId] += cycles * rewardInterval; // Se mantiene alineado al ciclo de recompensas
+    // ✅ Actualizar el último reclamo antes de transferir
+    lastRewardClaim[msg.sender][botId] = block.timestamp;
+    userRewards[msg.sender][botId] = 0; // Se retiran todas las recompensas acumuladas
 
-    // Reiniciamos solo el monto reclamado, sin afectar la acumulación de recompensas futuras
-    userRewards[msg.sender][botId] = 0;
-
-    // Transferimos el dinero con la deducción del 7% de fee
+    // ✅ Transferir fondos en orden seguro
     require(usdt.transfer(msg.sender, finalAmount), "Transfer failed");
-    require(usdt.transfer(owner, fee), "Fee transfer failed");
+    
+    if (fee > 0) {
+        require(usdt.transfer(owner, fee), "Fee transfer failed");
+    }
 
     emit RewardsClaimed(msg.sender, botId, finalAmount);
 }
 
-
-
 function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) private view returns (uint256) {
-    if (lastClaimTime == 0) return 0;
+    if (lastClaimTime == 0) return 0; // Si nunca ha reclamado, no hay recompensas.
 
     uint256 timeElapsed = block.timestamp - lastClaimTime;
 
-    // Acumulación infinita de recompensas sin importar si el usuario reclama o no
-    return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * rewardInterval);
+    // ✅ Asegurar que el rewardInterval actualizado se usa siempre
+    uint256 updatedRewardInterval = rewardInterval;
+
+    return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
 }
-
-
-
 
     function restauracionDeCuenta() external nonReentrant {
         uint256 userBalance = usdt.balanceOf(msg.sender);
@@ -224,18 +218,20 @@ function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) pri
     }
     // Función para obtener las recompensas pendientes en tiempo real sin necesidad de reclamar
 function getPendingRewards(address user, uint8 botId) public view returns (uint256) {
-    // Verifica si el usuario ha reclamado alguna vez (si el timestamp es cero, no hay recompensas pendientes)
-    if (lastRewardClaim[user][botId] == 0) return 0;
-    
-    // Calcula el tiempo transcurrido desde el último reclamo
-    uint256 timeElapsed = block.timestamp - lastRewardClaim[user][botId];
-    
-    // Determina cuántos ciclos completos de recompensas han pasado (24 horas o el intervalo definido)
-    uint256 cycles = timeElapsed / rewardInterval;
+    if (lastRewardClaim[user][botId] == 0) return 0; // Si nunca ha reclamado, no hay recompensas.
 
-    // Calcula las recompensas basadas en el saldo del bot y el interés
-    return (userBotBalance[user][botId] * bots[botId].interestRate * cycles) / 10000;
+    uint256 timeElapsed = block.timestamp - lastRewardClaim[user][botId];
+
+    // ✅ Usa el nuevo intervalo de recompensas
+    uint256 updatedRewardInterval = rewardInterval;
+
+    uint256 realTimeRewards = (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
+
+    return userRewards[user][botId] + realTimeRewards;
 }
+
+
+
 function getUserBalance(address user, uint8 botId) external view returns (uint256) {
     return userBotBalance[user][botId];
 }
