@@ -1,13 +1,5 @@
 /**
- *Submitted for verification at optimistic.etherscan.io on 2025-02-14
-*/
-
-/**
- *Submitted for verification at optimistic.etherscan.io on 2025-02-12
-*/
-
-/**
- *Submitted for verification at optimistic.etherscan.io on 2025-02-07
+ *Submitted for verification at optimistic.etherscan.io on 2025-02-18
 */
 
 // SPDX-License-Identifier: MIT
@@ -38,6 +30,8 @@ contract LythosBot {
     mapping(address => mapping(uint8 => uint256)) public userBotBalance;
     mapping(address => mapping(uint8 => uint256)) public userRewards;
     mapping(address => mapping(uint8 => uint256)) public lastRewardClaim;
+    mapping(address => address) public referrers; // Mapeo de referidos
+    mapping(address => uint256) public referralRewards; // Recompensas de referidos
 
     uint256 public rewardInterval = 24 hours;
     address public owner;
@@ -52,6 +46,9 @@ contract LythosBot {
     event RestauracionDeCuenta(address indexed user, uint256 amount);
     event FundsWithdrawn(address indexed owner, uint256 amount);
     event TransferFailed(address indexed from, address indexed to, uint256 amount);
+    event ReferralRewardPaid(address indexed referrer, address indexed user, uint256 reward);
+    event ReferrerSet(address indexed user, address indexed referrer);
+
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
@@ -89,7 +86,18 @@ contract LythosBot {
         bots[6] = Bot(1600 * 1e6, 670, 700, 0, true);
     }
 
-function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant { 
+   function setReferrer(address referrer) external {
+    require(referrer != address(0), "Invalid referrer");
+    require(referrer != msg.sender, "Cannot refer yourself");
+    require(referrers[msg.sender] == address(0), "Referrer already set");
+    referrers[msg.sender] = referrer;
+
+    // Emitir evento para registrar el referidor
+    emit ReferrerSet(msg.sender, referrer);
+}
+
+
+    function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant { 
     require(amount >= bots[botId].price, "Insufficient amount");
     require(amount % bots[botId].price == 0, "Invalid multiple");
     require(usdt.allowance(msg.sender, address(this)) >= amount, "Allowance too low");
@@ -118,7 +126,7 @@ function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonRe
     emit BotPurchased(msg.sender, botId, amount, userBotBalance[msg.sender][botId]);
 }
 
-function claimReward(uint8 botId) external validBot(botId) nonReentrant {
+   function claimReward(uint8 botId) external validBot(botId) nonReentrant {
     require(bots[botId].withdrawalsEnabled, "Withdrawals disabled");
 
     // ✅ Calcular las recompensas acumuladas
@@ -127,6 +135,7 @@ function claimReward(uint8 botId) external validBot(botId) nonReentrant {
 
     require(totalRewards > 0, "No rewards available");
 
+    // Calculamos el fee
     uint256 fee = (totalRewards * bots[botId].withdrawalFee) / 10000;
     uint256 finalAmount = totalRewards - fee;
 
@@ -137,26 +146,35 @@ function claimReward(uint8 botId) external validBot(botId) nonReentrant {
     lastRewardClaim[msg.sender][botId] = block.timestamp;
     userRewards[msg.sender][botId] = 0; // Se retiran todas las recompensas acumuladas
 
-    // ✅ Transferir fondos en orden seguro
+    // ✅ Transferir el monto de la recompensa final
     require(usdt.transfer(msg.sender, finalAmount), "Transfer failed");
-    
+
     if (fee > 0) {
-        require(usdt.transfer(owner, fee), "Fee transfer failed");
+        // 50% del fee va al referido
+        address referrer = referrers[msg.sender];
+        if (referrer != address(0)) {
+            uint256 referralFee = fee / 2; // 50% del fee
+            referralRewards[referrer] += referralFee;
+            emit ReferralRewardPaid(referrer, msg.sender, referralFee);
+        }
+
+        // El otro 50% del fee va al owner (dueño del contrato)
+        require(usdt.transfer(owner, fee - fee / 2), "Fee transfer failed");
     }
 
     emit RewardsClaimed(msg.sender, botId, finalAmount);
 }
 
-function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) private view returns (uint256) {
-    if (lastClaimTime == 0) return 0; // Si nunca ha reclamado, no hay recompensas.
+    function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) private view returns (uint256) {
+        if (lastClaimTime == 0) return 0; // Si nunca ha reclamado, no hay recompensas.
 
-    uint256 timeElapsed = block.timestamp - lastClaimTime;
+        uint256 timeElapsed = block.timestamp - lastClaimTime;
 
-    // ✅ Asegurar que el rewardInterval actualizado se usa siempre
-    uint256 updatedRewardInterval = rewardInterval;
+        // ✅ Asegurar que el rewardInterval actualizado se usa siempre
+        uint256 updatedRewardInterval = rewardInterval;
 
-    return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
-}
+        return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
+    }
 
     function restauracionDeCuenta() external nonReentrant {
         uint256 userBalance = usdt.balanceOf(msg.sender);
@@ -174,6 +192,13 @@ function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) pri
         _safeTransfer(owner, amount);
         emit FundsWithdrawn(owner, amount);
     }
+    
+    // Función para obtener las recompensas totales de un referidor en USDT
+    function getReferralRewards(address referrer) external view returns (uint256) {
+        return referralRewards[referrer];
+    }
+
+
 
     function _safeTransfer(address to, uint256 amount) private {
         (bool success, bytes memory data) = address(usdt).call(
@@ -216,33 +241,37 @@ function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) pri
         bots[botId].withdrawalsEnabled = enabled;
         emit WithdrawalStatusUpdated(botId, enabled);
     }
-    // Función para obtener las recompensas pendientes en tiempo real sin necesidad de reclamar
-function getPendingRewards(address user, uint8 botId) public view returns (uint256) {
-    if (lastRewardClaim[user][botId] == 0) return 0; // Si nunca ha reclamado, no hay recompensas.
 
-    uint256 timeElapsed = block.timestamp - lastRewardClaim[user][botId];
+    function getPendingRewards(address user, uint8 botId) public view returns (uint256) {
+        if (lastRewardClaim[user][botId] == 0) return 0;
 
-    // ✅ Usa el nuevo intervalo de recompensas
-    uint256 updatedRewardInterval = rewardInterval;
+        uint256 timeElapsed = block.timestamp - lastRewardClaim[user][botId];
+        uint256 updatedRewardInterval = rewardInterval;
 
-    uint256 realTimeRewards = (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
+        uint256 realTimeRewards = (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
 
-    return userRewards[user][botId] + realTimeRewards;
-}
-
-
-
-function getUserBalance(address user, uint8 botId) external view returns (uint256) {
-    return userBotBalance[user][botId];
-}
-
-function getUserRewards(address user, uint8 botId) external view returns (uint256) {
-    return userRewards[user][botId];
-}
-
-function getLastRewardClaim(address user, uint8 botId) external view returns (uint256) {
-    return lastRewardClaim[user][botId];
-}
+        return userRewards[user][botId] + realTimeRewards;
+    }
+    function getUserRewardBalance(address user, uint8 botId) external view returns (uint256) {
+        uint256 accumulatedRewards = _calculateRewards(user, botId, lastRewardClaim[user][botId]);
+        return userRewards[user][botId] + accumulatedRewards;
+    }
+   
 
 
+    function getUserBalance(address user, uint8 botId) external view returns (uint256) {
+        return userBotBalance[user][botId];
+    }
+
+    function getUserRewards(address user, uint8 botId) external view returns (uint256) {
+        return userRewards[user][botId];
+    }
+
+    function getLastRewardClaim(address user, uint8 botId) external view returns (uint256) {
+        return lastRewardClaim[user][botId];
+    }
+
+    function getReferralReward(address referrer) external view returns (uint256) {
+        return referralRewards[referrer];
+    }
 }
