@@ -249,3 +249,34 @@ body::before {
   0% { top: -4px; }
   100% { top: 100%; }
 }
+
+body {
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.tron-button {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    color: #00ffff;
+    background: none;
+    border: 2px solid #00ffff;
+    padding: 12px 24px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0 10px #00ffff, inset 0 0 10px #00ffff;
+    position: relative;
+    overflow: hidden;
+}
+
+.tron-button:hover {
+    background: #00ffff;
+    color: #000;
+    box-shadow: 0 0 20px #00ffff, inset 0 0 20px #00ffff;
+}
+
