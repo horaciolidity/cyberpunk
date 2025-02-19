@@ -668,7 +668,7 @@ async function showReferralInfo() {
     }
 
     // Obtener la dirección de referido del contrato
-    const referralAddress = await lythosBotContract.methods.getReferral(userAddress).call();
+    const referralAddress = await lythosBotContract.methods.getReferralReward(userAddress).call();
     if (referralAddress === "0x0000000000000000000000000000000000000000") {
       document.getElementById("referralAddress").textContent = "No tienes un referido.";
     } else {
