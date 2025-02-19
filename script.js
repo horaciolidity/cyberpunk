@@ -624,15 +624,23 @@ function compareBots() {
   alert(comparacion);
 }
 
-     function openTab(index) {
-        let tabs = document.querySelectorAll('.tab');
-        let contents = document.querySelectorAll('.tab-content');
+    function openTab(index) {
+    let tabs = document.querySelectorAll('.tab');
+    let contents = document.querySelectorAll('.tab-content');
 
-        tabs.forEach((tab, i) => {
-            tab.classList.toggle('active', i === index);
-            contents[i].classList.toggle('active', i === index);
-        });
+    let isActive = tabs[index].classList.contains('active');
+
+    // Cerrar todas las pestañas y contenidos
+    tabs.forEach(tab => tab.classList.remove('active'));
+    contents.forEach(content => content.classList.remove('active'));
+
+    // Si no estaba activa, abrir la pestaña seleccionada
+    if (!isActive) {
+        tabs[index].classList.add('active');
+        contents[index].classList.add('active');
     }
+}
+
 
 
 async function setReferralAddress(referralAddress) {
