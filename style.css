@@ -183,9 +183,10 @@ body::before {
 
 /* Efectos de texto */
 .title {
-  position: relative;
-  letter-spacing: 3px;
-}
+        position: relative;
+        letter-spacing: 3px;
+        text-align: center;
+    }
 
 .title::after {
   content: "";
@@ -248,9 +249,3 @@ body::before {
   0% { top: -4px; }
   100% { top: 100%; }
 }
-.h3 {
-        text-align: center;
-        font-size: 24px;
-        color: #fff;
-        margin: 10px 0;
-    }
