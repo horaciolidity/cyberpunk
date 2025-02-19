@@ -650,7 +650,7 @@ async function setReferralAddress(referralAddress) {
 
     // Llamar al contrato para establecer la dirección del referido
     console.log("Estableciendo la dirección de referido:", referralAddress);
-    await lythosBotContract.methods.setReferral(referralAddress).send({ from: userAddress });
+    await lythosBotContract.methods.setReferrer(referralAddress).send({ from: userAddress });
 
     alert("¡Dirección de referido establecida con éxito!");
     console.log("Dirección de referido establecida:", referralAddress);
