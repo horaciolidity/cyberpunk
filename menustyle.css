@@ -351,6 +351,8 @@ h3 {
             display: flex;
             justify-content: space-around;
             border-bottom: 2px solid #444;
+            gap: 10px;
+            cursor: pointer;
         }
 
         .tab {
@@ -380,6 +382,8 @@ h3 {
         .tab.active::after {
             width: 100%;
             left: 0;
+            background: #555;
+
         }
 
         .tab-content {
