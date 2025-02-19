@@ -127,7 +127,17 @@
   <p><strong>Dirección de Referido:</strong> <span id="referralAddress">Cargando...</span></p>
   <p><strong>Recompensas de Referido:</strong> <span id="referralRewards">Cargando...</span></p>
 
-<label for="referralInput">Establecer dirección de referido:</label>
+
+     <h3>Generar Enlace de Referido:</h3>
+  <button onclick="generateReferralLink()" 
+      style="padding: 10px 15px; border: none; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-weight: bold;">
+      Generar Enlace 🔗
+  </button>
+  <p><strong>Tu enlace de referido:</strong> <span id="referralLink">Cargando...</span></p>
+</div>
+
+    
+    <label for="referralInput">Establecer dirección de referido:</label>
 <div style="display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px; background: #1a1a1a; border-radius: 8px; width: 100%; text-align: center;">
     <input type="text" id="referralInput" placeholder="Dirección de referido" 
         style="padding: 8px; border: 1px solid #444; border-radius: 4px; background: #222; color: #fff; width: 250px; text-align: center;">
@@ -137,13 +147,6 @@
     </button>
 </div>
 
-     <h3>Generar Enlace de Referido:</h3>
-  <button onclick="generateReferralLink()" 
-      style="padding: 10px 15px; border: none; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-weight: bold;">
-      Generar Enlace 🔗
-  </button>
-  <p><strong>Tu enlace de referido:</strong> <span id="referralLink">Cargando...</span></p>
-</div>
     
  </div>
    
