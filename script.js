@@ -694,13 +694,20 @@ document.getElementById("referralRewards").textContent = `${web3.utils.fromWei(r
   }
 }
 
- async function generateReferralLink() {
-      const userAddress = await connectMetaMask();
-      if (userAddress) {
-          const referralURL = `${window.location.origin}?ref=${userAddress}`;
-          document.getElementById("referralLink").innerHTML = `<a href="${referralURL}" target="_blank">${referralURL}</a>`;
-      }
-  }
+async function generateReferralLink() {
+    try {
+        if (!window.userAddress) {
+            alert("Primero conecta tu wallet.");
+            return;
+        }
+
+        const referralURL = `${window.location.origin}?ref=${window.userAddress}`;
+        document.getElementById("referralLink").innerHTML = `<a href="${referralURL}" target="_blank">${referralURL}</a>`;
+    } catch (error) {
+        console.error("Error al generar el enlace de referido:", error);
+    }
+}
+
 
 
     async function viewHistory(botId) {
