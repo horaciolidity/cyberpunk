@@ -48,8 +48,11 @@ async function initializeWeb3() {
         throw new Error("No se pudo obtener la cuenta de MetaMask.");
       }
 
+      // Guardar la dirección del usuario globalmente
+      userAddress = account;
       // Guardar la dirección como una variable global
       window.userAddress = account;
+
 
 
       // Mostrar la dirección conectada
