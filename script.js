@@ -677,7 +677,7 @@ async function showReferralInfo() {
 
     // Obtener recompensas de referido
     const referralRewards = await lythosBotContract.methods.getReferralRewards(userAddress).call();
-    document.getElementById("referralRewards").textContent = `${web3.utils.fromWei(referralRewards, "ether")} ETH`;
+document.getElementById("referralRewards").textContent = `${web3.utils.fromWei(referralRewards, "mwei")} USDT`;
 
   } catch (error) {
     console.error("Error al obtener la información del referido:", error);
