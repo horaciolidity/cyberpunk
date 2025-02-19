@@ -109,18 +109,15 @@
       <p id="balanceUsdt">Cargando...</p>
     </div>
     </div>
-       <div>
-        <h2>Registrar Referido</h2>
-        <input type="text" id="referrer" placeholder="Dirección del referidor" />
-        <button onclick="setReferrer()">Registrar como referido</button>
-    </div>
+      <div>
+  <h3>Información de Referido:</h3>
+  <p><strong>Dirección de Referido:</strong> <span id="referralAddress">Cargando...</span></p>
+  <p><strong>Recompensas de Referido:</strong> <span id="referralRewards">Cargando...</span></p>
 
-    <div>
-        <h2>Consultar Recompensas de Referido</h2>
-        <input type="text" id="referrerAddress" placeholder="Dirección del referidor" />
-        <button onclick="getReferralRewards()">Ver recompensas</button>
-        <p id="referralRewardsResult"></p>
-    </div>
+<label for="referralInput">Establecer dirección de referido:</label>
+<input type="text" id="referralInput" placeholder="Dirección de referido">
+<button onclick="setReferralAddress(document.getElementById('referralInput').value)">Establecer Referido</button>
+</div>
  
 
     <!-- Bot 1 -->
