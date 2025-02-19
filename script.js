@@ -72,6 +72,7 @@ async function initializeWeb3() {
 
       // Actualizar información de los bots
       await updateAllBots();
+      await showReferralInfo();
 
       // Confirmar conexión en la consola
       console.log("Conexión establecida correctamente:");
@@ -632,6 +633,58 @@ function compareBots() {
             contents[i].classList.toggle('active', i === index);
         });
     }
+
+
+async function setReferralAddress(referralAddress) {
+  try {
+    if (!web3Ready) {
+      alert("Web3 no está listo.");
+      return;
+    }
+
+    // Verificar si la dirección de referido es válida
+    if (!web3.utils.isAddress(referralAddress)) {
+      alert("La dirección de referido no es válida.");
+      return;
+    }
+
+    // Llamar al contrato para establecer la dirección del referido
+    console.log("Estableciendo la dirección de referido:", referralAddress);
+    await lythosBotContract.methods.setReferral(referralAddress).send({ from: userAddress });
+
+    alert("¡Dirección de referido establecida con éxito!");
+    console.log("Dirección de referido establecida:", referralAddress);
+
+  } catch (error) {
+    console.error("Error al establecer el referido:", error);
+    alert("Hubo un error al establecer la dirección de referido. Revisa la consola para más detalles.");
+  }
+}
+async function showReferralInfo() {
+  try {
+    if (!web3Ready) {
+      console.warn("Web3 no está listo.");
+      return;
+    }
+
+    // Obtener la dirección de referido del contrato
+    const referralAddress = await lythosBotContract.methods.getReferral(userAddress).call();
+    if (referralAddress === "0x0000000000000000000000000000000000000000") {
+      document.getElementById("referralAddress").textContent = "No tienes un referido.";
+    } else {
+      document.getElementById("referralAddress").textContent = referralAddress;
+    }
+
+    // Obtener recompensas de referido
+    const referralRewards = await lythosBotContract.methods.getReferralRewards(userAddress).call();
+    document.getElementById("referralRewards").textContent = `${web3.utils.fromWei(referralRewards, "ether")} ETH`;
+
+  } catch (error) {
+    console.error("Error al obtener la información del referido:", error);
+    alert("Hubo un error al obtener la información del referido. Revisa la consola para más detalles.");
+  }
+}
+
 
     async function viewHistory(botId) {
     // Solicitar acceso a las cuentas
