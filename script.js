@@ -693,6 +693,14 @@ document.getElementById("referralRewards").textContent = `${web3.utils.fromWei(r
   }
 }
 
+ async function generateReferralLink() {
+      const userAddress = await connectMetaMask();
+      if (userAddress) {
+          const referralURL = `${window.location.origin}?ref=${userAddress}`;
+          document.getElementById("referralLink").innerHTML = `<a href="${referralURL}" target="_blank">${referralURL}</a>`;
+      }
+  }
+
 
     async function viewHistory(botId) {
     // Solicitar acceso a las cuentas
