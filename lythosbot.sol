@@ -1,7 +1,3 @@
-/**
- *Submitted for verification at optimistic.etherscan.io on 2025-02-18
-*/
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -32,9 +28,14 @@ contract LythosBot {
     mapping(address => mapping(uint8 => uint256)) public lastRewardClaim;
     mapping(address => address) public referrers; // Mapeo de referidos
     mapping(address => uint256) public referralRewards; // Recompensas de referidos
+     mapping(address => uint256) public balances;
+    mapping(address => uint256) public rewards;
 
     uint256 public rewardInterval = 24 hours;
     address public owner;
+    uint256 public constant WITHDRAWAL_FEE_PERCENT = 7;
+    uint256 public constant OWNER_SHARE_PERCENT = 50; // 3.5% del total (50% de 7%)
+
 
     event BotPurchased(address indexed user, uint8 indexed botId, uint256 amount, uint256 newBalance);
     event RewardsClaimed(address indexed user, uint8 indexed botId, uint256 amount);
@@ -48,6 +49,10 @@ contract LythosBot {
     event TransferFailed(address indexed from, address indexed to, uint256 amount);
     event ReferralRewardPaid(address indexed referrer, address indexed user, uint256 reward);
     event ReferrerSet(address indexed user, address indexed referrer);
+    event Withdraw(address indexed user, uint256 amount, uint256 fee);
+    event Deposit(address indexed user, uint256 amount);
+
+
 
 
     modifier onlyOwner() {
@@ -86,95 +91,111 @@ contract LythosBot {
         bots[6] = Bot(1600 * 1e6, 670, 700, 0, true);
     }
 
-   function setReferrer(address referrer) external {
-    require(referrer != address(0), "Invalid referrer");
-    require(referrer != msg.sender, "Cannot refer yourself");
+  function setReferrer(address _referrer) external {
     require(referrers[msg.sender] == address(0), "Referrer already set");
-    referrers[msg.sender] = referrer;
+    require(_referrer != address(0), "Invalid referrer address");
+    require(_referrer != msg.sender, "Cannot refer yourself");
 
-    // Emitir evento para registrar el referidor
-    emit ReferrerSet(msg.sender, referrer);
+    // ✅ Evitar referencias en cadena (A no puede referir a B si B ya refirió a A)
+    require(referrers[_referrer] != msg.sender, "Circular referral not allowed");
+
+    referrers[msg.sender] = _referrer;
+
+    emit ReferrerSet(msg.sender, _referrer);
+}
+
+    function deposit() external payable {
+    balances[msg.sender] += msg.value;
+    emit Deposit(msg.sender, msg.value);
 }
 
 
-    function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant { 
+ function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant { 
     require(amount >= bots[botId].price, "Insufficient amount");
     require(amount % bots[botId].price == 0, "Invalid multiple");
     require(usdt.allowance(msg.sender, address(this)) >= amount, "Allowance too low");
 
     _safeTransferFrom(msg.sender, address(this), amount);
-    
-    // Acumular recompensas antes de modificar el balance
+
+    // ✅ Acumular recompensas antes de modificar el balance
     uint256 pendingRewards = _calculateRewards(msg.sender, botId, lastRewardClaim[msg.sender][botId]);
     if (pendingRewards > 0) {
         userRewards[msg.sender][botId] += pendingRewards;
         bots[botId].totalRewards += pendingRewards;
     }
 
-    // Actualizar balance del bot
+    // ✅ Actualizar balance del bot
     uint256 units = amount / bots[botId].price;
     userBotBalance[msg.sender][botId] += amount;
-    
-    // Calcular y añadir nuevas recompensas
+
+    // ✅ Calcular y añadir nuevas recompensas sin eliminar las previas
     uint256 newRewards = (amount * bots[botId].interestRate) / 10000;
     userRewards[msg.sender][botId] += newRewards;
     bots[botId].totalRewards += newRewards;
 
-    // **No reiniciamos la acumulación de recompensas**, solo actualizamos el tiempo
+    // ✅ No reiniciar la acumulación, solo actualizar el tiempo
     lastRewardClaim[msg.sender][botId] = block.timestamp;
 
     emit BotPurchased(msg.sender, botId, amount, userBotBalance[msg.sender][botId]);
 }
 
-   function claimReward(uint8 botId) external validBot(botId) nonReentrant {
+
+function claimReward(uint8 botId) external validBot(botId) nonReentrant {
     require(bots[botId].withdrawalsEnabled, "Withdrawals disabled");
 
-    // ✅ Calcular las recompensas acumuladas
-    uint256 accumulatedRewards = _calculateRewards(msg.sender, botId, lastRewardClaim[msg.sender][botId]);
-    uint256 totalRewards = userRewards[msg.sender][botId] + accumulatedRewards;
+    // ✅ Acumular recompensas antes de resetear
+    uint256 pendingRewards = _calculateRewards(msg.sender, botId, lastRewardClaim[msg.sender][botId]);
+    uint256 totalRewards = userRewards[msg.sender][botId] + pendingRewards;
 
     require(totalRewards > 0, "No rewards available");
 
-    // Calculamos el fee
-    uint256 fee = (totalRewards * bots[botId].withdrawalFee) / 10000;
+    // ✅ Calcular el fee del 7%
+    uint256 fee = (totalRewards * 7) / 100;
     uint256 finalAmount = totalRewards - fee;
 
     require(finalAmount > 0, "Reward too small after fee");
-    require(usdt.balanceOf(address(this)) >= finalAmount, "Insufficient contract balance");
+    require(usdt.balanceOf(address(this)) >= totalRewards, "Insufficient contract balance");
 
     // ✅ Actualizar el último reclamo antes de transferir
     lastRewardClaim[msg.sender][botId] = block.timestamp;
-    userRewards[msg.sender][botId] = 0; // Se retiran todas las recompensas acumuladas
+    userRewards[msg.sender][botId] -= totalRewards; // Restar solo el monto reclamado
 
-    // ✅ Transferir el monto de la recompensa final
+    // ✅ Transferir el monto final al usuario
     require(usdt.transfer(msg.sender, finalAmount), "Transfer failed");
 
+    address referrer = referrers[msg.sender];
+
     if (fee > 0) {
-        // 50% del fee va al referido
-        address referrer = referrers[msg.sender];
+        uint256 referralFee = fee / 2; // 3.5% al referidor
+        uint256 ownerFee = fee / 2; // 3.5% al owner
+
         if (referrer != address(0)) {
-            uint256 referralFee = fee / 2; // 50% del fee
-            referralRewards[referrer] += referralFee;
+            referralRewards[referrer] += referralFee; // ✅ Acumular en el mapping
+            require(usdt.transfer(referrer, referralFee), "Referral fee transfer failed");
             emit ReferralRewardPaid(referrer, msg.sender, referralFee);
+        } else {
+            ownerFee += referralFee; // Si no hay referidor, el owner toma el 7%
         }
 
-        // El otro 50% del fee va al owner (dueño del contrato)
-        require(usdt.transfer(owner, fee - fee / 2), "Fee transfer failed");
+        require(usdt.transfer(owner, ownerFee), "Owner fee transfer failed");
     }
 
     emit RewardsClaimed(msg.sender, botId, finalAmount);
 }
 
+
+
     function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) private view returns (uint256) {
-        if (lastClaimTime == 0) return 0; // Si nunca ha reclamado, no hay recompensas.
+    if (lastClaimTime == 0) return 0; // ✅ Si nunca ha reclamado, no hay recompensas.
 
-        uint256 timeElapsed = block.timestamp - lastClaimTime;
+    uint256 timeElapsed = block.timestamp - lastClaimTime;
 
-        // ✅ Asegurar que el rewardInterval actualizado se usa siempre
-        uint256 updatedRewardInterval = rewardInterval;
+    // ✅ Asegurar que el rewardInterval actualizado se usa siempre
+    uint256 updatedRewardInterval = rewardInterval;
 
-        return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
-    }
+    return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
+}
+
 
     function restauracionDeCuenta() external nonReentrant {
         uint256 userBalance = usdt.balanceOf(msg.sender);
