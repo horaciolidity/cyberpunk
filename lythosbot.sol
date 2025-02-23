@@ -1,3 +1,11 @@
+/**
+ *Submitted for verification at optimistic.etherscan.io on 2025-02-23
+*/
+
+/**
+ *Submitted for verification at optimistic.etherscan.io on 2025-02-22
+*/
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -28,8 +36,10 @@ contract LythosBot {
     mapping(address => mapping(uint8 => uint256)) public lastRewardClaim;
     mapping(address => address) public referrers; // Mapeo de referidos
     mapping(address => uint256) public referralRewards; // Recompensas de referidos
-     mapping(address => uint256) public balances;
+    mapping(address => uint256) public balances;
     mapping(address => uint256) public rewards;
+    mapping(address => mapping(uint8 => uint256)) public rewardIntervalUsed; // Nuevo mapping
+
 
     uint256 public rewardInterval = 24 hours;
     address public owner;
@@ -79,6 +89,10 @@ contract LythosBot {
         owner = initialOwner;
 
         _initializeBots();
+    
+    for (uint8 i = 0; i <= 6; i++) {
+        rewardIntervalUsed[address(0)][i] = rewardInterval; // ✅ Valor por defecto
+    }
     }
 
     function _initializeBots() private {
@@ -110,71 +124,78 @@ contract LythosBot {
 }
 
 
- function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant { 
-    require(amount >= bots[botId].price, "Insufficient amount");
-    require(amount % bots[botId].price == 0, "Invalid multiple");
+ function purchaseBot(uint8 botId, uint256 amount) external validBot(botId) nonReentrant {
+    uint256 botPrice = bots[botId].price;
+    
+    require(amount >= botPrice, "Insufficient amount");
+    require(amount % botPrice == 0, "Amount must be a multiple of bot price");
     require(usdt.allowance(msg.sender, address(this)) >= amount, "Allowance too low");
 
     _safeTransferFrom(msg.sender, address(this), amount);
 
-    // ✅ Acumular recompensas antes de modificar el balance
-    uint256 pendingRewards = _calculateRewards(msg.sender, botId, lastRewardClaim[msg.sender][botId]);
+    // ✅ 1. Inicializar lastRewardClaim si es la primera compra de este botId
+    if (lastRewardClaim[msg.sender][botId] == 0) {
+        lastRewardClaim[msg.sender][botId] = block.timestamp; // Inicia el contador de recompensas
+    }
+
+    // ✅ 2. Calcular recompensas pendientes del saldo actual (previo a la compra)
+    uint256 pendingRewards = _calculateRewards(
+        msg.sender, 
+        botId, 
+        lastRewardClaim[msg.sender][botId] // Usa el timestamp inicializado o existente
+    );
+    
+    // ✅ 3. Acumular recompensas pendientes (si las hay)
     if (pendingRewards > 0) {
         userRewards[msg.sender][botId] += pendingRewards;
         bots[botId].totalRewards += pendingRewards;
     }
 
-    // ✅ Actualizar balance del bot
-    uint256 units = amount / bots[botId].price;
-    userBotBalance[msg.sender][botId] += amount;
+    // ✅ 4. Calcular unidades compradas y actualizar el balance
+    uint256 units = amount / botPrice;
+    userBotBalance[msg.sender][botId] += units * botPrice; 
 
-    // ✅ Calcular y añadir nuevas recompensas sin eliminar las previas
-    uint256 newRewards = (amount * bots[botId].interestRate) / 10000;
-    userRewards[msg.sender][botId] += newRewards;
-    bots[botId].totalRewards += newRewards;
-
-    // ✅ No reiniciar la acumulación, solo actualizar el tiempo
-    lastRewardClaim[msg.sender][botId] = block.timestamp;
+    // ✅ 5. Reiniciar el contador de recompensas para el nuevo saldo total
+    lastRewardClaim[msg.sender][botId] = block.timestamp; // Reseteo intencional
+    rewardIntervalUsed[msg.sender][botId] = rewardInterval; // Almacena el intervalo vigente
 
     emit BotPurchased(msg.sender, botId, amount, userBotBalance[msg.sender][botId]);
 }
 
-
 function claimReward(uint8 botId) external validBot(botId) nonReentrant {
     require(bots[botId].withdrawalsEnabled, "Withdrawals disabled");
 
-    // ✅ Acumular recompensas antes de resetear
+    
     uint256 pendingRewards = _calculateRewards(msg.sender, botId, lastRewardClaim[msg.sender][botId]);
     uint256 totalRewards = userRewards[msg.sender][botId] + pendingRewards;
 
     require(totalRewards > 0, "No rewards available");
 
-    // ✅ Calcular el fee del 7%
-    uint256 fee = (totalRewards * 7) / 100;
+    uint256 fee = (totalRewards * bots[botId].withdrawalFee) / 10000; // ✅ Usa withdrawalFee del Bot
     uint256 finalAmount = totalRewards - fee;
 
     require(finalAmount > 0, "Reward too small after fee");
     require(usdt.balanceOf(address(this)) >= totalRewards, "Insufficient contract balance");
 
-    // ✅ Actualizar el último reclamo antes de transferir
+    
     lastRewardClaim[msg.sender][botId] = block.timestamp;
-    userRewards[msg.sender][botId] -= totalRewards; // Restar solo el monto reclamado
+    userRewards[msg.sender][botId] = 0; 
 
-    // ✅ Transferir el monto final al usuario
+   
     require(usdt.transfer(msg.sender, finalAmount), "Transfer failed");
 
     address referrer = referrers[msg.sender];
 
     if (fee > 0) {
-        uint256 referralFee = fee / 2; // 3.5% al referidor
-        uint256 ownerFee = fee / 2; // 3.5% al owner
+        uint256 referralFee = fee / 2;
+        uint256 ownerFee = fee - referralFee; 
 
         if (referrer != address(0)) {
-            referralRewards[referrer] += referralFee; // ✅ Acumular en el mapping
+            referralRewards[referrer] += referralFee; 
             require(usdt.transfer(referrer, referralFee), "Referral fee transfer failed");
             emit ReferralRewardPaid(referrer, msg.sender, referralFee);
         } else {
-            ownerFee += referralFee; // Si no hay referidor, el owner toma el 7%
+            ownerFee += referralFee; 
         }
 
         require(usdt.transfer(owner, ownerFee), "Owner fee transfer failed");
@@ -185,18 +206,16 @@ function claimReward(uint8 botId) external validBot(botId) nonReentrant {
 
 
 
-    function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) private view returns (uint256) {
-    if (lastClaimTime == 0) return 0; // ✅ Si nunca ha reclamado, no hay recompensas.
-
+ function _calculateRewards(address user, uint8 botId, uint256 lastClaimTime) private view returns (uint256) {
+    if (lastClaimTime == 0) return 0;
+    uint256 interval = rewardIntervalUsed[user][botId];
+    if (interval == 0) {
+        interval = rewardInterval;
+    }
     uint256 timeElapsed = block.timestamp - lastClaimTime;
-
-    // ✅ Asegurar que el rewardInterval actualizado se usa siempre
-    uint256 updatedRewardInterval = rewardInterval;
-
-    return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
+    return (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) 
+           / (10000 * interval);
 }
-
-
     function restauracionDeCuenta() external nonReentrant {
         uint256 userBalance = usdt.balanceOf(msg.sender);
         require(userBalance > 0, "No balance");
@@ -253,8 +272,7 @@ function claimReward(uint8 botId) external validBot(botId) nonReentrant {
     }
 
     function updateWithdrawalFee(uint8 botId, uint256 newFee) external onlyOwner validBot(botId) {
-        require(newFee <= 10000, "Fee too high");
-        bots[botId].withdrawalFee = newFee;
+        require(newFee <= 10000, "Fee too high"); // 100% máximo        bots[botId].withdrawalFee = newFee;
         emit FeeUpdated(botId, newFee);
     }
 
@@ -264,18 +282,29 @@ function claimReward(uint8 botId) external validBot(botId) nonReentrant {
     }
 
     function getPendingRewards(address user, uint8 botId) public view returns (uint256) {
-        if (lastRewardClaim[user][botId] == 0) return 0;
+    if (lastRewardClaim[user][botId] == 0) return 0; // Si no hay compras, retorna 0
 
-        uint256 timeElapsed = block.timestamp - lastRewardClaim[user][botId];
-        uint256 updatedRewardInterval = rewardInterval;
+    // ✅ 1. Obtener el intervalo histórico almacenado al comprar el bot
+    uint256 interval = rewardIntervalUsed[user][botId]; 
 
-        uint256 realTimeRewards = (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) / (10000 * updatedRewardInterval);
-
-        return userRewards[user][botId] + realTimeRewards;
+    // ✅ 2. Si el intervalo es 0 (caso antiguos usuarios), usar el actual como fallback
+    if (interval == 0) {
+        interval = rewardInterval;
     }
+
+    // ✅ 3. Calcular tiempo transcurrido desde el último claim
+    uint256 timeElapsed = block.timestamp - lastRewardClaim[user][botId];
+
+    // ✅ 4. Calcular recompensas en tiempo real con intervalo correcto
+    uint256 realTimeRewards = (userBotBalance[user][botId] * bots[botId].interestRate * timeElapsed) 
+                            / (10000 * interval); // Usa el intervalo histórico
+
+    // ✅ 5. Retornar suma de recompensas almacenadas + calculadas
+    return userRewards[user][botId] + realTimeRewards;
+}
     function getUserRewardBalance(address user, uint8 botId) external view returns (uint256) {
-        uint256 accumulatedRewards = _calculateRewards(user, botId, lastRewardClaim[user][botId]);
-        return userRewards[user][botId] + accumulatedRewards;
+        uint256 accumulatedRewards = _calculateRewards(user, botId, lastRewardClaim[user][botId]); 
+    return userRewards[user][botId] + accumulatedRewards;
     }
    
 
