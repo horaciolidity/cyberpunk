@@ -98,72 +98,87 @@ window.addEventListener("load", initializeWeb3);
     
 async function purchaseBot(event) {
   try {
-    // Obtener la tarjeta del bot correspondiente al botón presionado
     const botCard = event.target.closest(".bot-card");
     if (!botCard) {
       alert("Error: No se pudo determinar el bot seleccionado.");
       return;
     }
 
-    // Extraer ID del bot y cantidad ingresada
+    // Extraer datos del bot
     const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
     const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
 
-    // Validaciones
+    // Validaciones iniciales
     if (isNaN(botId) || botId < 0 || botId > 6) {
-      alert("Error: El ID del bot no es válido.");
+      alert("ID de bot inválido");
       return;
     }
 
     if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
-      alert("Por favor, ingresa una cantidad válida en USDT.");
+      alert("Ingresa una cantidad válida en USDT");
       return;
     }
 
-    // Convertir el monto a micro-unidades (1 USDT = 10^6 micro-unidades)
+    // Convertir a micro-unidades (6 decimales)
     const amountInMicroUnits = BigInt(Math.floor(amountInUsdt * 10 ** 6));
+    
+    // Confirmación visual con formato correcto
+    const confirmacion = confirm(
+      `¿Comprar Bot ${botId} con ${amountInUsdt.toFixed(2)} USDT?`
+    );
+    if (!confirmacion) return;
 
-    console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
+    // 1. Verificar y aprobar solo si es necesario
+    const maxApproval = '115792089237316195423570985008687907853269984665640564039457584007913129639935'; // Máximo uint256
+    const currentAllowance = await usdtContract.methods.allowance(userAddress, lythosBotContractAddress).call();
+    
+    if (currentAllowance < amountInMicroUnits) {
+      console.log("Solicitando aprobación...");
+      await usdtContract.methods
+        .approve(lythosBotContractAddress, maxApproval)
+        .send({ from: userAddress });
+    }
 
-    // Verificar saldo en USDT antes de continuar
-    const userBalance = BigInt(await usdtContract.methods.balanceOf(userAddress).call());
-    if (amountInMicroUnits > userBalance) {
-      alert("Saldo insuficiente en USDT para completar la compra.");
+    // 2. Verificar saldo después de aprobación
+    const userBalance = await usdtContract.methods.balanceOf(userAddress).call();
+    if (BigInt(userBalance) < amountInMicroUnits) {
+      alert(`Saldo insuficiente. Necesitas ${(amountInMicroUnits / 10n**6n).toString()} USDT`);
       return;
     }
 
-    // Confirmar compra con el usuario
-    const confirmation = confirm(`Vas a comprar el Bot ${botId} con ${(Number(amountInMicroUnits) / 1e6).toFixed(2)} USDT. ¿Deseas continuar?`);
-    if (!confirmation) {
-      alert("Compra cancelada.");
-      return;
-    }
+    // 3. Ejecutar compra
+    console.log("Iniciando compra...");
+    const tx = await lythosBotContract.methods
+      .purchaseBot(botId, amountInMicroUnits)
+      .send({ 
+        from: userAddress,
+        gas: 300000 // Aumentar gas para evitar fallos
+      });
 
-    // Aprobar la transferencia de USDT
-    console.log("Solicitando aprobación de transferencia...");
-    await usdtContract.methods.approve(lythosBotContractAddress, amountInMicroUnits).send({ from: userAddress });
-    console.log("Aprobación completada.");
+    console.log("Transacción exitosa:", tx);
+    
+    // 4. Actualizar toda la UI
+    await Promise.all([
+      updateUSDTBalance(),
+      updateAllBots(),
+      showReferralInfo()
+    ]);
 
-    // Realizar la compra del bot
-    console.log("Intentando realizar la compra...");
-    const tx = await lythosBotContract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
-    console.log("Compra exitosa:", tx);
-    alert("¡Compra realizada con éxito!");
+    alert(`¡Bot ${botId} comprado exitosamente!`);
 
-    // Actualizar la información del bot después de la compra
-    await updateBotInfo(botId);
   } catch (error) {
-    console.error("Error al comprar el bot:", error);
-
-    // Identificar y manejar errores específicos
+    console.error("Error en compra:", error);
+    
+    // Manejo detallado de errores
     if (error.code === 4001) {
-      alert("Transacción rechazada por el usuario.");
+      alert("Transacción cancelada por el usuario");
     } else if (error.message.includes("insufficient funds")) {
-      alert("Fondos insuficientes para pagar la comisión de la red.");
+      alert("Fondos insuficientes para gas");
     } else if (error.message.includes("revert")) {
-      alert("El contrato rechazó la transacción. Verifica las condiciones para comprar este bot.");
+      const reason = error.message.match(/revert (.*?)\n/)?.[1] || "Condiciones no cumplidas";
+      alert(`Error en contrato: ${reason}`);
     } else {
-      alert("Error durante la compra. Revisa la consola para más detalles.");
+      alert(`Error: ${error.message}`);
     }
   }
 }
@@ -175,91 +190,105 @@ async function updateBotInfo(botId) {
       return;
     }
 
-    // Obtener datos del contrato relacionados con el bot y el usuario
-    const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
-    const totalRewards = BigInt(await lythosBotContract.methods.getUserRewards(userAddress, botId).call()); // 🔥 Total acumulado
-    const botDetails = await lythosBotContract.methods.bots(botId).call();
-    const lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
-    const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
+    // 1. Obtener todos los datos del contrato en paralelo
+    const [
+      userBalance,
+      totalRewards,
+      botDetails,
+      lastRewardClaim,
+      rewardInterval
+    ] = await Promise.all([
+      lythosBotContract.methods.userBotBalance(userAddress, botId).call(),
+      lythosBotContract.methods.getPendingRewards(userAddress, botId).call(),
+      lythosBotContract.methods.bots(botId).call(),
+      lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call(),
+      lythosBotContract.methods.rewardInterval().call()
+    ]);
+
+    // 2. Convertir valores a BigInt
+    const balance = BigInt(userBalance);
+    const rewards = BigInt(totalRewards);
+    const lastClaim = BigInt(lastRewardClaim);
+    const interval = BigInt(rewardInterval);
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
-    const interestRate = (Number(botDetails.interestRate) / 100).toFixed(2); // ✅ 300 → 3.00%
 
+    // 3. Calcular valores derivados
+    const interestRate = (Number(botDetails.interestRate) / 100).toFixed(2);
+    const withdrawalFee = (rewards * BigInt(botDetails.withdrawalFee)) / 10000n;
     
+    // 4. Calcular tiempo restante para el próximo claim
+    let timeUntilNextClaim = 0n;
+    if (lastClaim > 0n) {
+      const nextClaimTime = lastClaim + interval;
+      timeUntilNextClaim = nextClaimTime > currentTime 
+        ? nextClaimTime - currentTime 
+        : 0n;
+    }
 
-    console.log(`🔄 Bot ${botId} - Saldo obtenido:`, userBalance);
-
-    // Seleccionar la tarjeta del bot específica en el DOM
+    // 5. Seleccionar elementos del DOM
     const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
     if (!botInfo) {
-      console.error(`❌ No se encontró la tarjeta del bot con ID ${botId}`);
-      return;
-    }
-    const interestElement = document.querySelector(`#interestRate${botId}`);
-    if (interestElement) {
-      interestElement.textContent = `${interestRate}%`; 
-    } else {
-      console.error(`Elemento #interestRate${botId} no encontrado`);
-    }
-
-    const botStatus = document.getElementById(`botStatus${botId}`);
-    const botStatusLight = document.getElementById(`botStatusLight${botId}`);
-
-    if (!botStatus || !botStatusLight) {
-      console.warn(`⚠️ Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
+      console.error(`❌ Bot ${botId} no encontrado en la interfaz`);
       return;
     }
 
-    if (userBalance > 0n) {
-      console.log(`✅ Bot ${botId} activado con saldo: ${userBalance}`);
-      botStatus.textContent = "Bot activo";
-      botStatus.classList.remove("bot-inactive");
-      botStatus.classList.add("bot-active");
+    // 6. Actualizar estado visual del bot
+    const updateBotStatus = () => {
+      const isActive = balance > 0n;
+      const statusElement = document.getElementById(`botStatus${botId}`);
+      const statusLight = document.getElementById(`botStatusLight${botId}`);
 
-      botStatusLight.classList.remove("red");
-      botStatusLight.classList.add("green");
-    } else {
-      console.log(`❌ Bot ${botId} sigue inactivo. Saldo: ${userBalance}`);
-      botStatus.textContent = "Bot inactivo";
-      botStatus.classList.remove("bot-active");
-      botStatus.classList.add("bot-inactive");
-
-      botStatusLight.classList.remove("green");
-      botStatusLight.classList.add("red");
-    }
-
-    // Calcular la tarifa de retiro
-    const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
-
-    // Corregir cálculo de `timeUntilNextClaim`
-    let timeUntilNextClaim = 0n;
-    if (lastRewardClaim > 0n) {
-      timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
-      if (timeUntilNextClaim < 0n) timeUntilNextClaim = 0n; // Asegurar valores correctos
-    }
-
-    // Actualizar los datos en la interfaz de usuario
-    const updateText = (selector, value) => {
-      const element = botInfo.querySelector(selector);
-      if (element) element.textContent = value;
+      if (statusElement && statusLight) {
+        statusElement.textContent = isActive ? "Bot activo" : "Bot inactivo";
+        statusElement.className = isActive ? "bot-active" : "bot-inactive";
+        statusLight.className = `status-light ${isActive ? "green" : "red"}`;
+      }
     };
 
-    updateText(`#userBalance${botId}`, (Number(userBalance) / 1e6).toFixed(2));
-    updateText(`#pendingRewards${botId}`, (Number(totalRewards) / 1e6).toFixed(2)); // ✅ Ahora muestra el total acumulado
-    updateText(`#withdrawalFee${botId}`, `${(Number(withdrawalFee) / 1e6).toFixed(2)} `);
-    updateText(`#timeUntilClaim${botId}`, timeUntilNextClaim > 0n ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible");
-    updateText(`#claimNotice${botId}`, totalRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible");
-    updateText(`#userTotalBalance${botId}`, ((Number(userBalance) + Number(totalRewards)) / 1e6).toFixed(2));
-    updateText(`#interestRate${botId}`, `${interestRate.toFixed(2)}%`); // ✅ Muestra el % de pago
+    // 7. Función helper para actualizar campos
+    const updateField = (selector, value, suffix = "") => {
+      const element = botInfo.querySelector(selector);
+      if (element) {
+        element.textContent = `${value}${suffix}`;
+      }
+    };
 
+    // 8. Ejecutar actualizaciones
+    updateBotStatus();
+    
+    updateField("#userBalance${botId}", (Number(balance) / 1e6).toFixed(2), " USDT");
+    updateField("#pendingRewards${botId}", (Number(rewards) / 1e6).toFixed(2), " USDT");
+    updateField("#withdrawalFee${botId}", (Number(withdrawalFee) / 1e6).toFixed(2), " USDT");
+    updateField("#timeUntilClaim${botId}", 
+      timeUntilNextClaim > 0n 
+        ? `${(Number(timeUntilNextClaim) / 3600).toFixed(1)} horas`
+        : "Disponible"
+    );
+    updateField("#claimNotice${botId}", 
+      rewards > 0n && timeUntilNextClaim === 0n ? "¡Recompensa disponible!" : " "
+    );
+    updateField("#userTotalBalance${botId}", 
+      ((Number(balance) + Number(rewards)) / 1e6).toFixed(2), " USDT"
+    );
+    updateField("#interestRate${botId}", interestRate, "%");
 
-    console.log(`✅ Bot ${botId}: Información actualizada correctamente.`);
+    console.log(`✅ Bot ${botId} actualizado correctamente`);
+
   } catch (error) {
-    console.error(`❌ Error al actualizar el bot ${botId}:`, error);
-    alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
+    console.error(`❌ Error actualizando Bot ${botId}:`, error);
+    showNotification(`Error actualizando Bot ${botId}: ${error.message}`, "error");
   }
 }
 
-
+// Función auxiliar para notificaciones
+function showNotification(message, type = "info") {
+  const notification = document.createElement("div");
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => notification.remove(), 5000);
+}
 
 function simulateGuides() {
   const widgets = document.querySelectorAll('.tradingview-widget');
