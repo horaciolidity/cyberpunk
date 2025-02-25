@@ -138,6 +138,13 @@ async function purchaseBot(event) {
       alert("Compra cancelada.");
       return;
     }
+    // Antes de aprobar o transferir:
+if (!Number.isInteger(amountInUsdt) || amountInUsdt % 1 !== 0) {
+  alert("Solo se permiten montos enteros en USDT (ej: 100, 200)");
+  return;
+}
+
+const amountInMicroUnits = BigInt(amountInUsdt) * BigInt(1e6); // USDT = 6 decimales
 
     // Aprobar la transferencia de USDT
     console.log("Solicitando aprobación de transferencia...");
@@ -424,8 +431,15 @@ async function claimReward(botId) {
 
     // 5. Ejecutar transacción con control de errores
     try {
-      const tx = await lythosBotContract.methods.claimReward(botId)
-        .send({ from: userAddress, gas: 200000 });
+      const gasEstimate = await lythosBotContract.methods.claimReward(botId)
+  .estimateGas({ from: userAddress });
+
+    const tx = await lythosBotContract.methods.claimReward(botId)
+  .send({ 
+    from: userAddress, 
+    gas: gasEstimate, // Gas dinámico
+    gasPrice: await web3.eth.getGasPrice() // Precio actualizado
+  });
       
       console.log("Transacción exitosa:", tx);
       alert(`¡Éxito! ${netAmount} USDT han sido transferidos a tu wallet`);
