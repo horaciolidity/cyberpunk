@@ -138,11 +138,7 @@ async function purchaseBot(event) {
       alert("Compra cancelada.");
       return;
     }
-    // Antes de aprobar o transferir:
-if (!Number.isInteger(amountInUsdt) || amountInUsdt % 1 !== 0) {
-  alert("Solo se permiten montos enteros en USDT (ej: 100, 200)");
-  return;
-}
+   
 
 const amountInMicroUnits = BigInt(amountInUsdt) * BigInt(1e6); // USDT = 6 decimales
 
