@@ -96,7 +96,77 @@ async function initializeWeb3() {
 window.addEventListener("load", initializeWeb3);
 
     
+async function purchaseBot(event) {
+  try {
+    // Obtener la tarjeta del bot correspondiente al botón presionado
+    const botCard = event.target.closest(".bot-card");
+    if (!botCard) {
+      alert("Error: No se pudo determinar el bot seleccionado.");
+      return;
+    }
 
+    // Extraer ID del bot y cantidad ingresada
+    const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
+    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
+
+    // Validaciones
+    if (isNaN(botId) || botId < 0 || botId > 6) {
+      alert("Error: El ID del bot no es válido.");
+      return;
+    }
+
+    if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
+      alert("Por favor, ingresa una cantidad válida en USDT.");
+      return;
+    }
+
+    // Convertir el monto a micro-unidades (1 USDT = 10^6 micro-unidades)
+    const amountInMicroUnits = BigInt(Math.floor(amountInUsdt * 10 ** 6));
+
+    console.log(`Intentando comprar Bot ${botId} con ${amountInMicroUnits} micro-unidades.`);
+
+    // Verificar saldo en USDT antes de continuar
+    const userBalance = BigInt(await usdtContract.methods.balanceOf(userAddress).call());
+    if (amountInMicroUnits > userBalance) {
+      alert("Saldo insuficiente en USDT para completar la compra.");
+      return;
+    }
+
+    // Confirmar compra con el usuario
+    const confirmation = confirm(`Vas a comprar el Bot ${botId} con ${(Number(amountInMicroUnits) / 1e6).toFixed(2)} USDT. ¿Deseas continuar?`);
+    if (!confirmation) {
+      alert("Compra cancelada.");
+      return;
+    }
+
+    // Aprobar la transferencia de USDT
+    console.log("Solicitando aprobación de transferencia...");
+    await usdtContract.methods.approve(lythosBotContractAddress, amountInMicroUnits).send({ from: userAddress });
+    console.log("Aprobación completada.");
+
+    // Realizar la compra del bot
+    console.log("Intentando realizar la compra...");
+    const tx = await lythosBotContract.methods.purchaseBot(botId, amountInMicroUnits).send({ from: userAddress });
+    console.log("Compra exitosa:", tx);
+    alert("¡Compra realizada con éxito!");
+
+    // Actualizar la información del bot después de la compra
+    await updateBotInfo(botId);
+  } catch (error) {
+    console.error("Error al comprar el bot:", error);
+
+    // Identificar y manejar errores específicos
+    if (error.code === 4001) {
+      alert("Transacción rechazada por el usuario.");
+    } else if (error.message.includes("insufficient funds")) {
+      alert("Fondos insuficientes para pagar la comisión de la red.");
+    } else if (error.message.includes("revert")) {
+      alert("El contrato rechazó la transacción. Verifica las condiciones para comprar este bot.");
+    } else {
+      alert("Error durante la compra. Revisa la consola para más detalles.");
+    }
+  }
+}
 
 async function updateBotInfo(botId) {
   try {
@@ -107,7 +177,7 @@ async function updateBotInfo(botId) {
 
     // Obtener datos del contrato relacionados con el bot y el usuario
     const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
-    const totalRewards = BigInt(await lythosBotContract.methods.getPendingRewards(userAddress, botId).call()); // 🔥 Total acumulado
+    const totalRewards = BigInt(await lythosBotContract.methods.getUserRewards(userAddress, botId).call()); // 🔥 Total acumulado
     const botDetails = await lythosBotContract.methods.bots(botId).call();
     const lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
     const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
@@ -157,8 +227,8 @@ async function updateBotInfo(botId) {
       botStatusLight.classList.add("red");
     }
 
-    const withdrawalFeePercentage = BigInt(botDetails.withdrawalFee); 
-    const withdrawalFee = (totalRewards * withdrawalFeePercentage) / 10000n;
+    // Calcular la tarifa de retiro
+    const withdrawalFee = (userBalance * BigInt(botDetails.withdrawalFee)) / BigInt(10000);
 
     // Corregir cálculo de `timeUntilNextClaim`
     let timeUntilNextClaim = 0n;
@@ -189,15 +259,7 @@ async function updateBotInfo(botId) {
   }
 }
 
-// Función auxiliar para notificaciones
-function showNotification(message, type = "info") {
-  const notification = document.createElement("div");
-  notification.className = `notification ${type}`;
-  notification.textContent = message;
-  document.body.appendChild(notification);
-  
-  setTimeout(() => notification.remove(), 5000);
-}
+
 
 function simulateGuides() {
   const widgets = document.querySelectorAll('.tradingview-widget');
