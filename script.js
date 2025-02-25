@@ -246,7 +246,7 @@ async function updateBotInfo(botId) {
     updateText(`#userBalance${botId}`, (Number(userBalance) / 1e6).toFixed(2));
     updateText(`#pendingRewards${botId}`, (Number(totalRewards) / 1e6).toFixed(2)); // ✅ Ahora muestra el total acumulado
     updateText(`#withdrawalFee${botId}`, `${(Number(withdrawalFee) / 1e6).toFixed(2)} `);
-    updateText(`#timeUntilClaim${botId}`, timeUntilNextClaim > 0n ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible");
+    updateText(`#timeUntilClaim${botId}`, timeUntilNextClaim > 0n ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas`);
     updateText(`#claimNotice${botId}`, totalRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible");
     updateText(`#userTotalBalance${botId}`, ((Number(userBalance) + Number(totalRewards)) / 1e6).toFixed(2));
     updateText(`#interestRate${botId}`, `${interestRate.toFixed(2)}%`); // ✅ Muestra el % de pago
