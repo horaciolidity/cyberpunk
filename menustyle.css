@@ -131,20 +131,44 @@
       background: #b20812;
     }
 
-    .theme-button {
-      margin-top: 10px; /* Reducido */
-      padding: 5px 10px; /* Reducido */
-      background: #22edfc;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      font-size: 0.9em; /* Reducido */
-      border-radius: 5px;
-    }
+    :root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --button-bg: #f0f0f0;
+    --button-text: #000000;
+    --button-border: #ccc;
+}
 
-    .theme-button:hover {
-      background: #1cc0d3;
-    }
+.dark-theme {
+    --bg-color: #181818;
+    --text-color: #ffffff;
+    --button-bg: #333;
+    --button-text: #ffffff;
+    --button-border: #555;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.theme-button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: 1px solid var(--button-border);
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.theme-button:hover {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+}
+
 
      .guide {
   position: absolute;
