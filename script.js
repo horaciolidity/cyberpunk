@@ -138,9 +138,6 @@ async function purchaseBot(event) {
       alert("Compra cancelada.");
       return;
     }
-   
-
-const amountInMicroUnits = BigInt(amountInUsdt) * BigInt(1e6); // USDT = 6 decimales
 
     // Aprobar la transferencia de USDT
     console.log("Solicitando aprobación de transferencia...");
@@ -427,9 +424,8 @@ async function claimReward(botId) {
 
     // 5. Ejecutar transacción con control de errores
     try {
-      // Reemplazar:
-const tx = await lythosBotContract.methods.claimReward(botId)
-  .send({ from: userAddress, gas: 200000 });
+      const tx = await lythosBotContract.methods.claimReward(botId)
+        .send({ from: userAddress, gas: 200000 });
       
       console.log("Transacción exitosa:", tx);
       alert(`¡Éxito! ${netAmount} USDT han sido transferidos a tu wallet`);
