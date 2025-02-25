@@ -263,7 +263,7 @@ async function updateBotInfo(botId) {
     console.log(`✅ Bot ${botId}: Información actualizada correctamente.`);
   } catch (error) {
     console.error(`❌ Error al actualizar el bot ${botId}:`, error);
-    alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
+    
   }
 }
 
@@ -513,7 +513,6 @@ document.querySelectorAll(".button.primary").forEach(button => {
             console.log("Detalles de la transacción:", tx);
         } catch (error) {
             console.error("Error al comprar el bot:", error);
-            alert("Error durante la compra. Por favor, verifica tu saldo y vuelve a intentar.");
         }
     });
 });
