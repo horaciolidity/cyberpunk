@@ -7,6 +7,39 @@
   --grid-color: rgba(0, 247, 255, 0.1);
 }
 
+  #splash-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white; /* Fondo para mejor contraste */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeOut 4s forwards;
+        }
+
+        #splash-logo {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            75% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
 .image-replacement {
   text-indent: 100%;
   white-space: nowrap;
