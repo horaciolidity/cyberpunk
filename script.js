@@ -96,100 +96,97 @@ async function initializeWeb3() {
 window.addEventListener("load", initializeWeb3);
 
     
-async function purchaseBot(event) {
+async function updateBotInfo(botId) {
   try {
-    const botCard = event.target.closest(".bot-card");
-    if (!botCard) {
-      alert("Error: No se pudo identificar el bot seleccionado");
+    if (!web3Ready) {
+      console.warn("⏳ Web3 no está listo. Esperando...");
       return;
     }
 
-    // Obtener datos del formulario
-    const botId = parseInt(botCard.dataset.botId);
-    const amountInput = botCard.querySelector(".usdtAmount");
-    const amountInUsdt = parseFloat(amountInput.value);
+    // Obtener datos del contrato relacionados con el bot y el usuario
+    const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
+    const totalRewards = BigInt(await lythosBotContract.methods.getPendingRewards(userAddress, botId).call()); // 🔥 Total acumulado
+    const botDetails = await lythosBotContract.methods.bots(botId).call();
+    const lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
+    const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
+    const currentTime = BigInt(Math.floor(Date.now() / 1000));
+    const interestRate = (Number(botDetails.interestRate) / 100).toFixed(2); // ✅ 300 → 3.00%
 
-    // Validaciones básicas
-    if (isNaN(botId) return alert("ID de bot inválido");
-    if (isNaN(amountInUsdt) return alert("Ingrese un monto válido");
-
-    // Obtener precio mínimo del bot desde el contrato
-    const botInfo = await lythosBotContract.methods.bots(botId).call();
-    const minPrice = BigInt(botInfo.price);
-    const amountInMicro = BigInt(amountInUsdt * 10 ** 6);
-
-    // Validar monto vs precio mínimo
-    if (amountInMicro < minPrice) {
-      return alert(`Monto mínimo: ${Number(minPrice) / 1e6} USDT`);
-    }
-
-    // Obtener saldo actualizado
-    const usdtBalance = BigInt(await usdtContract.methods.balanceOf(userAddress).call());
-    if (usdtBalance < amountInMicro) {
-      return alert(`Saldo insuficiente\nDisponible: ${Number(usdtBalance) / 1e6} USDT`);
-    }
-
-    // Confirmación final del usuario
-    const confirmacion = confirm(
-      `Confirmar compra de Bot ${botId}\n` +
-      `Monto: ${amountInUsdt.toFixed(2)} USDT\n` +
-      `Tarifa de red estimada: ~0.5-3 USD`
-    );
-    if (!confirmacion) return;
-
-    // Aprobar solo si es necesario
-    const maxApproval = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
-    const currentAllowance = BigInt(await usdtContract.methods
-      .allowance(userAddress, lythosBotContractAddress)
-      .call());
-
-    if (currentAllowance < amountInMicro) {
-      await usdtContract.methods
-        .approve(lythosBotContractAddress, maxApproval)
-        .send({ from: userAddress });
-    }
-
-    // Ejecutar compra con gas dinámico
-    const gasLimit = await lythosBotContract.methods
-      .purchaseBot(botId, amountInMicro)
-      .estimateGas({ from: userAddress });
-
-    await lythosBotContract.methods
-      .purchaseBot(botId, amountInMicro)
-      .send({
-        from: userAddress,
-        gas: Math.floor(gasLimit * 1.3) // Margen de seguridad
-      });
-
-    // Actualizaciones post-compra
-    await Promise.all([
-      updateUSDTBalance(),
-      updateAllBots(),
-      showReferralInfo()
-    ]);
-
-    // Resetear campo de entrada
-    amountInput.value = "";
-    alert("✅ Compra realizada exitosamente");
-
-  } catch (error) {
-    console.error("Error en proceso de compra:", error);
     
-    // Manejo específico de errores
-    const errorMessages = {
-      4001: "Transacción cancelada por el usuario",
-      "insufficient funds": "Fondos insuficientes para gas",
-      "Network Error": "Problema de conexión con la red",
-      "revert": "Error en contrato: " + (error.reason || "Condiciones no cumplidas")
+
+    console.log(`🔄 Bot ${botId} - Saldo obtenido:`, userBalance);
+
+    // Seleccionar la tarjeta del bot específica en el DOM
+    const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
+    if (!botInfo) {
+      console.error(`❌ No se encontró la tarjeta del bot con ID ${botId}`);
+      return;
+    }
+    const interestElement = document.querySelector(`#interestRate${botId}`);
+    if (interestElement) {
+      interestElement.textContent = `${interestRate}%`; 
+    } else {
+      console.error(`Elemento #interestRate${botId} no encontrado`);
+    }
+
+    const botStatus = document.getElementById(`botStatus${botId}`);
+    const botStatusLight = document.getElementById(`botStatusLight${botId}`);
+
+    if (!botStatus || !botStatusLight) {
+      console.warn(`⚠️ Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
+      return;
+    }
+
+    if (userBalance > 0n) {
+      console.log(`✅ Bot ${botId} activado con saldo: ${userBalance}`);
+      botStatus.textContent = "Bot activo";
+      botStatus.classList.remove("bot-inactive");
+      botStatus.classList.add("bot-active");
+
+      botStatusLight.classList.remove("red");
+      botStatusLight.classList.add("green");
+    } else {
+      console.log(`❌ Bot ${botId} sigue inactivo. Saldo: ${userBalance}`);
+      botStatus.textContent = "Bot inactivo";
+      botStatus.classList.remove("bot-active");
+      botStatus.classList.add("bot-inactive");
+
+      botStatusLight.classList.remove("green");
+      botStatusLight.classList.add("red");
+    }
+
+    const withdrawalFeePercentage = BigInt(botDetails.withdrawalFee); 
+    const withdrawalFee = (totalRewards * withdrawalFeePercentage) / 10000n;
+
+    // Corregir cálculo de `timeUntilNextClaim`
+    let timeUntilNextClaim = 0n;
+    if (lastRewardClaim > 0n) {
+      timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
+      if (timeUntilNextClaim < 0n) timeUntilNextClaim = 0n; // Asegurar valores correctos
+    }
+
+    // Actualizar los datos en la interfaz de usuario
+    const updateText = (selector, value) => {
+      const element = botInfo.querySelector(selector);
+      if (element) element.textContent = value;
     };
 
-    const match = Object.entries(errorMessages).find(([key]) => 
-      error.message.includes(key)
-    );
+    updateText(`#userBalance${botId}`, (Number(userBalance) / 1e6).toFixed(2));
+    updateText(`#pendingRewards${botId}`, (Number(totalRewards) / 1e6).toFixed(2)); // ✅ Ahora muestra el total acumulado
+    updateText(`#withdrawalFee${botId}`, `${(Number(withdrawalFee) / 1e6).toFixed(2)} `);
+    updateText(`#timeUntilClaim${botId}`, timeUntilNextClaim > 0n ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible");
+    updateText(`#claimNotice${botId}`, totalRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible");
+    updateText(`#userTotalBalance${botId}`, ((Number(userBalance) + Number(totalRewards)) / 1e6).toFixed(2));
+    updateText(`#interestRate${botId}`, `${interestRate.toFixed(2)}%`); // ✅ Muestra el % de pago
 
-    alert(match ? match[1] : `Error desconocido: ${error.message}`);
+
+    console.log(`✅ Bot ${botId}: Información actualizada correctamente.`);
+  } catch (error) {
+    console.error(`❌ Error al actualizar el bot ${botId}:`, error);
+    alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
   }
 }
+
 async function updateBotInfo(botId) {
   try {
     if (!web3Ready) {
