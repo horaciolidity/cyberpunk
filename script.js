@@ -105,93 +105,87 @@ async function updateBotInfo(botId) {
       return;
     }
 
-    // 1. Obtener todos los datos del contrato en paralelo
-    const [
-      userBalance,
-      totalRewards,
-      botDetails,
-      lastRewardClaim,
-      rewardInterval
-    ] = await Promise.all([
-      lythosBotContract.methods.userBotBalance(userAddress, botId).call(),
-      lythosBotContract.methods.getPendingRewards(userAddress, botId).call(),
-      lythosBotContract.methods.bots(botId).call(),
-      lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call(),
-      lythosBotContract.methods.rewardInterval().call()
-    ]);
-
-    // 2. Convertir valores a BigInt
-    const balance = BigInt(userBalance);
-    const rewards = BigInt(totalRewards);
-    const lastClaim = BigInt(lastRewardClaim);
-    const interval = BigInt(rewardInterval);
+    // Obtener datos del contrato relacionados con el bot y el usuario
+    const userBalance = BigInt(await lythosBotContract.methods.userBotBalance(userAddress, botId).call());
+    const totalRewards = BigInt(await lythosBotContract.methods.getPendingRewards(userAddress, botId).call()); // 🔥 Total acumulado
+    const botDetails = await lythosBotContract.methods.bots(botId).call();
+    const lastRewardClaim = BigInt(await lythosBotContract.methods.getLastRewardClaim(userAddress, botId).call());
+    const rewardInterval = BigInt(await lythosBotContract.methods.rewardInterval().call());
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
+    const interestRate = (Number(botDetails.interestRate) / 100).toFixed(2); // ✅ 300 → 3.00%
 
-    // 3. Calcular valores derivados
-    const interestRate = (Number(botDetails.interestRate) / 100).toFixed(2);
-    const withdrawalFee = (rewards * BigInt(botDetails.withdrawalFee)) / 10000n;
     
-    // 4. Calcular tiempo restante para el próximo claim
-    let timeUntilNextClaim = 0n;
-    if (lastClaim > 0n) {
-      const nextClaimTime = lastClaim + interval;
-      timeUntilNextClaim = nextClaimTime > currentTime 
-        ? nextClaimTime - currentTime 
-        : 0n;
-    }
 
-    // 5. Seleccionar elementos del DOM
+    console.log(`🔄 Bot ${botId} - Saldo obtenido:`, userBalance);
+
+    // Seleccionar la tarjeta del bot específica en el DOM
     const botInfo = document.querySelector(`.bot-info[data-bot-id="${botId}"]`);
     if (!botInfo) {
-      console.error(`❌ Bot ${botId} no encontrado en la interfaz`);
+      console.error(`❌ No se encontró la tarjeta del bot con ID ${botId}`);
+      return;
+    }
+    const interestElement = document.querySelector(`#interestRate${botId}`);
+    if (interestElement) {
+      interestElement.textContent = `${interestRate}%`; 
+    } else {
+      console.error(`Elemento #interestRate${botId} no encontrado`);
+    }
+
+    const botStatus = document.getElementById(`botStatus${botId}`);
+    const botStatusLight = document.getElementById(`botStatusLight${botId}`);
+
+    if (!botStatus || !botStatusLight) {
+      console.warn(`⚠️ Elementos botStatus${botId} o botStatusLight${botId} no encontrados.`);
       return;
     }
 
-    // 6. Actualizar estado visual del bot
-    const updateBotStatus = () => {
-      const isActive = balance > 0n;
-      const statusElement = document.getElementById(`botStatus${botId}`);
-      const statusLight = document.getElementById(`botStatusLight${botId}`);
+    if (userBalance > 0n) {
+      console.log(`✅ Bot ${botId} activado con saldo: ${userBalance}`);
+      botStatus.textContent = "Bot activo";
+      botStatus.classList.remove("bot-inactive");
+      botStatus.classList.add("bot-active");
 
-      if (statusElement && statusLight) {
-        statusElement.textContent = isActive ? "Bot activo" : "Bot inactivo";
-        statusElement.className = isActive ? "bot-active" : "bot-inactive";
-        statusLight.className = `status-light ${isActive ? "green" : "red"}`;
-      }
-    };
+      botStatusLight.classList.remove("red");
+      botStatusLight.classList.add("green");
+    } else {
+      console.log(`❌ Bot ${botId} sigue inactivo. Saldo: ${userBalance}`);
+      botStatus.textContent = "Bot inactivo";
+      botStatus.classList.remove("bot-active");
+      botStatus.classList.add("bot-inactive");
 
-    // 7. Función helper para actualizar campos
-    const updateField = (selector, value, suffix = "") => {
+      botStatusLight.classList.remove("green");
+      botStatusLight.classList.add("red");
+    }
+
+    const withdrawalFeePercentage = BigInt(botDetails.withdrawalFee); 
+    const withdrawalFee = (totalRewards * withdrawalFeePercentage) / 10000n;
+
+    // Corregir cálculo de `timeUntilNextClaim`
+    let timeUntilNextClaim = 0n;
+    if (lastRewardClaim > 0n) {
+      timeUntilNextClaim = lastRewardClaim + rewardInterval - currentTime;
+      if (timeUntilNextClaim < 0n) timeUntilNextClaim = 0n; // Asegurar valores correctos
+    }
+
+    // Actualizar los datos en la interfaz de usuario
+    const updateText = (selector, value) => {
       const element = botInfo.querySelector(selector);
-      if (element) {
-        element.textContent = `${value}${suffix}`;
-      }
+      if (element) element.textContent = value;
     };
 
-    // 8. Ejecutar actualizaciones
-    updateBotStatus();
-    
-    updateField("#userBalance${botId}", (Number(balance) / 1e6).toFixed(2), " USDT");
-    updateField("#pendingRewards${botId}", (Number(rewards) / 1e6).toFixed(2), " USDT");
-    updateField("#withdrawalFee${botId}", (Number(withdrawalFee) / 1e6).toFixed(2), " USDT");
-    updateField("#timeUntilClaim${botId}", 
-      timeUntilNextClaim > 0n 
-        ? `${(Number(timeUntilNextClaim) / 3600).toFixed(1)} horas`
-        : "Disponible"
-    );
-    updateField("#claimNotice${botId}", 
-      rewards > 0n && timeUntilNextClaim === 0n ? "¡Recompensa disponible!" : " "
-    );
-    updateField("#userTotalBalance${botId}", 
-      ((Number(balance) + Number(rewards)) / 1e6).toFixed(2), " USDT"
-    );
-    updateField("#interestRate${botId}", interestRate, "%");
+    updateText(`#userBalance${botId}`, (Number(userBalance) / 1e6).toFixed(2));
+    updateText(`#pendingRewards${botId}`, (Number(totalRewards) / 1e6).toFixed(2)); // ✅ Ahora muestra el total acumulado
+    updateText(`#withdrawalFee${botId}`, `${(Number(withdrawalFee) / 1e6).toFixed(2)} `);
+    updateText(`#timeUntilClaim${botId}`, timeUntilNextClaim > 0n ? `${Math.ceil(Number(timeUntilNextClaim) / 3600)} horas` : "Disponible");
+    updateText(`#claimNotice${botId}`, totalRewards > 0n && timeUntilNextClaim <= 0n ? "¡Recompensa disponible!" : "No disponible");
+    updateText(`#userTotalBalance${botId}`, ((Number(userBalance) + Number(totalRewards)) / 1e6).toFixed(2));
+    updateText(`#interestRate${botId}`, `${interestRate.toFixed(2)}%`); // ✅ Muestra el % de pago
 
-    console.log(`✅ Bot ${botId} actualizado correctamente`);
 
+    console.log(`✅ Bot ${botId}: Información actualizada correctamente.`);
   } catch (error) {
-    console.error(`❌ Error actualizando Bot ${botId}:`, error);
-    showNotification(`Error actualizando Bot ${botId}: ${error.message}`, "error");
+    console.error(`❌ Error al actualizar el bot ${botId}:`, error);
+    alert(`Hubo un problema al actualizar la información del Bot ${botId}. Revisa la consola para más detalles.`);
   }
 }
 
