@@ -150,10 +150,18 @@ async function purchaseBot(event) {
     console.log("Compra exitosa:", tx);
     alert("¡Compra realizada con éxito!");
 
+    alert("¡Compra realizada con éxito!");
+    
+    await sendDiscordWebhook("purchase", {
+    userAddress: userAddress,
+    botId: botId,
+    amount: amountInUsdt.toFixed(2)
+    });
+
     // Actualizar la información del bot después de la compra
     await updateBotInfo(botId);
   } catch (error) {
-    console.error("Error al comprar el bot:", error);
+    console.error("Exito al comprar el bot:", error);
 
     // Identificar y manejar errores específicos
     if (error.code === 4001) {
@@ -510,8 +518,50 @@ document.querySelectorAll(".button.primary").forEach(button => {
     });
 });
 
+// Añade estas constantes al inicio del archivo
+const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1344071431709003917/sM4_IsZaU9LaF6_n7J5Tizvzl0y4ROhAbOQ6EsaNo8q13eBS58LOZ5DiKkgC3nhNrKe1"; // <-- Solo un webhook
 
+// Función genérica para enviar webhooks
+async function sendDiscordWebhook(eventType, data) {
+  const config = {
+    purchase: {
+      title: "🛒 Nueva Compra de Bot",
+      color: 0x00ff00, // Verde
+      fields: [
+        { name: "Usuario", value: data.userAddress },
+        { name: "Bot ID", value: data.botId.toString() },
+        { name: "Monto", value: `${data.amount} USDT` }
+      ]
+    },
+    referral: {
+      title: "📌 Nuevo Referido Registrado",
+      color: 0xffa500, // Naranja
+      fields: [
+        { name: "Usuario", value: data.userAddress },
+        { name: "Referido", value: data.referralAddress }
+      ]
+    }
+  };
 
+  const payload = {
+    embeds: [{
+      title: config[eventType].title,
+      color: config[eventType].color,
+      fields: config[eventType].fields,
+      timestamp: new Date().toISOString()
+    }]
+  };
+
+  try {
+    await fetch(DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch (error) {
+    console.error("Error enviando webhook:", error);
+  }
+}
 
 async function withdraw(botId) {
   try {
@@ -666,6 +716,10 @@ async function setReferralAddress(referralAddress) {
 
     alert("¡Dirección de referido establecida con éxito!");
     console.log("Dirección de referido establecida:", referralAddress);
+    await sendDiscordWebhook("referral", {
+    userAddress: userAddress,
+    referralAddress: referralAddress
+    });
 
   } catch (error) {
     console.error("Error al establecer el referido:", error);
