@@ -46,6 +46,9 @@
       </div>
     </div>
   </div>
+  <div id="splash-container">
+        <img src="logo.png" alt="Logo" id="splash-logo">
+    </div>
 </body>
 
 </html>
@@ -64,6 +67,7 @@
       rpcUrls: ['https://mainnet.optimism.io'], // RPC público de Optimism
       blockExplorerUrls: ['https://explorer.optimism.io']
     };
+   
 
     // Función para cambiar a Optimism o agregar la red
     async function switchToOptimism() {
@@ -91,6 +95,10 @@
         }
       }
     }
+     document.getElementById('splash-container').addEventListener('animationend', () => {
+            document.getElementById('splash-container').remove();
+            document.body.style.overflow = 'auto'; // Restaura el scroll
+        });
 
     // Conectar MetaMask y redirigir al dashboard
     async function connectToWeb3() {
