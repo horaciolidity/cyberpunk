@@ -710,6 +710,14 @@ async function generateReferralLink() {
         console.error("Error al generar el enlace de referido:", error);
     }
 }
+function changeTheme(theme) {
+    if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+    } else {
+        document.body.classList.remove('dark-theme');
+    }
+}
+
 
 
 
