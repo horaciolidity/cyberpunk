@@ -427,15 +427,9 @@ async function claimReward(botId) {
 
     // 5. Ejecutar transacción con control de errores
     try {
-      const gasEstimate = await lythosBotContract.methods.claimReward(botId)
-  .estimateGas({ from: userAddress });
-
-    const tx = await lythosBotContract.methods.claimReward(botId)
-  .send({ 
-    from: userAddress, 
-    gas: gasEstimate, // Gas dinámico
-    gasPrice: await web3.eth.getGasPrice() // Precio actualizado
-  });
+      // Reemplazar:
+const tx = await lythosBotContract.methods.claimReward(botId)
+  .send({ from: userAddress, gas: 200000 });
       
       console.log("Transacción exitosa:", tx);
       alert(`¡Éxito! ${netAmount} USDT han sido transferidos a tu wallet`);
