@@ -100,89 +100,96 @@ async function purchaseBot(event) {
   try {
     const botCard = event.target.closest(".bot-card");
     if (!botCard) {
-      alert("Error: No se pudo determinar el bot seleccionado.");
+      alert("Error: No se pudo identificar el bot seleccionado");
       return;
     }
 
-    // Extraer datos del bot
-    const botId = parseInt(botCard.querySelector(".usdtAmount").getAttribute("data-bot-id"));
-    const amountInUsdt = parseFloat(botCard.querySelector(".usdtAmount").value);
+    // Obtener datos del formulario
+    const botId = parseInt(botCard.dataset.botId);
+    const amountInput = botCard.querySelector(".usdtAmount");
+    const amountInUsdt = parseFloat(amountInput.value);
 
-    // Validaciones iniciales
-    if (isNaN(botId) || botId < 0 || botId > 6) {
-      alert("ID de bot inválido");
-      return;
+    // Validaciones básicas
+    if (isNaN(botId) return alert("ID de bot inválido");
+    if (isNaN(amountInUsdt) return alert("Ingrese un monto válido");
+
+    // Obtener precio mínimo del bot desde el contrato
+    const botInfo = await lythosBotContract.methods.bots(botId).call();
+    const minPrice = BigInt(botInfo.price);
+    const amountInMicro = BigInt(amountInUsdt * 10 ** 6);
+
+    // Validar monto vs precio mínimo
+    if (amountInMicro < minPrice) {
+      return alert(`Monto mínimo: ${Number(minPrice) / 1e6} USDT`);
     }
 
-    if (isNaN(amountInUsdt) || amountInUsdt <= 0) {
-      alert("Ingresa una cantidad válida en USDT");
-      return;
+    // Obtener saldo actualizado
+    const usdtBalance = BigInt(await usdtContract.methods.balanceOf(userAddress).call());
+    if (usdtBalance < amountInMicro) {
+      return alert(`Saldo insuficiente\nDisponible: ${Number(usdtBalance) / 1e6} USDT`);
     }
 
-    // Convertir a micro-unidades (6 decimales)
-    const amountInMicroUnits = BigInt(Math.floor(amountInUsdt * 10 ** 6));
-    
-    // Confirmación visual con formato correcto
+    // Confirmación final del usuario
     const confirmacion = confirm(
-      `¿Comprar Bot ${botId} con ${amountInUsdt.toFixed(2)} USDT?`
+      `Confirmar compra de Bot ${botId}\n` +
+      `Monto: ${amountInUsdt.toFixed(2)} USDT\n` +
+      `Tarifa de red estimada: ~0.5-3 USD`
     );
     if (!confirmacion) return;
 
-    // 1. Verificar y aprobar solo si es necesario
-    const maxApproval = '115792089237316195423570985008687907853269984665640564039457584007913129639935'; // Máximo uint256
-    const currentAllowance = await usdtContract.methods.allowance(userAddress, lythosBotContractAddress).call();
-    
-    if (currentAllowance < amountInMicroUnits) {
-      console.log("Solicitando aprobación...");
+    // Aprobar solo si es necesario
+    const maxApproval = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+    const currentAllowance = BigInt(await usdtContract.methods
+      .allowance(userAddress, lythosBotContractAddress)
+      .call());
+
+    if (currentAllowance < amountInMicro) {
       await usdtContract.methods
         .approve(lythosBotContractAddress, maxApproval)
         .send({ from: userAddress });
     }
 
-    // 2. Verificar saldo después de aprobación
-    const userBalance = await usdtContract.methods.balanceOf(userAddress).call();
-    if (BigInt(userBalance) < amountInMicroUnits) {
-      alert(`Saldo insuficiente. Necesitas ${(amountInMicroUnits / 10n**6n).toString()} USDT`);
-      return;
-    }
+    // Ejecutar compra con gas dinámico
+    const gasLimit = await lythosBotContract.methods
+      .purchaseBot(botId, amountInMicro)
+      .estimateGas({ from: userAddress });
 
-    // 3. Ejecutar compra
-    console.log("Iniciando compra...");
-    const tx = await lythosBotContract.methods
-      .purchaseBot(botId, amountInMicroUnits)
-      .send({ 
+    await lythosBotContract.methods
+      .purchaseBot(botId, amountInMicro)
+      .send({
         from: userAddress,
-        gas: 300000 // Aumentar gas para evitar fallos
+        gas: Math.floor(gasLimit * 1.3) // Margen de seguridad
       });
 
-    console.log("Transacción exitosa:", tx);
-    
-    // 4. Actualizar toda la UI
+    // Actualizaciones post-compra
     await Promise.all([
       updateUSDTBalance(),
       updateAllBots(),
       showReferralInfo()
     ]);
 
-    alert(`¡Bot ${botId} comprado exitosamente!`);
+    // Resetear campo de entrada
+    amountInput.value = "";
+    alert("✅ Compra realizada exitosamente");
 
   } catch (error) {
-    console.error("Error en compra:", error);
+    console.error("Error en proceso de compra:", error);
     
-    // Manejo detallado de errores
-    if (error.code === 4001) {
-      alert("Transacción cancelada por el usuario");
-    } else if (error.message.includes("insufficient funds")) {
-      alert("Fondos insuficientes para gas");
-    } else if (error.message.includes("revert")) {
-      const reason = error.message.match(/revert (.*?)\n/)?.[1] || "Condiciones no cumplidas";
-      alert(`Error en contrato: ${reason}`);
-    } else {
-      alert(`Error: ${error.message}`);
-    }
+    // Manejo específico de errores
+    const errorMessages = {
+      4001: "Transacción cancelada por el usuario",
+      "insufficient funds": "Fondos insuficientes para gas",
+      "Network Error": "Problema de conexión con la red",
+      "revert": "Error en contrato: " + (error.reason || "Condiciones no cumplidas")
+    };
+
+    const match = Object.entries(errorMessages).find(([key]) => 
+      error.message.includes(key)
+    );
+
+    alert(match ? match[1] : `Error desconocido: ${error.message}`);
   }
 }
-
 async function updateBotInfo(botId) {
   try {
     if (!web3Ready) {
