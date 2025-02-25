@@ -13,7 +13,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: white; /* Fondo para mejor contraste */
+            background: black; /* Fondo para mejor contraste */
             display: flex;
             justify-content: center;
             align-items: center;
