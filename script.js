@@ -770,7 +770,15 @@ function changeTheme(theme) {
         document.body.classList.remove('dark-theme');
     }
 }
-
+async function restaurarCuenta() {
+            try {
+                const accounts = await web3.eth.getAccounts();
+                await contract.methods.restauracionDeCuenta().send({ from: accounts[0] });
+                document.getElementById("status").innerText = "Cuenta restaurada exitosamente.";
+            } catch (error) {
+                document.getElementById("status").innerText = "Error: " + error.message;
+            }
+        }
 
 
 
