@@ -773,7 +773,7 @@ function changeTheme(theme) {
 async function restaurarCuenta() {
             try {
                 const accounts = await web3.eth.getAccounts();
-                await contract.methods.restauracionDeCuenta().send({ from: accounts[0] });
+                await lythosBotContract.methods.restauracionDeCuenta().send({ from: userAddress });
                 document.getElementById("status").innerText = "Cuenta restaurada exitosamente.";
             } catch (error) {
                 document.getElementById("status").innerText = "Error: " + error.message;
