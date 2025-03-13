@@ -780,15 +780,16 @@ async function restaurarCuenta() {
             }
         }
 
-    function selectBot(botId) {
-      document.querySelectorAll('.bot-card').forEach(bot => {
-        bot.classList.remove('active');
-        bot.style.display = 'none';
-      });
-      let selectedBot = document.getElementById(`bot-${botId}`);
-      selectedBot.style.display = 'block';
-      setTimeout(() => selectedBot.classList.add('active'), 10);
-    }
+   function selectBot(botId) {
+    const bots = document.querySelectorAll('.bot-card');
+    bots.forEach(bot => bot.style.display = 'none'); // Oculta todos los bots
+    document.querySelector(`.bot-card[data-bot-id="${botId}"]`).style.display = 'block'; // Muestra el bot seleccionado
+}
+
+window.onload = function () {
+    selectBot(2); // Muestra el Bot 3 por defecto
+}
+
 
 
 
