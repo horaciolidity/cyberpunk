@@ -52,32 +52,6 @@
       style="padding: 10px 15px; border: none; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-weight: bold;">10 USDT Claim</button>
     <p id="status"></p>
 
-       <h2>Selecciona un bot</h2>
-    <div class="bot-container">
-      <button class="bot-selector" onclick="selectBot(0)">Bot 1</button>
-      <button class="bot-selector" onclick="selectBot(1)">Bot 2</button>
-      <button class="bot-selector" onclick="selectBot(2)">Bot 3</button>
-      <button class="bot-selector" onclick="selectBot(3)">Bot 4</button>
-      <button class="bot-selector" onclick="selectBot(4)">Bot 5</button>
-      <button class="bot-selector" onclick="selectBot(5)">Bot 6</button>
-      <button class="bot-selector" onclick="selectBot(6)">Bot 7</button>
-    </div>
-    <div id="botDisplay">
-      <div class="bot-card" id="bot-0">Contenido del Bot 1</div>
-      <div class="bot-card" id="bot-1">Contenido del Bot 2</div>
-      <div class="bot-card" id="bot-2">Contenido del Bot 3</div>
-      <div class="bot-card" id="bot-3">Contenido del Bot 4</div>
-      <div class="bot-card" id="bot-4">Contenido del Bot 5</div>
-      <div class="bot-card" id="bot-5">Contenido del Bot 6</div>
-      <div class="bot-card" id="bot-6">Contenido del Bot 7</div>
-    </div>
-  </div>
-  
-
-      
-  
-
-
  <div class="tabs-container">
     <div class="tabs">
         <div class="tab active" onclick="openTab(0)"> Tutorial</div>
@@ -207,10 +181,21 @@
  </div>
    
 
+       <h2>Selecciona un bot</h2>
 
+   <div class="bot-container">
+      <button class="bot-selector" onclick="selectBot(0)">Bot 1</button>
+      <button class="bot-selector" onclick="selectBot(1)">Bot 2</button>
+      <button class="bot-selector" onclick="selectBot(2)">Bot 3</button>
+      <button class="bot-selector" onclick="selectBot(3)">Bot 4</button>
+      <button class="bot-selector" onclick="selectBot(4)">Bot 5</button>
+      <button class="bot-selector" onclick="selectBot(5)">Bot 6</button>
+      <button class="bot-selector" onclick="selectBot(6)">Bot 7</button>
+    </div>
  
-
+<div id="botDisplay" class="bot-deck">
     <!-- Bot 1 -->
+<div class="bot-card" id="bot-0">Contenido del Bot 1</div>
 <div class="bot-card" data-bot-id="0">
       <h3>Bot 1 - BTC/USDT</h3>
       <div class="status">
@@ -256,8 +241,11 @@
 </div>
 
     </div>
+  </div>
 
     <!-- Bot 2 -->
+<div class="bot-card" id="bot-1">Contenido del Bot 2</div>
+
 <div class="bot-card" data-bot-id="1">
       <h3>Bot 2 - ETH/USDT</h3>
       <div class="status">
@@ -301,9 +289,11 @@
   <button class="button secondary" onclick="exportReport(1)">📤 Exportar Reporte</button>
 </div>
     </div>
-
+ </div>
 
     <!-- Bot 3 -->
+    <div class="bot-card" id="bot-2" style="display: block;">Contenido del Bot 3</div>
+
 <div class="bot-card" data-bot-id="2">
       <h3>Bot 3 - BCH/USDT</h3>
       <div class="status">
@@ -349,8 +339,11 @@
 </div>
 
     </div>
+</div>
 
           <!-- Bot 3 -->
+    <div class="bot-card" id="bot-3">Contenido del Bot 4</div>
+
 <div class="bot-card" data-bot-id="3">
       <h3>Bot 4 - WLD/USDT</h3>
       <div class="status">
@@ -393,8 +386,11 @@
 </div>
 
     </div>
+</div>
 
           <!-- Bot 3 -->
+    <div class="bot-card" id="bot-4">Contenido del Bot 5</div>
+
 <div class="bot-card" data-bot-id="4">
       <h3>Bot 5 - DOGE/USDT</h3>
       <div class="status">
@@ -437,9 +433,11 @@
   <button class="button secondary" onclick="exportReport(4)">📤 Exportar Reporte</button>
 </div>
     </div>
-
+</div> 
 
           <!-- Bot 3 -->
+    <div class="bot-card" id="bot-5">Contenido del Bot 6</div>
+
 <div class="bot-card" data-bot-id="5">
       <h3>Bot 6 - ENA/USDT</h3>
       <div class="status">
@@ -481,8 +479,10 @@
   <button class="button secondary" onclick="exportReport(1)">📤 Exportar Reporte</button>
 </div>
     </div>
-
+</div>
           <!-- Bot 3 -->
+    <div class="bot-card" id="bot-6">Contenido del Bot 7</div>
+
 <div class="bot-card" data-bot-id="6">
       <h3>Bot 7 - COW/USDT</h3>
       <div class="status">
@@ -525,7 +525,7 @@
 </div>
     </div>
 
-   
+   </div>
   </div>
  
 </select>
