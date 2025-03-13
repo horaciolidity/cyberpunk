@@ -780,6 +780,16 @@ async function restaurarCuenta() {
             }
         }
 
+    function selectBot(botId) {
+      document.querySelectorAll('.bot-card').forEach(bot => {
+        bot.classList.remove('active');
+        bot.style.display = 'none';
+      });
+      let selectedBot = document.getElementById(`bot-${botId}`);
+      selectedBot.style.display = 'block';
+      setTimeout(() => selectedBot.classList.add('active'), 10);
+    }
+
 
 
     async function viewHistory(botId) {
